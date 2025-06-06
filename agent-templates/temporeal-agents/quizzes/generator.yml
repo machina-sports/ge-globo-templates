@@ -1,0 +1,218 @@
+workflow:
+
+  name: coverage-quizzes-generator
+  title: "Coverage - Quizzes Generator"
+  description: "Workflow to generate quizzes."
+  context-variables:
+    debugger:
+      enabled: true
+    machina-ai:
+      api_key: "$TEMP_CONTEXT_VARIABLE_SDK_OPENAI_API_KEY"
+  outputs:
+    workflow-status: |
+      (
+        $.(content-script-exists) is True
+        and '$.(next-topic-to-cover)' != 'NONE_TOPIC_TO_COVER'
+      ) and 'executed' or 'skipped'
+  tasks:
+
+    # load-existing-agendas
+    - type: document
+      name: load-existing-agendas
+      connector:
+        name: "machina-ai"
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      config:
+        action: "search"
+        search-limit: 100
+        search-vector: false
+        search-sorters: ["value.agenda-control.updated", 1]
+      filters:
+        metadata.content-group: "{'$in': ['SPORTS_SOCCER_QUIZZES']}"
+      inputs:
+        name: "'content-agenda'"
+      outputs:
+        topics-covered: |
+          [
+            d.get('metadata', {}).get('content-topic')
+            for d in $.get('documents', [])
+          ]
+
+    # load-existing-scripts
+    - type: document
+      name: load-content-scripts
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["value.agenda-control.updated", 1]
+      filters:
+        metadata.content-group: "{'$in': ['SPORTS_SOCCER_QUIZZES']}"
+      inputs:
+        name: "'content-script'"
+      outputs:
+        content-custom-instruction: "$.get('documents', [{}])[0].get('value', {}).get('custom_instruction', '') if $.get('documents') else ''"
+        content-custom-level: "$.get('documents', [{}])[0].get('value', {}).get('custom_level', '') if $.get('documents') else ''"
+        content-custom-script-name: "$.get('documents', [{}])[0].get('value', {}).get('custom_script_name', '') if $.get('documents') else ''"
+        content-custom-topic-name: "$.get('documents', [{}])[0].get('value', {}).get('custom_topic_name', '') if $.get('documents') else ''"
+        content-script-agenda: "$.get('documents', [{}])[0].get('agenda-control', {}) if $.get('documents') else None"
+        content-script-counter: "$.get('documents', [{}])[0].get('agenda-control', {}).get('counter', 0) if $.get('documents') else 0"
+        content-script-doc-id: "$.get('documents', [{}])[0].get('_id', '') if $.get('documents') else ''"
+        content-script-exists: "len($.get('documents', [])) > 0 if $.get('documents') else False"
+        content-script-metadata: "$.get('documents', [{}])[0].get('metadata', {}) if $.get('documents') else None"
+        content-script-required: "$.get('documents', [{}])[0].get('value', {}).get('agenda-required', []) if $.get('documents') else []"
+        content-script-value: "$.get('documents', [{}])[0].get('value', {}) if $.get('documents') else None"
+        topics-indexes: "$.get('documents', [{}])[0].get('value', {}).get('indexes', []) if $.get('documents') else []"
+        
+    # mapping next-topic-to-cover
+    - type: mapping
+      name: coverage-mapping-agenda-script
+      condition: |
+        (
+          '$.(next-topic-to-cover)' != 'NONE_TOPIC_TO_COVER'
+          and $.(content-script-exists) is True
+        )
+      inputs:
+        content-script-metadata: "$.get('content-script-metadata')"
+        topics-covered: "$.get('topics-covered', [])"
+        topics-indexes: "$.get('topics-indexes', [])"
+      outputs:
+        content-group: "$.get('content-group', '')"
+        content-name: "$.get('content-name', '')"
+        event_code: "$.get('event_code', '')"
+        next-topic-to-cover: "$.get('next-topic-to-cover', '')"
+        new-agenda-object: |
+          {
+            'agenda-control': {
+              'counter': 0,
+              'processing': True
+            },
+            'agenda-required': $.(content-script-required),
+            'title': '$.(next-topic-to-cover)',
+            'status': 'active'
+          }
+
+    # create new agenda
+    - type: document
+      name: create-new-agenda
+      condition: |
+        (
+          '$.(next-topic-to-cover)' != 'NONE_TOPIC_TO_COVER'
+          and $.(content-script-exists) is True
+        )
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      documents:
+        content-agenda: "$.get('new-agenda-object')"
+      metadata:
+        content-group: "$.get('content-group')"
+        content-name: "$.get('content-name')"
+        content-topic: "$.get('next-topic-to-cover')"
+        event_code: "$.get('event_code')"
+
+    # get the new agenda object
+    - type: document
+      name: load-new-agenda
+      condition: |
+        (
+          '$.(next-topic-to-cover)' != 'NONE_TOPIC_TO_COVER'
+          and $.(content-script-exists) is True
+        )
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+      filters:
+        metadata.content-group: "$.get('content-group')"
+        metadata.content-name: "$.get('content-name')"
+        metadata.content-topic: "$.get('next-topic-to-cover')"
+        metadata.event_code: "$.get('event_code')"
+      inputs:
+        name: "'content-agenda'"
+      outputs:
+        content-agenda-doc-id: "$.get('documents', [{}])[0].get('_id', '') if $.get('documents') else ''"
+        content-agenda-control: "$.get('documents', [{}])[0].get('agenda-control', {}) if $.get('documents') else None"
+        content-agenda-exists: "len($.get('documents', [])) > 0 if $.get('documents') else False"
+        content-agenda-value: "$.get('documents', [{}])[0].get('value', {}) if $.get('documents') else None"
+
+    # prompt-coverage-quizzes-generator
+    - type: prompt
+      name: prompt-coverage-quizzes-generator
+      condition: |
+        (
+          '$.(next-topic-to-cover)' != 'NONE_TOPIC_TO_COVER'
+          and $.(content-script-exists) is True
+        )
+      connector:
+        name: "machina-ai"
+        command: "invoke_prompt"
+        model: "gpt-4.1"
+      inputs:
+        input-selected-topic: "$.get('next-topic-to-cover')"
+        content-custom-instruction: "$.get('content-custom-instruction')"
+        content-custom-level: "$.get('content-custom-level')"
+        content-custom-script-name: "$.get('content-custom-script-name')"
+        content-custom-topic: "$.get('content-custom-topic-name')"
+      outputs:
+        output-agenda-object: "$"
+
+    # update new agenda
+    - type: document
+      name: update-new-agenda
+      condition: |
+        (
+          '$.(next-topic-to-cover)' != 'NONE_TOPIC_TO_COVER'
+          and $.(content-script-exists) is True
+        )
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      filters:
+        document-id: "$.get('content-agenda-doc-id')"
+      documents:
+        content-agenda: |
+          {
+            **$.get('content-agenda-value', {}),
+            'agenda-control': {
+              **$.get('content-agenda-control', {}),
+              'processing': False,
+              'updated': datetime.utcnow()
+            },
+            'agenda-object': {
+              **$.get('output-agenda-object', {}),
+              'custom_instruction': $.get('content-custom-instruction'),
+              'custom_level': $.get('content-custom-level'),
+              'custom_script_name': $.get('content-custom-script-name'),
+              'custom_topic': $.get('content-custom-topic-name'),
+            }
+          }
+      metadata:
+        content-group: "$.get('content-group')"
+        content-name: "$.get('content-name')"
+        content-topic: "$.get('next-topic-to-cover')"
+        event_code: "$.get('event_code')"
+
+    # content-script-control-update 
+    - type: document
+      name: content-script-control-update
+      condition: "$.get('content-script-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      filters:
+        document_id: "$.get('content-script-doc-id')"
+      documents:
+        content-script: |
+          {
+            **$.get('content-script-value', {}),
+            'agenda-control': {
+              **$.get('content-script-agenda', {}),
+              'counter': $.get('content-script-counter', 0) + 1,
+              'updated': datetime.utcnow()
+            }
+          }

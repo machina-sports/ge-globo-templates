@@ -1,0 +1,167 @@
+workflow:
+
+  name: coverage-quizzes-service
+  title: "Coverage - Quizzes Service"
+  description: "Coverage Quizzes Service"
+  inputs:
+    event_code: "$.get('event_code') or None"
+    custom_instruction: "$.get('custom_instruction', 'Analyze the teams recent performance, including strengths, weaknesses, and key statistics')"
+    custom_script_name: "$.get('custom_script_name', 'SPORTS_SOCCER_EVENT')"
+    custom_topic_name: "$.get('custom_topic_name', 'RESEARCH_PLAYERS')"
+    custom_level: "$.get('custom_level', 'EASY')"
+  outputs:
+    workflow-status: "$.get('event-exists') is not True and 'skipped' or 'executed'"
+  tasks:
+
+    # load-event-by-code
+    - type: document
+      name: "load-event-by-code"
+      condition: "$.get('event_code') is not None"
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["start_time", 1]
+      filters:
+        metadata.event_code: "$.get('event_code')"
+      inputs:
+        name: "{'$in': ['soccer-game']}"
+      outputs:
+        event-exists: "len($.get('documents', [])) > 0 if $.get('documents') else False"
+        event-value: "$.get('documents')[0].get('value', {}) if $.get('documents') else None"
+        quizzes-control: "$.get('documents')[0].get('value', {}).get('quizzes-control', {}) if $.get('documents') else None"
+
+    # load-event-by-schedule
+    - type: document
+      name: load-event-by-schedule
+      condition: "$.get('event-exists') is not True"
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["value.version_control.updated", 1]
+      filters:
+        value.start_time: "{'$gt': datetime.utcnow() - timedelta(hours=72), '$lt': datetime.utcnow() + timedelta(hours=72)}"
+        value.quizzes-control.finished: "{'$ne': True}"
+        value.quizzes-control.processing: "{'$ne': True}"
+        value.version_control.processing: "{'$ne': True}"
+        value.version_control.finished: "{'$ne': True}"
+      inputs:
+        name: "{'$in': ['soccer-game']}"
+      outputs:
+        event-exists: "len($.get('documents', [])) > 0 if $.get('documents') else False"
+        event-value: "$.get('documents')[0].get('value', {}) if $.get('documents') else None"
+        quizzes-control: "$.get('documents')[0].get('value', {}).get('quizzes-control', {}) if $.get('documents') else None"
+
+    # mapping-soccer-event-summary
+    - type: mapping
+      name: mapping-soccer-event-summary
+      condition: "$.get('event-exists') is True"
+      inputs:
+        event_selected: "$.get('event-value', {})"
+      outputs:
+        event_code: "$.get('event_code')"
+        season: "$.get('season')"
+        season_title: "$.get('season_title')"
+        sport_event: "$.get('sport_event')"
+        sport_event_statistics: "$.get('sport_event_statistics')"
+        sport_event_status: "$.get('sport_event_status')"
+        sport_event_timeline: "$.get('sport_event_timeline')"
+        team_home_name: "$.get('team_home_name')"
+        team_away_name: "$.get('team_away_name')"
+        team_home_id: "$.get('team_home_id')"
+        team_away_id: "$.get('team_away_id')"
+        title: "$.get('title')"
+
+    # event-version-control
+    - type: document
+      name: event-version-control
+      condition: "$.get('event-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      documents:
+        soccer-game: |
+          {
+            **$.get('event-value', {}),
+            'quizzes-control': {
+              **$.get('quizzes-control', {}),
+              'processing': True
+            }
+          }
+      metadata:
+        event_code: "$.get('event_code')"
+
+    # mapping-date-prefix
+    - type: mapping
+      name: coverage-mapping-date-prefix
+      condition: "$.get('event-exists') is True"
+      outputs:
+        date_prefix: "$.get('date_prefix')"
+
+    # mapping-quizzes-service
+    - type: mapping
+      name: coverage-mapping-quizzes-service
+      condition: "$.get('event-exists') is True"
+      inputs:
+        # custom_instruction: "$.get('custom_instruction')"
+        custom_level: "$.get('custom_level')"
+        date_prefix: "$.get('date_prefix')"
+        script_name: "$.get('custom_script_name')"
+        team_home_name: "$.get('team_home_name', '').upper().replace(' ', '_')"
+        team_away_name: "$.get('team_away_name', '').upper().replace(' ', '_')"
+        topic_name: "$.get('custom_topic_name')"
+      outputs:
+        agenda-required: "$.get('agenda-required')"
+        content-group: "$.get('content-group')"
+        content-name: "$.get('content-name')"
+        coverage-indexes: "$.get('coverage-indexes')"
+
+    # quizzes-populate-scripts
+    - type: document
+      name: quizzes-populate-scripts
+      condition: "$.get('event-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      documents:
+        content-script: |
+          {
+            "agenda-required": $.get('agenda-required'),
+            "custom_instruction": $.get('custom_instruction'),
+            "custom_level": $.get('custom_level'),
+            "custom_script_name": $.get('custom_script_name'),
+            "custom_topic_name": $.get('custom_topic_name'),
+            "indexes": $.get('coverage-indexes'),
+            "name": "content-script",
+            "title": $.get('content-name'),
+            "web-search-limit": 3
+          }
+      metadata:
+        content-group: "$.get('content-group')"
+        content-name: "$.get('content-name')"
+        event_code: "$.get('event_code')"
+
+    # event-version-control
+    - type: document
+      name: event-version-control
+      description: "Update the events document version control."
+      condition: "$.get('event-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      documents:
+        soccer-game: |
+          {
+            **$.get('event-value', {}),
+            'quizzes-control': {
+              **$.get('quizzes-control', {}),
+              'finished': True,
+              'processing': False
+            }
+          }
+      metadata:
+        event_code: "$.get('event_code')"

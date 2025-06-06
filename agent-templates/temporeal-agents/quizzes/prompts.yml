@@ -1,0 +1,214 @@
+prompts:
+
+  # prompt-coverage-quizzes-executor
+  - type: prompt
+    name: prompt-coverage-quizzes-executor
+    title: "Coverage - Quizzes Executor"
+    description: "Generates basic factual quiz questions for TV based on match data."
+    schema:
+      title: "QuizContentEnglish"
+      description: |
+        TV QUIZ RULES:
+
+        OBJECTIVE: Generate questions about completed events with verifiable answers from official records.
+
+        STRICT BANS:
+        - NO predictions/opinions ("Who will win?", "What might happen?")
+        - NO ambiguous/multi-answer questions
+        - NO future events
+
+        DIFFICULTY LEVELS:
+        EASY: Recent results, simple records, current facts
+        MEDIUM: Performance stats, season comparisons, milestones, tactics
+        HARD: Historical records, multi-season stats, rare achievements
+
+        STRUCTURE:
+        - Multiple-choice with 3 options
+        - One verifiable correct answer
+        - Two plausible wrong answers
+        - Max 50 chars (Ex: "Goals scored today?")
+      type: "object"
+      required: ["questions"]
+      properties:
+        questions:
+          type: "array"
+          minItems: 1
+          maxItems: 10
+          description: "Array of ULTRA-SHORT quiz questions (max 50 chars) with brief options (max 25 chars)."
+          items:
+            type: "object"
+            required: [
+              "title",
+              "title_es",
+              "title_it",
+              "title_de",
+              "title_fr",
+              "title_pt",
+              "title_ja",
+              "title_he",
+              "title_ar",
+              "answers",
+              "difficulty",
+              "image_briefing",
+              "text_to_search"
+            ]
+            properties:
+              title:
+                type: "string"
+                description: "ULTRA-SHORT question (max 50 chars) for TV/app display."
+              difficulty:
+                type: "string"
+                description: "Difficulty level, create a couple of easy, medium and hard questions"
+                enum: ["EASY", "MEDIUM", "HARD"]
+              image_briefing:
+                type: "string"
+                description: |
+                  Briefing for generate an image for the question, consider the image assets available will come from the image search
+                  Example: "Aerial view of the stadium", "Close up of the player's face", "Goal celebration", "Tactical diagram"
+              text_to_search:
+                type: "array"
+                description: "Array of comma-separated list of relevant terms for image search"
+                items:
+                  type: "string"
+                  description: |
+                    - ALWAYS prefix with "Soccer" to avoid unrelated results.
+                    - MUST include:
+                      - "Soccer" followed by Team name (e.g., "Soccer AC Milan" not just "Milan")
+                      - "Soccer" followed by any mentioned person's full name, stadium name, league name, country name, city name, etc.
+              title_es:
+                type: "string"
+                description: "SHORT and OBJECTIVE question in Spanish."
+              title_it:
+                type: "string"
+                description: "SHORT and OBJECTIVE question in Italian."
+              title_de:
+                type: "string"
+                description: "SHORT and OBJECTIVE question in German."
+              title_fr:
+                type: "string"
+                description: "SHORT and OBJECTIVE question in French."
+              title_pt:
+                type: "string"
+                description: "SHORT and OBJECTIVE question in Brazilian Portuguese."
+              title_ja:
+                type: "string"
+                description: "SHORT and OBJECTIVE question in Japanese."
+              title_he:
+                type: "string"
+                description: "SHORT and OBJECTIVE question in Hebrew."
+              title_ar:
+                type: "string"
+                description: "SHORT and OBJECTIVE question in Arabic."
+              answers:
+                type: "array"
+                description: "EXACTLY 3 ULTRA-SHORT options (max 25 chars each) for TV/app display."
+                minItems: 3
+                maxItems: 3
+                items:
+                  type: "object"
+                  description: "Brief answer option (max 25 chars)."
+                  required: [
+                    "title",
+                    "title_es",
+                    "title_it",
+                    "title_de",
+                    "title_fr",
+                    "title_pt",
+                    "title_ja",
+                    "title_he",
+                    "title_ar"
+                  ]
+                  properties:
+                    title:
+                      type: "string"
+                      description: "ULTRA-SHORT option (max 25 chars)."
+                    correct:
+                      type: "boolean"
+                      description: "True if this is the ONLY correct answer, False otherwise."
+                    title_es:
+                      type: "string"
+                      description: "SHORT and OBJECTIVE option in Spanish."
+                    title_it:
+                      type: "string"
+                      description: "SHORT and OBJECTIVE option in Italian."
+                    title_de:
+                      type: "string"
+                      description: "SHORT and OBJECTIVE option in German."
+                    title_fr:
+                      type: "string"
+                      description: "SHORT and OBJECTIVE option in French."
+                    title_pt:
+                      type: "string"
+                      description: "SHORT and OBJECTIVE option in Brazilian Portuguese."
+                    title_ja:
+                      type: "string"
+                      description: "SHORT and OBJECTIVE option in Japanese."
+                    title_he:
+                      type: "string"
+                      description: "SHORT and OBJECTIVE option in Hebrew."
+                    title_ar:
+                      type: "string"
+                      description: "SHORT and OBJECTIVE option in Arabic."
+
+  # prompt-coverage-quizzes-generator
+  - type: prompt
+    name: prompt-coverage-quizzes-generator
+    title: "Coverage - Quizzes Generator"
+    description: "Generate editorial briefing script for coverage planning based on topics, competitions, or general football subjects"
+    schema:
+      title: "PromptTopicCoverageQuizzesGenerator"
+      description: "Generate editorial briefing for coverage planning based on any football topic, competition, or subject matter"
+      required: [
+        "title",
+        "content",
+        "subject",
+        "script_code",
+        "quizzes-topics"
+      ]
+      type: "object"
+      properties:
+        content:
+          type: "string"
+          description: "Brief editorial outline of key coverage points and quiz focus areas"
+        title:
+          type: "string"
+          description: "Engaging title that represents the topic or subject being covered"
+        subject:
+          type: "string"
+          description: "Main coverage focus (e.g., 'UEFA Nations League analysis', 'Premier League top scorers', 'Champions League history')"
+        script_code:
+          type: "string"
+          description: "Coverage type code that categorizes the content focus"
+          enum:
+            - "COMPETITION_ANALYSIS"
+            - "TEAM_HISTORICAL_RESEARCH"
+            - "PLAYER_STATISTICAL_ANALYSIS"
+            - "MATCH_PREVIEW_COVERAGE"
+            - "TOURNAMENT_OVERVIEW"
+            - "LEAGUE_STANDINGS_ANALYSIS"
+            - "TRANSFER_MARKET_RESEARCH"
+            - "SEASONAL_REVIEW"
+            - "RECORD_BREAKING_ANALYSIS"
+            - "DERBY_HISTORICAL_ANALYSIS"
+        quizzes-topics:
+          type: "array"
+          description: "Vector search queries to find relevant documents for quiz generation. Each query should target specific team statistics, player records, competition data, or match information that can be used to create quiz questions."
+          minItems: 2
+          maxItems: 4
+          items:
+            type: "string"
+            description: |
+              Vector search query string to find relevant documents. Should be specific and focused on searchable content. Examples:
+              - For competitions: "UEFA Nations League statistics", "Champions League records", "Premier League top scorers"
+              - For teams: "Manchester United Premier League records", "Barcelona Champions League history"
+              - For players: "Cristiano Ronaldo goal statistics", "Messi Barcelona achievements"
+              - For matches: "Spain France head to head history", "El Clasico historical results"
+              - For tournaments: "World Cup final results", "European Championship winners"
+              
+              Focus on:
+              - Competition names and statistics
+              - Team names and records
+              - Player names and achievements
+              - Historical data and milestones
+              - Tournament results and records
+          

@@ -1,0 +1,28 @@
+agent:
+
+  name: coverage-quizzes-consumer
+  title: "Coverage - Quizzes"
+  description: "Workflow to consume quizzes."
+  # context:
+  #   config-frequency: 0.2
+  workflows:
+
+    # coverage quiz service
+    - name: "coverage-quizzes-service"
+      description: "Coverage Quizzes Service"
+      # inputs:
+      #   event_code: $.get('event_code', 'sr:sport_event:51273555')
+      outputs:
+        quizzes-service-status: "$.get('workflow-status', False)"
+
+    # coverage quiz generator
+    - name: "coverage-quizzes-generator"
+      description: "Coverage Quizzes Generator"
+      outputs:
+        quizzes-generator-status: "$.get('workflow-status', False)"
+
+    # coverage quiz executor
+    - name: "coverage-quizzes-executor"
+      description: "Coverage Quizzes Executor"
+      outputs:
+        quizzes-executor-status: "$.get('workflow-status', False)"

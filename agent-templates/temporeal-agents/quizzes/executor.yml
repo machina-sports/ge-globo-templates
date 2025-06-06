@@ -1,0 +1,269 @@
+workflow:
+
+  name: coverage-quizzes-executor
+  title: "Coverage - Quizzes Executor"
+  description: "Workflow to execute quizzes."
+  context-variables:
+    debugger:
+      enabled: true
+    machina-ai:
+      api_key: "$TEMP_CONTEXT_VARIABLE_SDK_OPENAI_API_KEY"
+  outputs:
+    workflow-status: "$.get('workflow-status', 'skipped')"
+  tasks:
+
+    # load-next-agenda
+    - type: document
+      name: load-next-agenda
+      connector:
+        name: "machina-ai"
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["value.agenda-control.updated", 1]
+      filters:
+        metadata.content-group: "{'$in': ['SPORTS_SOCCER_QUIZZES']}"
+        value.agenda-control.processing: "{'$ne': True}"
+        value.agenda-control.finished: "{'$ne': True}"
+      inputs:
+        name: "'content-agenda'"
+      outputs:
+        agenda-exists: "len($.get('documents', [])) > 0 if $.get('documents') else False"
+        agenda-document: "$.get('documents', [{}])[0] if $.get('documents') else None"
+        agenda-document-id: "$.get('documents', [{}])[0].get('_id', '') if $.get('documents') else ''"
+        agenda-metadata: "$.get('documents', [{}])[0].get('metadata', {}) if $.get('documents') else None"
+        agenda-value: "$.get('documents', [{}])[0].get('value', {}) if $.get('documents') else None"
+
+    # document-agenda-control
+    - type: document
+      name: coverage-agenda-control-processing
+      condition: "$.get('agenda-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      filters:
+        document_id: "$.get('agenda-document-id')"
+      documents:
+        content-agenda: |
+          {
+            **$.get('agenda-value', {}),
+            'agenda-control': {
+              **$.get('agenda-control', {}),
+              'processing': True,
+              'updated': datetime.utcnow()
+            }
+          }
+
+    # mapping agenda-control
+    - type: mapping
+      name: coverage-mapping-agenda-control
+      condition: "$.get('agenda-exists') is True"
+      inputs:
+        _document: "$.get('agenda-value')"
+        _metadata: "$.get('agenda-metadata')"
+      outputs:
+        agenda-control: "$.get('agenda-control')"
+        agenda-control-finished: "$.get('agenda-control').get('finished', False)"
+        agenda-counter: "$.get('agenda-counter')"
+        custom-instruction: "$.get('custom-instruction')"
+        custom-level: "$.get('custom-level')"
+        custom-script-name: "$.get('custom-script-name')"
+        custom-topic: "$.get('custom-topic')"
+        content-group: "$.get('content-group')"
+        content-name: "$.get('content-name')"
+        content-topic: "$.get('content-topic')"
+        event_code: "$.get('event_code')"
+        script-instructions: "$.get('script-instructions')"
+
+    # mapping quizzes-control
+    - type: mapping
+      name: coverage-mapping-quizzes-control
+      condition: "$.get('agenda-exists') is True"
+      inputs:
+        _document: "$.get('agenda-value')"
+        _metadata: "$.get('agenda-metadata')"
+      outputs:
+        agenda-required: "$.get('agenda-required')"
+        quizzes-control: "$.get('quizzes-control')"
+        quizzes-control-status: "$.get('quizzes-control-status')"
+        quizzes-topics: "$.get('quizzes-topics')"
+        snippets-loaded: "[]"
+
+    # load-required-agenda
+    - type: document
+      name: load-required-agenda
+      condition: "$.get('agenda-exists') is True"
+      connector:
+        name: "machina-ai"
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      config:
+        action: "search"
+        search-limit: 100
+        search-vector: false
+        search-sorters: ["value.agenda-control.updated", 1]
+      filters:
+        metadata.content-group: "{'$in': ['SPORTS_SOCCER_EVENT']}"
+        metadata.content-topic: "{'$in': $.get('agenda-required', [])}"
+        value.agenda-control.processing: "{'$ne': True}"
+        value.agenda-control.finished: "True"
+      inputs:
+        name: "'content-agenda'"
+      outputs:
+        required-agenda-results: "$.get('documents', []) if $.get('documents') else []"
+        required-agenda-length: |
+          len($.context('agenda-required'))
+        existing-agenda-length: |
+          len($.get('documents', []))
+
+    # load-related-snippets
+    - type: document
+      name: load-related-snippets
+      condition: |
+        (
+          $.get('agenda-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+        )
+      connector:
+        name: "machina-ai"
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      config:
+        action: "search"
+        threshold-docs: 3
+        threshold-similarity: 0.01
+        search-limit: 1000
+      foreach:
+        name: topic-text
+        expr: "$"
+        value: "$.get('quizzes-topics', [])"
+      filters:
+        metadata.content-group: "{'$in': ['SPORTS_SOCCER_EVENT']}"
+        metadata.event_code: "$.get('event_code')"
+      inputs:
+        name: "'content-snippet'"
+        search-limit: "'1000'"
+        search-query: "$.get('topic-text')"
+      outputs:
+        snippets-loaded: |
+          [
+            d.get('_id', '')
+            for d in $.get('documents', [])[:4]
+          ]
+        snippets-bulk: |
+          [
+            d.get('value', {})
+            for d in $.get('documents', [])[:4]
+          ]
+  
+    # prompt-coverage-quizzes-executor
+    - type: prompt
+      name: prompt-coverage-quizzes-executor
+      description: "prompt-quizzes"
+      condition: |
+        (
+          $.get('agenda-exists') is True
+          and $.get('required-agenda-length', 0) == $.get('existing-agenda-length', 0)
+          and len($.get('snippets-bulk', [])) > 0
+        )
+      connector:
+        name: "machina-ai"
+        command: "invoke_prompt"
+        model: "gpt-4.1"
+      # foreach:
+      #   name: snippet
+      #   expr: "$"
+      #   value: "$.get('snippets-bulk', [])[:10]"
+      inputs:
+        doc_context: "$.get('snippets-bulk', [])"
+        instruction: "$.get('script-instructions')"
+        custom-instruction: "$.get('custom-instruction')"
+        custom-level: "$.get('custom-level')"
+        custom-script-name: "$.get('custom-script-name')"
+        custom-topic: "$.get('custom-topic')"
+      outputs:
+        generated-content-quizzes: "$.get('questions', [])"
+
+    # mapping quizzes-results
+    - type: mapping
+      name: coverage-mapping-quizzes-results
+      condition: |
+        (
+          $.get('agenda-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and len($.get('snippets-bulk', [])) > 0
+        )
+      inputs:
+        _content-quizzes: "$.get('generated-content-quizzes', [])"
+      outputs:
+        agenda-control-finished: "True"
+        generated-content-quizzes: "$.get('quizzes-results', [])"
+        quizzes-control-status: "'executed'"
+        workflow-status: "'executed'"
+
+    # save / update documents
+
+    # 0 bulk-content-quizzes
+    - type: document
+      name: bulk-content-quizzes
+      condition: |
+        (
+          $.get('agenda-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and len($.get('snippets-bulk', [])) > 0
+        )
+      description: "Bulk save the quizzes."
+      config:
+        action: "bulk-save"
+        embed-vector: false
+      document_name: "'content-quiz'"
+      documents:
+        items: "$.get('parsed_quizzes', [])"
+      inputs:
+        parsed_quizzes: |
+          [
+            {
+              **c,
+              "metadata": {
+                "content-group": "$.(content-group)",
+                "content-name": "$.(content-name)",
+                "content-topic": "$.(content-topic)",
+                "event_code": "$.(event_code)"
+              },
+              "version_control": {
+                "embed_image_status": "pending"
+              }
+            }
+            for c in $.get('generated-content-quizzes', [])
+          ]
+
+    # document-agenda-control
+    - type: document
+      name: coverage-agenda-control-update
+      condition: "$.get('agenda-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      filters:
+        document_id: "$.get('agenda-document-id')"
+      documents:
+        content-agenda: |
+          {
+            **$.get('agenda-value', {}),
+            'agenda-control': {
+              **$.get('agenda-control', {}),
+              'counter': $.get('agenda-counter', 0) + 1,
+              'finished': $.get('agenda-control-finished', False),
+              'processing': False,
+              'updated': datetime.utcnow()
+            },
+            'quizzes-control': {
+              **$.get('quizzes-control', {}),
+              'status': $.get('quizzes-control-status')
+            }
+          }

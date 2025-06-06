@@ -1,0 +1,44 @@
+mappings:
+
+  # coverage-mapping-quizzes-control
+  - type: mapping
+    name: coverage-mapping-quizzes-control
+    title: "Coverage - Mapping Quizzes Control"
+    description: "Mapping data from quizzes"
+    outputs:
+      agenda-required: |
+        $.get('_document', {}).get('agenda-required', []) if $.get('_document') else []
+      quizzes-control: |
+        $.get('_document', {}).get('quizzes-control', {}) if $.get('_document') else {}
+      quizzes-control-status: |
+        $.get('_document', {}).get('quizzes-control', {}).get('status', 'pending') if $.get('_document') else 'pending'
+      quizzes-topics: |
+        $.get('_document', {}).get('agenda-object', {}).get('quizzes-topics', []) if $.get('_document') else []
+
+  # coverage-mapping-quizzes-service
+  - type: mapping
+    name: coverage-mapping-quizzes-service
+    title: "Coverage - Mapping Quizzes Service"
+    description: "Mapping data from quizzes service"
+    outputs:
+      agenda-required: |
+        []
+      content-group: |
+        f"{$.('script_name')}"
+      content-name: |
+        f"{$.('date_prefix')}_{$.('script_name')}_{$.('topic_name')}_QUIZZES"
+      coverage-indexes: |
+        [
+          f"{$.('date_prefix')}_{$.('script_name')}_{$.('topic_name')}_QUIZZES"
+        ]
+
+  # coverage-mapping-quizzes-results
+  - type: mapping
+    name: coverage-mapping-quizzes-results
+    title: "Coverage - Mapping Quizzes Results"
+    description: "Mapping data from quizzes results"
+    outputs:
+      quizzes-results: |
+        [
+          *$.get('_content-quizzes', [])
+        ]

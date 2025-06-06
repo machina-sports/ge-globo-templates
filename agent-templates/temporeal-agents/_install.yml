@@ -116,3 +116,23 @@ datasets:
 
   - type: "connector"
     path: "../../connectors/storage/storage.yml"
+
+  # quizzes
+
+  - type: "workflow"
+    path: "quizzes/executor.yml"
+
+  - type: "workflow"
+    path: "quizzes/generator.yml"
+
+  - type: "mappings"
+    path: "quizzes/mappings.yml"
+
+  - type: "prompts"
+    path: "quizzes/prompts.yml"
+  
+  - type: "workflow"
+    path: "quizzes/service.yml"
+
+  - type: "agent"
+    path: "quizzes/consumer.yml"
