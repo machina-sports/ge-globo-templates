@@ -142,7 +142,7 @@ workflow:
         expr: "$"
         value: "$.get('quizzes-topics', [])"
       filters:
-        metadata.content-group: "{'$in': ['SPORTS_SOCCER_EVENT']}"
+        metadata.content-group: "{'$in': ['COVERAGE_RESEARCHER_STATS']}"
         metadata.event_code: "$.get('event_code')"
       inputs:
         name: "'content-snippet'"

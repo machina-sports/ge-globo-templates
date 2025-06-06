@@ -6,7 +6,7 @@ workflow:
   inputs:
     event_code: "$.get('event_code') or None"
     custom_instruction: "$.get('custom_instruction', 'Analyze the teams recent performance, including strengths, weaknesses, and key statistics')"
-    custom_script_name: "$.get('custom_script_name', 'SPORTS_SOCCER_EVENT')"
+    custom_script_name: "$.get('custom_script_name', 'SPORTS_SOCCER_QUIZZES')"
     custom_topic_name: "$.get('custom_topic_name', 'RESEARCH_PLAYERS')"
     custom_level: "$.get('custom_level', 'EASY')"
   outputs:
