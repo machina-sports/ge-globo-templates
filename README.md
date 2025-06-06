@@ -1,1 +1,1 @@
-# ge-globo-temporeal
+# ge-globo

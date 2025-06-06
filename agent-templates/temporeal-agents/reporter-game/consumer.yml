@@ -1,0 +1,28 @@
+agent:
+
+  name: coverage-reporter-game-consumer
+  title: "Coverage - Reporter Game"
+  description: "Workflow to consume reporter-game."
+  # context:
+  #   config-frequency: 0.2
+  workflows:
+
+    # coverage reporter-game service
+    - name: "coverage-reporter-game-service"
+      description: "Coverage - Reporter Game Service"
+      inputs:
+        event_code: $.get('event_code')
+      outputs:
+        reporter-game-service-status: "$.get('workflow-status', False)"
+
+    # coverage reporter-game generator
+    - name: "coverage-reporter-game-generator"
+      description: "Coverage - Reporter Game Generator"
+      outputs:
+        reporter-game-generator-status: "$.get('workflow-status', False)"
+
+    # coverage reporter-game executor
+    - name: "coverage-reporter-game-executor"
+      description: "Coverage - Reporter Game Executor"
+      outputs:
+        reporter-game-executor-status: "$.get('workflow-status', False)"

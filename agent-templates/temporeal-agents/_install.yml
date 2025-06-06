@@ -1,0 +1,118 @@
+setup:
+  title: "Tempo Real Agents"
+  description: AI-powered agents for Tempo Real.
+  category:
+    - special-templates
+  estimatedTime: 15 minutes
+  features:
+    - AI Agent to generate briefings, and snippets.
+  integrations:
+    - machina-ai
+  status: available
+  value: "agent-templates/temporeal-agents"
+  version: 1.0.0
+
+datasets:
+
+  - type: "mappings"
+    path: "_mappings.yml"
+
+  - type: "workflow"
+    path: "update-embeddings.yml"
+    
+  # reporter-game
+
+  - type: "workflow"
+    path: "reporter-game/executor.yml"
+
+  - type: "workflow"
+    path: "reporter-game/generator.yml"
+
+  - type: "mappings"
+    path: "reporter-game/mappings.yml"
+
+  - type: "prompts"
+    path: "reporter-game/prompts/article.yml"
+
+  - type: "prompts"
+    path: "reporter-game/prompts/executor.yml"
+
+  - type: "prompts"
+    path: "reporter-game/prompts/generator.yml"
+
+  - type: "workflow"
+    path: "reporter-game/service.yml"
+
+  - type: "agent"
+    path: "reporter-game/consumer.yml"
+
+  # reporter-image
+
+  - type: "workflow"
+    path: "reporter-image/executor.yml"
+
+  - type: "workflow"
+    path: "reporter-image/generator.yml"
+
+  - type: "mappings"
+    path: "reporter-image/mappings.yml"
+
+  - type: "prompts"
+    path: "reporter-image/prompts.yml"
+
+  - type: "workflow"
+    path: "reporter-image/service.yml"
+
+  - type: "agent"
+    path: "reporter-image/consumer.yml"
+
+  # researcher-game
+
+  - type: "workflow"
+    path: "researcher-game/executor.yml"
+
+  - type: "mappings"
+    path: "researcher-game/mappings.yml"
+
+  - type: "prompts"
+    path: "researcher-game/prompts.yml"
+
+  - type: "workflow"
+    path: "researcher-game/reasoning.yml"
+
+  - type: "workflow"
+    path: "researcher-game/service.yml"
+
+  - type: "agent"
+    path: "researcher-game/consumer.yml"
+    
+  # researcher-stats
+
+  - type: "workflow"
+    path: "researcher-stats/executor.yml"
+
+  - type: "mappings"
+    path: "researcher-stats/mappings.yml"
+
+  - type: "prompts"
+    path: "researcher-stats/prompts/analysis.yml"
+
+  - type: "prompts"
+    path: "researcher-stats/prompts/lastmatch.yml"
+
+  - type: "prompts"
+    path: "researcher-stats/prompts/reasoning.yml"
+
+  - type: "workflow"
+    path: "researcher-stats/reasoning.yml"
+
+  - type: "workflow"
+    path: "researcher-stats/service.yml"
+
+  - type: "agent"
+    path: "researcher-stats/consumer.yml"
+
+  # storage
+
+  - type: "connector"
+    path: "../../connectors/storage/storage.yml"

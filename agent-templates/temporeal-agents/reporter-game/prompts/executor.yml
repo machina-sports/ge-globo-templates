@@ -1,0 +1,155 @@
+prompts:
+
+  # prompt-coverage-reporter-game-executor
+  - type: prompt
+    name: prompt-coverage-reporter-game-executor
+    title: "Coverage - Reporter Game Executor"
+    description: |
+      Estrutura para um blog post sobre a história, conquistas e preparação do clube para a Copa do Mundo de Clubes da FIFA 2025. Aborde momentos marcantes, evolução, ídolos, mudanças e expectativas para o torneio.
+    schema:
+      title: "PostBlogPreviaTitulo"
+      description: |
+        Estrutura para um blog post sobre a história e preparação do clube para a Copa do Mundo de Clubes da FIFA 2025
+        - História do clube (fundação, evolução, décadas marcantes)
+        - Conquistas e títulos importantes
+        - Temporadas históricas e campanhas memoráveis
+        - Mudanças de técnicos e eras de comando
+        - Evolução do elenco e jogadores icônicos
+        - Transferências marcantes e bastidores
+        - Impacto social, torcida, rivalidades e cultura do clube
+        - Estrutura, estádio, torcida e engajamento social
+        - Momentos recentes e desafios atuais
+
+        ORIENTAÇÕES DE TOM E VOZ:
+        - Escreva de forma descontraída, como uma conversa entre amigos que entendem do assunto
+        - Use linguagem simples e acessível, sem jargões técnicos
+        - Seja direto, evite explicações longas
+        - Mostre domínio do tema sem ser formal
+        - Torne o texto envolvente, como em redes sociais
+        - Explique temas complexos de forma didática
+        - Seja acolhedor para iniciantes
+        - Não use linguagem promocional ou de vendas
+      type: "object"
+      properties:
+        title:
+          type: "string"
+          description: |
+            Título em português destacando o tema central do clube.
+            Evite jargões como Glórias, Jornadas, Desafios, De 1900 ao Mundial de Clubes etc.
+            Mencione fatos históricos, conquistas, ídolos ao invés de expectativas para o torneio.
+        subtitle:
+          type: "string"
+          description: "Subtítulo complementar que aprofunda o tema do artigo."
+        slug:
+          type: "string"
+          description: "Identificador único (slug) para a matéria."
+        section_title:
+          type: "string"
+          description: "Título geral da seção principal."
+        section_1_title:
+          type: "string"
+          description: "Título da primeira seção."
+        section_1_content:
+          type: "string"
+          description: "Introdução ao tema."
+        section_1_image:
+          type: "string"
+          description: "Nome da imagem para a primeira seção exemplo bayern_fundacao_1900 (sem extensão)"
+        section_1_image_query:
+          type: "string"
+          description: "Query em inglês para buscar imagens no google exemplo Bayern Munich 1900"
+        section_2_title:
+          type: "string"
+          description: "Título da segunda seção."
+        section_2_content:
+          type: "string"
+          description: "Desenvolvimento do tema."
+        section_2_image:
+          type: "string"
+          description: "Nome da imagem para a segunda seção exemplo bayern_anos70_europeu (sem extensão)"
+        section_2_image_query:
+          type: "string"
+          description: "Query em inglês para buscar imagens no google exemplo Bayern Munich 1970"
+        section_3_title:
+          type: "string"
+          description: "Título da terceira seção."
+        section_3_content:
+          type: "string"
+          description: "Contexto histórico ou curiosidades."
+        section_3_image:
+          type: "string"
+          description: "Nome da imagem para a terceira seção exemplo bayern_idolos_legends (sem extensão)"
+        section_3_image_query:
+          type: "string"
+          description: "Query em inglês para buscar imagens no google exemplo Bayern de Munique idols"
+        section_4_title:
+          type: "string"
+          description: "Título da quarta seção."
+        section_4_content:
+          type: "string"
+          description: "Análises ou comparativos."
+        section_4_image:
+          type: "string"
+          description: "Nome da imagem para a quarta seção exemplo allianz_arena_fans (sem extensão)"
+        section_4_image_query:
+          type: "string"
+          description: "Query em inglês para buscar imagens no google exemplo allianz arena fans"
+        section_5_title:
+          type: "string"
+          description: "Título da quinta seção."
+        section_5_content:
+          type: "string"
+          description: "Conclusão ou expectativas."
+        section_5_image:
+          type: "string"
+          description: "Nome da imagem para a quinta seção exemplo bayern_treinador_2025 (sem extensão)"
+        section_5_image_query:
+          type: "string"
+          description: "Query em inglês para buscar imagens no google exemplo bayern manager 2025"
+        image_briefing:
+          type: "string"
+          description: "Briefing para imagem principal."
+        main_image_query:
+          type: "string"
+          description: "Query em inglês para buscar imagens no google exemplo Bayern Munich 2025"
+        main_image_name:
+          type: "string"
+          description: "Nome da imagem para a imagem principal exemplo main_image (sem extensão)"
+        related_questions:
+          type: "array"
+          description: "Sugira pelo menos 15 perguntas relacionadas ao tema."
+          minItems: 15
+          maxItems: 15
+          items:
+            type: "string"
+            description: "Pergunta relevante sobre o tema abordado."
+      required: [
+        "title",
+        "subtitle",
+        "slug",
+        "section_title",
+        "section_1_title",
+        "section_1_content",
+        "section_1_image",
+        "section_1_image_query",
+        "section_2_title",
+        "section_2_content",
+        "section_2_image",
+        "section_2_image_query",
+        "section_3_title",
+        "section_3_content",
+        "section_3_image",
+        "section_3_image_query",
+        "section_4_title",
+        "section_4_content",
+        "section_4_image",
+        "section_4_image_query",
+        "section_5_title",
+        "section_5_content",
+        "section_5_image",
+        "section_5_image_query",
+        "image_briefing",
+        "related_questions",
+        "main_image_query",
+        "main_image_name"
+      ]

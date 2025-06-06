@@ -1,0 +1,49 @@
+workflow:
+  name: article-update-embeddings
+  title: Article - Update Embeddings
+  context-variables:
+    debugger:
+      enabled: true
+    machina-ai:
+      api_key: "$TEMP_CONTEXT_VARIABLE_SDK_OPENAI_API_KEY"
+    machina-ai-fast:
+      api_key: "$TEMP_CONTEXT_VARIABLE_SDK_GROQ_API_KEY"
+  inputs:
+    document_id: "$.get('document_id')"
+  outputs:
+    workflow-status: "$.get('document_id') is not None and 'executed' or 'skipped'"
+  tasks:
+
+    # Load thread document
+    - type: document
+      name: load-thread-document
+      description: Load thread document
+      config:
+        action: search
+        search-limit: 1
+        search-vector: false
+      condition: "$.get('document_id') is not None"
+      filters:
+        _id: "$.get('document_id')"
+      inputs:
+        name: "'content-article'"
+      outputs:
+        document_data: "$.get('documents')[0] if len($.get('documents', [])) > 0 else None"
+        document_value: "$.get('documents')[0].get('value', {}) if len($.get('documents', [])) > 0 else {}"
+
+    # Update thread document
+    - type: document
+      name: update-thread-document
+      config:
+        action: update
+        embed-vector: true
+        force-update: true
+      connector:
+        name: "machina-ai"
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      condition: "$.get('document_id') is not None"
+      filters:
+        document_id: "$.get('document_id')"
+      documents:
+        content-article: "$.get('document_value')"

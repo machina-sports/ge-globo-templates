@@ -1,0 +1,261 @@
+workflow:
+
+  name: coverage-researcher-game-executor
+  title: "Coverage - Researcher Game Executor"
+  description: "Workflow to execute researcher game."
+  context-variables:
+    debugger:
+      enabled: true
+    machina-ai:
+      api_key: "$TEMP_CONTEXT_VARIABLE_SDK_OPENAI_API_KEY"
+    machina-ai-fast:
+      api_key: "$TEMP_CONTEXT_VARIABLE_SDK_GROQ_API_KEY"
+  outputs:
+    workflow-status: "$.get('workflow-status', 'skipped')"
+  tasks:
+
+    # load-next-agenda
+    - type: document
+      name: load-next-agenda
+      connector:
+        name: machina-ai
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["value.agenda-control.updated", 1]
+      filters:
+        metadata.content-group: "{'$in': ['COVERAGE_RESEARCHER_GAME']}"
+        value.agenda-control.processing: "{'$ne': True}"
+        value.agenda-control.finished: "{'$ne': True}"
+      inputs:
+        name: "'content-agenda'"
+      outputs:
+        agenda-exists: "len($.get('documents', [])) > 0 if $.get('documents') else False"
+        agenda-document: "$.get('documents', [{}])[0] if $.get('documents') else None"
+        agenda-document-id: "$.get('documents', [{}])[0].get('_id', '') if $.get('documents') else ''"
+        agenda-metadata: "$.get('documents', [{}])[0].get('metadata', {}) if $.get('documents') else None"
+        agenda-value: "$.get('documents', [{}])[0].get('value', {}) if $.get('documents') else None"
+
+    # document-agenda-control
+    - type: document
+      name: coverage-agenda-control-processing
+      condition: "$.get('agenda-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      filters:
+        document_id: "$.get('agenda-document-id')"
+      documents:
+        content-agenda: |
+          {
+            **$.get('agenda-value', {}),
+            'agenda-control': {
+              **$.get('agenda-control', {}),
+              'processing': True,
+              'updated': datetime.utcnow()
+            }
+          }
+
+    # mapping agenda-control
+    - type: mapping
+      name: coverage-mapping-agenda-control
+      condition: "$.get('agenda-exists') is True"
+      inputs:
+        _document: "$.get('agenda-value')"
+        _metadata: "$.get('agenda-metadata')"
+      outputs:
+        agenda-control: "$.get('agenda-control')"
+        agenda-control-finished: "$.get('agenda-control', {}).get('finished', False)"
+        agenda-counter: "$.get('agenda-counter')"
+        content-group: "$.get('content-group')"
+        content-name: "$.get('content-name')"
+        content-topic: "$.get('content-topic')"
+        event_code: "$.get('event_code')"
+        script-instructions: "$.get('script-instructions')"
+
+    # mapping game-control
+    - type: mapping
+      name: coverage-mapping-game-control
+      condition: "$.get('agenda-exists') is True"
+      inputs:
+        _document: "$.get('agenda-value')"
+        _metadata: "$.get('agenda-metadata')"
+      outputs:
+        game-control: "$.get('game-control')"
+        game-control-status: "$.get('game-control-status')"
+        game-control-queries: "$.get('game-control-new-queries', [])"
+        game-control-queries-length: "len($.get('game-control-new-queries', []))"
+
+    # create new search request
+    - type: document
+      name: create-search-request
+      condition: |
+        (
+          $.(agenda-exists) is True
+          and '$.(game-control-status)' == 'pending'
+          and $.(game-control-queries-length) > 0
+        )
+      config:
+        action: "bulk-save"
+        embed-vector: false
+        force-update: true
+      document_name: "'web-search'"
+      documents:
+        items: "$.get('parsed-items', [])"
+      inputs:
+        parsed-items: "$.get('game-control-queries')"  
+      outputs:
+        game-control-status: "'executed'"
+        workflow-status: "'executed'"
+
+    # load-searches-and-scrapings
+    - type: document
+      name: load-searches-and-scrapings
+      condition: |
+        (
+          $.(agenda-exists) is True
+          and '$.(game-control-status)' == 'executed'
+        )
+      config:
+        action: "search"
+        search-limit: 100
+        search-vector: false
+        search-sorters: ["value.version_control.updated", 1]
+      filters:
+        metadata.content-group: "$.get('content-group', '')"
+        metadata.content-name: "$.get('content-name', '')"
+        metadata.content-topic: "$.get('content-topic', '')"
+      inputs:
+        name: "{'$in': ['web-search', 'web-scraping']}"
+      outputs:
+        researcher-documents: "$.get('documents', [])"
+
+    # mapping-researcher-items
+    - type: mapping
+      name: coverage-mapping-researcher-game-items
+      condition: |
+        (
+          $.(agenda-exists) is True
+          and '$.(game-control-status)' == 'executed'
+        )
+      inputs:
+        _documents: "$.get('researcher-documents', [])"
+      outputs:
+        agenda-control-finished: |
+          (
+            $.(agenda-exists) is True
+            and len($.get('researcher-game-finished')) > 0
+            and len($.get('researcher-game-pending')) == 0
+          )
+        have-content-to-process: |
+          (
+            $.(agenda-exists) is True
+            and len($.get('researcher-game-finished')) > 0
+            and len($.get('researcher-game-pending')) == 0
+          )
+        game-control-status: |
+          (
+            $.(agenda-exists) is True
+            and len($.get('researcher-game-finished')) > 0
+            and len($.get('researcher-game-pending')) == 0
+          ) and 'finished' or $.get('game-control-status')
+        researcher-game-items: "$.get('researcher-game-items', [])"
+        researcher-game-finished: "len($.get('researcher-game-finished', []))"
+        researcher-game-processing: "len($.get('researcher-game-processing', []))"
+        researcher-game-pending: "len($.get('researcher-game-pending', []))"
+        workflow-status: |
+          (
+            $.(agenda-exists) is True
+            and len($.get('researcher-game-finished')) > 0
+            and len($.get('researcher-game-pending')) == 0
+          ) and 'executed' or $.get('workflow-status')
+
+    # prompt-coverage-researcher-analysis
+    - type: prompt
+      name: prompt-coverage-researcher-game-analysis
+      condition: "$.get('have-content-to-process') is True"
+      connector:
+        name: "machina-ai"
+        command: "invoke_prompt"
+        model: "gpt-4.1-mini"
+        # name: "machina-ai-fast"
+        # command: "invoke_prompt"
+        # model: "llama-3.3-70b-versatile"
+      foreach:
+        name: analysis
+        expr: "$"
+        value: "$.get('researcher-game-items')"
+      inputs:
+        input-content: "$.get('analysis', {}).get('content', [])"
+        instruction: "$.get('script-instructions')"
+      outputs:
+        snippets-bulk: |
+          [
+            {
+              'text': c.get('content', ''),
+              'title': c.get('title', ''),
+              'subject': c.get('subject', ''),
+              'metadata': {
+                'content-group': '$.(content-group)',
+                'content-name': '$.(content-name)',
+                'content-topic': '$.(content-topic)',
+                'event_code': '$.(event_code)'
+              }
+            }
+            for c in $.get('snippets', [])
+          ]
+
+    # save-researcher-game-snippets
+    - type: document
+      name: save-researcher-game-snippets
+      condition: "$.get('have-content-to-process') is True"
+      config:
+        action: "bulk-save"
+        embed-vector: true
+        force-update: true
+      connector:
+        name: machina-ai
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      document_name: "'content-snippet'"
+      documents:
+        items: "$.get('parsed-items')"
+      inputs:
+        parsed-items: |
+          [
+            *$.get('snippets-bulk', [])
+          ]
+
+    # document-agenda-control
+    - type: document
+      name: coverage-agenda-control-update
+      condition: "$.get('agenda-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      filters:
+        document_id: "$.get('agenda-document-id')"
+      documents:
+        content-agenda: |
+          {
+            **$.get('agenda-value', {}),
+            'agenda-control': {
+              **$.get('agenda-control', {}),
+              'counter': $.get('agenda-counter', 0) + 1,
+              'finished': $.get('agenda-control-finished', False),
+              'processing': False,
+              'updated': datetime.utcnow()
+            },
+            'game-control': {
+              **$.get('game-control', {}),
+              'finished': $.get('researcher-game-finished', 0),
+              'pending': $.get('researcher-game-pending', 0),
+              'processing': $.get('researcher-game-processing', 0),
+              'status': $.get('game-control-status')
+            }
+          }

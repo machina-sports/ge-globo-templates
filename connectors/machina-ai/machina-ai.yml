@@ -1,0 +1,21 @@
+connector:
+  name: "machina-ai"
+  description: "This connector is the Machina AI connector."
+  filename: "machina-ai.py"
+  filetype: "pyscript"
+  commands:
+
+    - name: "Edit Image"
+      value: "edit_image"
+
+    - name: "Generate Image"
+      value: "generate_image"
+
+    - name: "Embedding"
+      value: "invoke_embedding"
+
+    - name: "Prompt"
+      value: "invoke_prompt"
+
+    - name: "Prompt"
+      value: "transcribe_audio_to_text" 

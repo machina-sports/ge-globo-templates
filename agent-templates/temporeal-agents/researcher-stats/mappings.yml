@@ -1,0 +1,97 @@
+mappings:
+
+  # coverage-mapping-researcher-stats-control
+  - type: mapping
+    name: coverage-mapping-researcher-stats-control
+    title: "Coverage - Mapping Researcher Stats Control"
+    description: "Mapping data from researcher game"
+    outputs:
+      stats-control: |
+        $.get('_document', {}).get('stats-control', {}) if $.get('_document') else {}
+      stats-control-status: |
+        $.get('_document', {}).get('stats-control', {}).get('status', 'pending') if $.get('_document') else 'pending'
+
+  # coverage-mapping-researcher-stats-service
+  - type: mapping
+    name: coverage-mapping-researcher-stats-service
+    title: "Coverage - Mapping Researcher Stats Service"
+    description: "Mapping data from researcher game service"
+    outputs:
+      content-group: |
+        f"{$.('script_name')}"
+      content-name: |
+        f"{$.('date_prefix')}_{$.('game-short-name')}"
+      coverage-indexes: |
+        [
+          f"{$.('date_prefix')}_{$.('game-short-name')}_STATS"
+        ]
+
+  # coverage-mapping-researcher-stats-event-data
+  - type: mapping
+    name: coverage-mapping-researcher-stats-event-data
+    title: "Coverage - Mapping Researcher Stats Event Data"
+    description: "Mapping data from sportradar soccer data"
+    outputs:
+      article_count: "$.get('event_selected', {}).get('version_control', {}).get('article_count', 0)"
+      competition_id: "$.get('event_selected', {}).get('sport_event', {}).get('sport_event_context', {}).get('competition', {}).get('id')"
+      competition_name: "$.get('event_selected', {}).get('sport_event', {}).get('sport_event_context', {}).get('competition', {}).get('name')"
+      event_code: "$.get('event_selected', {}).get('sport_event', {}).get('id')"
+      event_date: "$.get('event_selected', {}).get('start_time').strftime('%Y-%m-%d')"
+      event_days_ago: |
+        ($.get('event_selected', {}).get('start_time') - timedelta(days=1)).strftime('%Y-%m-%d')
+      event_day_before: |
+        ($.get('event_selected', {}).get('start_time') - timedelta(days=1)).strftime('%Y-%m-%d')
+      event_day_of_week: "$.get('event_selected', {}).get('start_time').strftime('%A')"
+      event_date_time: "$.get('event_selected', {}).get('start_time').strftime('%Y-%m-%d %H:%M')"
+      image_count: "$.get('event_selected', {}).get('version_control', {}).get('image_count', 0)"
+      research_news_count: "$.get('event_selected', {}).get('version_control', {}).get('research_news_count', 0)"
+      research_odds_count: "$.get('event_selected', {}).get('version_control', {}).get('research_odds_count', 0)"
+      research_stats_count: "$.get('event_selected', {}).get('version_control', {}).get('research_stats_count', 0)"
+      research_team_count: "$.get('event_selected', {}).get('version_control', {}).get('research_team_count', 0)"
+      season: "$.get('event_selected', {}).get('sport_event', {}).get('sport_event_context', {}).get('season', {}).get('id')"
+      season_title: "$.get('event_selected', {}).get('sport_event', {}).get('sport_event_context', {}).get('season', {}).get('name')"
+      team_home_name: "$.get('event_selected', {}).get('sport_event', {}).get('competitors', [])[0].get('name')"
+      team_away_name: "$.get('event_selected', {}).get('sport_event', {}).get('competitors', [])[1].get('name')"
+      team_home_id: "$.get('event_selected', {}).get('sport_event', {}).get('competitors', [])[0].get('id')"
+      team_away_id: "$.get('event_selected', {}).get('sport_event', {}).get('competitors', [])[1].get('id')"
+      title: "$.get('event_selected', {}).get('title')"
+      widget-match-embed: "$.get('event_selected', {}).get('widget-match-embed')"
+      venue_title: f"{$.get('event_selected', {}).get('sport_event', {}).get('venue', {}).get('name')} ({$.get('event_selected', {}).get('sport_event', {}).get('venue', {}).get('city_name')}, {$.get('event_selected', {}).get('sport_event', {}).get('venue', {}).get('country_name')})"
+      venue_capacity: "$.get('event_selected', {}).get('sport_event', {}).get('venue', {}).get('capacity')"
+      venue_city: "$.get('event_selected', {}).get('sport_event', {}).get('venue', {}).get('city')"
+      venue_country: "$.get('event_selected', {}).get('sport_event', {}).get('venue', {}).get('country')"
+      venue_id: "$.get('event_selected', {}).get('sport_event', {}).get('venue', {}).get('id')"
+      venue_map_coordinates: "$.get('event_selected', {}).get('sport_event', {}).get('venue', {}).get('map_coordinates')"
+      venue_name: "$.get('event_selected', {}).get('sport_event', {}).get('venue', {}).get('name')"
+      venue_timezone: "$.get('event_selected', {}).get('sport_event', {}).get('venue', {}).get('timezone')"
+
+  # coverage-mapping-researcher-stats-lastmatch
+  - type: mapping
+    name: coverage-mapping-researcher-stats-lastmatch
+    title: "Coverage - Mapping Researcher Stats Last Match"
+    description: "Mapping data from last match"
+    outputs:
+      last_match: "$.get('item')"
+      competitors: "$.get('item').get('sport_event', {}).get('competitors', [])"
+      competitor_home_name: "$.get('item').get('sport_event', {}).get('competitors', [])[0].get('name')"
+      competitor_away_name: "$.get('item').get('sport_event', {}).get('competitors', [])[1].get('name')"
+      competitor_home_id: "$.get('item').get('sport_event', {}).get('competitors', [])[0].get('id')"
+      competitor_away_id: "$.get('item').get('sport_event', {}).get('competitors', [])[1].get('id')"
+      competitor_home_sr_id: "$.get('item').get('sport_event', {}).get('competitors', [])[0].get('sr_id')"
+      competitor_away_sr_id: "$.get('item').get('sport_event', {}).get('competitors', [])[1].get('sr_id')"
+      event_context: "$.get('item').get('sport_event', {}).get('sport_event_context', {})"
+      event_code: "$.get('item').get('sport_event', {}).get('id')"
+      event_date: "$.get('item').get('sport_event', {}).get('start_time')"
+      event_days_ago: |
+        datetime.strptime($.get('item').get('sport_event', {}).get('start_time'), '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None) - timedelta(days=1)
+      event_day_of_week: |
+        datetime.strptime($.get('item').get('sport_event', {}).get('start_time'), '%Y-%m-%dT%H:%M:%S%z').strftime('%A')
+      event_status: "$.get('item').get('sport_event_status', {})"
+      last_match_title: f"{$.get('item').get('sport_event', {}).get('competitors', [])[0].get('name')} vs {$.get('item').get('sport_event', {}).get('competitors', [])[1].get('name')}"
+      statistics: "next((c for c in $.get('item').get('statistics', {}).get('totals', {}).get('competitors', []) if c.get('id') == $.get('competitor_id')), {})"
+      venue: "$.get('item').get('sport_event', {}).get('venue', {})"
+      venue_title: "$.get('item').get('sport_event', {}).get('venue', {}).get('name')"
+      venue_city: "$.get('item').get('sport_event', {}).get('venue', {}).get('city')"
+      venue_country: "$.get('item').get('sport_event', {}).get('venue', {}).get('country')"
+      venue_id: "$.get('item').get('sport_event', {}).get('venue', {}).get('id')"
+      venue_sr_id: "$.get('item').get('sport_event', {}).get('venue', {}).get('sr_id')"

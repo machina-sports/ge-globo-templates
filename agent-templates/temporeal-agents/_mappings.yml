@@ -1,0 +1,58 @@
+mappings:
+
+  # coverage-mapping-agenda-control
+  - type: mapping
+    name: coverage-mapping-agenda-control
+    title: "Coverage - Mapping Agenda Control"
+    description: "Mapping data from agenda"
+    outputs:
+      agenda-control: |
+        $.get('_document', {}).get('agenda-control', {}) if $.get('_document') else {}
+      agenda-counter: |
+        $.get('_document', {}).get('agenda-control', {}).get('counter', 0) if $.get('_document') else 0
+      content-group: |
+        $.get('_metadata', {}).get('content-group', '')
+      content-id: |
+        $.get('_metadata', {}).get('content-id', '')
+      content-name: |
+        $.get('_metadata', {}).get('content-name', '')
+      content-topic: |
+        $.get('_metadata', {}).get('content-topic', '')
+      event_code: |
+        $.get('_metadata', {}).get('event_code', '')
+      script-code: |
+        $.get('_document', {}).get('agenda-object', {}).get('script_code', '') if $.get('_document') else ''
+      script-instructions: |
+        $.get('_document', {}).get('agenda-object', {}).get('content', '') if $.get('_document') else ''
+
+  # coverage-mapping-agenda-script
+  - type: mapping
+    name: coverage-mapping-agenda-script
+    title: "Coverage - Mapping Agenda Script"
+    description: "Mapping data from agenda"
+    outputs:
+      content-group: "$.get('content-script-metadata', {}).get('content-group', '')"
+      content-id: "$.get('content-script-metadata', {}).get('content-id', '')"
+      content-name: "$.get('content-script-metadata', {}).get('content-name', '')"
+      event_code: "$.get('content-script-metadata', {}).get('event_code', '')"
+      team_code: "$.get('content-script-metadata', {}).get('team_code', '')"
+      next-topic-to-cover: |
+        'NONE_TOPIC_TO_COVER' if not $.get('topics-indexes', []) else (
+          [
+            script
+            for script in $.get('topics-indexes', [])
+            if script not in $.get('topics-covered', [])
+          ][0] if [
+            script
+            for script in $.get('topics-indexes', [])
+            if script not in $.get('topics-covered', [])
+          ] else 'NONE_TOPIC_TO_COVER'
+        )
+
+  # coverage-mapping-date-prefix
+  - type: mapping
+    name: coverage-mapping-date-prefix
+    title: "Coverage - Mapping Agenda Prefixes"
+    description: "Mapping data from agenda service"
+    outputs:
+      date_prefix: f"{datetime.utcnow().strftime('%m%d')}-{datetime.utcnow().strftime('%A').upper()}"

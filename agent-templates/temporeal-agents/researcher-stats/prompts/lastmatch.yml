@@ -1,0 +1,204 @@
+prompts:
+
+  # prompt-coverage-researcher-stats-lastmatch
+  - type: prompt
+    name: prompt-coverage-researcher-stats-lastmatch
+    title: "Coverage - Researcher Stats Last Match"
+    description: "Generate comprehensive structured analysis focusing on a team's performance in their last match with detailed statistical insights"
+    schema:
+      title: "SoccerLastMatch"
+      description: "Comprehensive analysis structure for team performance in their last match in Brazilian soccer context"
+      type: "object"
+      properties:
+        key_players:
+          type: "array"
+          description: "Detailed analysis of key players' performances in the match with comprehensive statistics"
+          items:
+            type: "object"
+            properties:
+              title:
+                type: "string"
+                enum: [
+                  "[Team Name]'s Match Result Overview",
+                  "[Team Name]'s Attacking Players Performance",
+                  "[Team Name]'s Defensive Players Performance",
+                  "[Team Name]'s Midfield Players Performance",
+                  "[Team Name]'s Complete Lineup Analysis"
+                ]
+              content:
+                type: "string"
+                description: |
+                  Comprehensive data-driven analysis of key players' performances using all available statistics:
+                  
+                  Available Statistics for Each Player:
+                  1. Match Status & Time:
+                     - starter (true/false)
+                     - substituted_in (minute)
+                     - substituted_out (minute)
+                     - minutes_played
+                  
+                  2. Attacking Statistics:
+                     - goals_scored
+                     - assists
+                     - shots_on_target
+                     - shots_off_target
+                     - shots_blocked
+                     - shots_total
+                     - shooting_accuracy_percentage
+                  
+                  3. Passing & Ball Control:
+                     - passes_completed
+                     - passes_attempted
+                     - pass_accuracy_percentage
+                     - key_passes
+                     - crosses_completed
+                     - crosses_attempted
+                     - touches
+                     - ball_recoveries
+                  
+                  4. Defensive Actions:
+                     - tackles_won
+                     - tackles_attempted
+                     - interceptions
+                     - clearances
+                     - blocks
+                     - aerial_duels_won
+                     - aerial_duels_attempted
+                  
+                  5. Set Pieces:
+                     - corner_kicks
+                     - free_kicks_taken
+                  
+                  6. Discipline & Fouls:
+                     - yellow_cards
+                     - yellow_red_cards
+                     - red_cards
+                     - offsides
+                     - own_goals
+                     - fouls_committed
+                     - fouls_suffered
+                  
+                  Structure Requirements:
+                  1. Start with detailed match result, score, and context
+                  2. Analyze ALL players with significant contributions (minimum 6-8 players per section)
+                  3. Each player analysis must include:
+                     - Starter/substitute status with exact minutes
+                     - At least 4-5 relevant statistics with context
+                     - Performance rating based on statistical output
+                     - Comparison to team average when relevant
+                  4. Minimum 6-8 paragraphs per section
+                  5. For Complete Lineup Analysis:
+                     - Detailed formation breakdown (4-3-3, 4-4-2, etc.)
+                     - All 11 starters with positions and key stats
+                     - All substitutions with exact times and impact analysis
+                     - Formation changes during the match
+                     - Tactical adjustments and their statistical impact
+                  
+                  Content Length: Each section should be 400-600 words minimum
+                  
+                  Example Enhanced Format:
+                  "Match Result: Team A 2-0 Team B at Stadium X (DD/MM/YYYY)
+                  
+                  The victory was built on solid attacking foundations, with Team A registering 15 shots (8 on target) compared to Team B's 7 attempts (3 on target). Ball possession was evenly contested at 52%-48% in favor of Team A.
+                  
+                  Attacking Players Performance:
+                  Player X (starter, 90 minutes) was the standout performer with exceptional statistics: 2 goals from 5 shots (4 on target, 80% accuracy), completed 45/52 passes (86.5% accuracy), won 7/9 aerial duels, and created 3 key passes. His movement in the box was crucial, as evidenced by his 67 touches and 12 ball recoveries in the final third.
+                  
+                  Player Y (starter, substituted 75') contributed significantly with 1 assist from 3 key passes created, completed 38/41 passes (92.7% accuracy), and registered 4 shots (2 on target). Despite being substituted, his 15 crosses attempted (6 successful) provided constant width and attacking threat down the right flank..."
+            required: ["title", "content"]
+          minItems: 5
+          maxItems: 5
+        snippets:
+          type: "array"
+          description: "Comprehensive analysis snippets with detailed statistical breakdowns focusing on team performance in their last match"
+          items:
+            type: "object"
+            properties:
+              title:
+                type: "string"
+                enum: [
+                  "[Team Name]'s Last Match Comprehensive Overview",
+                  "[Team Name]'s Attacking Performance Analysis",
+                  "[Team Name]'s Possession and Passing Statistics",
+                  "[Team Name]'s Defensive Performance Breakdown",
+                  "[Team Name]'s Set Piece and Dead Ball Situations",
+                  "[Team Name]'s Passing Efficiency and Ball Distribution",
+                  "[Team Name]'s Counter Attack and Transition Play",
+                  "[Team Name]'s Disciplinary Record and Fair Play",
+                  "[Team Name]'s Aerial Duels and Physical Battles",
+                  "[Team Name]'s Final Third Penetration and Creativity"
+                ]
+              content:
+                type: "string"
+                description: |
+                  Comprehensive statistical analysis focusing on the team's performance in their last match with detailed breakdowns:
+                  
+                  Match Context Information:
+                  - Venue: home_team, away_team, stadium_name, city
+                  - Competition: competition_name, season_name, round_number, matchday
+                  - Date & Time: match_date, kickoff_time, timezone
+                  - Weather conditions (if available)
+                  - Attendance figures
+                  - Referee information
+                  
+                  Comprehensive Statistics Available:
+                  
+                  1. Possession & Ball Control:
+                     - ball_possession (percentage and time)
+                     - total_passes, passes_completed, pass_accuracy
+                     - passes_in_own_half, passes_in_opponent_half
+                     - short_passes, medium_passes, long_passes
+                     - forward_passes, backward_passes, sideways_passes
+                  
+                  2. Attacking Statistics:
+                     - shots_total, shots_on_target, shots_off_target, shots_blocked, shots_saved
+                     - shots_inside_box, shots_outside_box
+                     - big_chances_created, big_chances_missed
+                     - expected_goals (xG), expected_assists (xA)
+                     - touches_in_penalty_area
+                     - crosses_completed, crosses_attempted
+                  
+                  3. Defensive Metrics:
+                     - tackles_won, tackles_attempted, tackle_success_rate
+                     - interceptions, clearances, blocks
+                     - aerial_duels_won, aerial_duels_attempted
+                     - defensive_actions_in_own_third
+                     - goals_conceded, shots_conceded
+                     - clean_sheet_status
+                  
+                  4. Set Pieces & Dead Balls:
+                     - corner_kicks_taken, corner_kicks_conceded
+                     - free_kicks_won, free_kicks_conceded
+                     - goal_kicks, throw_ins
+                     - penalties_awarded, penalties_conceded
+                     - set_piece_goals, set_piece_goals_conceded
+                  
+                  5. Discipline & Fair Play:
+                     - fouls_committed, fouls_suffered
+                     - yellow_cards, red_cards, yellow_red_cards
+                     - offsides_committed, offsides_won
+                     - fair_play_score
+                  
+                  6. Physical & Intensity Metrics:
+                     - distance_covered, sprints_completed
+                     - duels_won, duels_attempted
+                     - ground_duels, aerial_duels
+                     - ball_recoveries_in_different_thirds
+                  
+                  Enhanced Requirements:
+                  1. Use ALL relevant statistics with specific numbers and percentages
+                  2. Provide context and comparison (league average, season average, opponent comparison)
+                  3. Minimum 5-7 sentences per snippet (200-300 words each)
+                  4. Include statistical trends and patterns
+                  5. Analyze efficiency ratios and conversion rates
+                  6. Compare first half vs second half performance when relevant
+                  7. Highlight standout individual contributions within team context
+                  8. Use proper formatting for all names, dates, and venues
+                  9. Include tactical context behind the statistics
+                  10. Provide insights into what the numbers reveal about team performance
+                  
+                  Content Depth: Each snippet should provide comprehensive analysis with multiple statistical layers and contextual insights.
+            required: ["title", "content"]
+          minItems: 8
+          maxItems: 10
+      required: ["snippets", "key_players"]

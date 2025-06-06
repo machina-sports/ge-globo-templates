@@ -1,0 +1,12 @@
+agent:
+  name: populate-folder-structure
+  title: "Populate - Folder Structure"
+  description: "Populate Folder Structure"
+  workflows:
+
+    # configuration-folder-structure
+    - name: "configuration-folder-structure"
+      description: "configuration-folder-structure"
+      condition: "$.get('setup-register') is not True"
+      outputs:
+        configuration-folder-structure-status: "$.get('workflow-status', False)"

@@ -1,0 +1,28 @@
+setup:
+  title: "Document Embedding"
+  description: AI-powered document embedding with personalized recommendations based on betting history.
+  category:
+    - betting-fantasy
+    - crm-fan-data
+  estimatedTime: 15 minutes
+  features:
+    - AI Agent to generate personalized recommendations based on betting history.
+    - AI Reporter to generate articles, briefings, and snippets.
+    - AI Image Generator to generate images for the blog, using a soccer match as context.
+    - AI Researcher to generate semantic snippets to enrich the articles.
+  integrations:
+    - documents
+  status: available
+  value: agent-templates/doc-embedding
+  version: 1.0.0
+
+datasets:
+  
+  - type: "connector"
+    path: "../../connectors/machina-ai/machina-ai.yml"
+
+  - type: "prompts"
+    path: "_prompts.yml"
+
+  - type: "workflow"
+    path: "embedding.yml"

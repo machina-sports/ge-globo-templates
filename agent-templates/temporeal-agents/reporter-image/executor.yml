@@ -1,0 +1,345 @@
+workflow:
+
+  name: coverage-reporter-image-executor
+  title: "Coverage - Images Executor"
+  description: "Workflow to execute images."
+  context-variables:
+    debugger:
+      enabled: true
+    machina-ai:
+      api_key: "$TEMP_CONTEXT_VARIABLE_SDK_OPENAI_API_KEY"
+  outputs:
+    workflow-status: "$.get('workflow-status', 'skipped')"
+  tasks:
+
+    # load-next-agenda
+    - type: document
+      name: load-next-agenda
+      connector:
+        name: "machina-ai"
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["value.agenda-control.updated", 1]
+      filters:
+        metadata.content-group: "{'$in': ['REPORTER_TEAM_IMAGES', 'REPORTER_GAME_IMAGES']}"
+        value.agenda-control.processing: "{'$ne': True}"
+        value.agenda-control.finished: "{'$ne': True}"
+        value.images-control.status: "{'$ne': 'executed'}"
+      inputs:
+        name: "'content-agenda'"
+      outputs:
+        agenda-exists: "len($.get('documents', [])) > 0 if $.get('documents') else False"
+        agenda-document: "$.get('documents', [{}])[0] if $.get('documents') else None"
+        agenda-document-id: "$.get('documents', [{}])[0].get('_id', '') if $.get('documents') else ''"
+        agenda-metadata: "$.get('documents', [{}])[0].get('metadata', {}) if $.get('documents') else None"
+        agenda-value: "$.get('documents', [{}])[0].get('value', {}) if $.get('documents') else None"
+
+    # document-agenda-control
+    - type: document
+      name: coverage-agenda-control-processing
+      condition: "$.get('agenda-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      filters:
+        document_id: "$.get('agenda-document-id')"
+      documents:
+        content-agenda: |
+          {
+            **$.get('agenda-value', {}),
+            'agenda-control': {
+              **$.get('agenda-control', {}),
+              'processing': True,
+              'updated': datetime.utcnow()
+            }
+          }
+
+    # mapping agenda-control
+    - type: mapping
+      name: coverage-mapping-agenda-control
+      condition: "$.get('agenda-exists') is True"
+      inputs:
+        _document: "$.get('agenda-value')"
+        _metadata: "$.get('agenda-metadata')"
+      outputs:
+        agenda-control: "$.get('agenda-control')"
+        agenda-control-finished: "$.get('agenda-control').get('finished', False)"
+        agenda-counter: "$.get('agenda-counter')"
+        content-group: "$.get('content-group')"
+        content-id: "$.get('content-id')"
+        content-name: "$.get('content-name')"
+        content-topic: "$.get('content-topic')"
+        event_code: "$.get('event_code')"
+        team_code: "$.get('team_code')"
+        script-instructions: "$.get('script-instructions')"
+
+    # mapping images-control
+    - type: mapping
+      name: coverage-mapping-images-control
+      condition: "$.get('agenda-exists') is True"
+      inputs:
+        _document: "$.get('agenda-value')"
+        _metadata: "$.get('agenda-metadata')"
+      outputs:
+        agenda-exists: "True"
+        agenda-required: "$.get('agenda-required')"
+        images-control: "$.get('images-control')"
+        images-control-status: "$.get('images-control-status')"
+        websearch-request: "$.get('websearch-request')"
+        websearch-request-status: "$.get('websearch-request-status')"
+
+    # load-content-article
+    - type: "document"
+      name: "load-content-article"
+      condition: |
+        (
+          $.get('agenda-exists') is True
+        )
+      connector:
+        name: "machina-ai"
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["updated", -1]
+      filters:
+        document_id: "$.get('content-id')"
+      outputs:
+        result-articles: "$.get('documents', []) if $.get('documents') else []"
+        result-article-selected: "$.get('documents', [])[0] if $.get('documents') else None"
+
+    # soccer-prompt-article-br-image-briefing
+    - type: prompt
+      name: soccer-prompt-article-br-image-briefing
+      condition: |
+        (
+          $.get('agenda-exists') is True
+          and $.get('websearch-request-status') == 'pending'
+          and $.get('content-group') == 'REPORTER_GAME_IMAGES'
+        )
+      connector:
+        name: "machina-ai"
+        command: "invoke_prompt"
+        model: "gpt-4.1-mini"
+      inputs:
+        _article_value: "$.get('result-article-selected', {}).get('value', {})"
+      outputs:
+        image-briefing: "$"
+  
+    # content-version-control
+    - type: document
+      name: content-version-control
+      condition: |
+        (
+          $.get('agenda-exists') is True
+          and $.get('websearch-request-status') == 'pending'
+          and $.get('content-group') == 'REPORTER_GAME_IMAGES'
+        )
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      filters:
+        document_id: "$.get('content-id')"
+      documents:
+        content-article: |
+          {
+            **$.get('result-article-selected', {}).get('value', {}),
+            **$.get('image-briefing', {})
+          }
+
+    # mapping image-from-articles
+    - type: mapping
+      name: coverage-mapping-image-from-articles
+      condition: |
+        (
+          $.get('agenda-exists') is True
+          and $.get('websearch-request-status') == 'pending'
+        )
+      inputs:
+        _article: |
+          {
+            **$.get('result-article-selected', {}).get('value', {}),
+            **$.get('image-briefing', {})
+          }
+        _metadata: "$.get('agenda-metadata')"
+      outputs:
+        image-bulk: "$.get('image-bulk', [])"
+        image-bulk-length: "len($.get('image-bulk', []))"
+
+    # create new search request
+    - type: "document"
+      name: "create-search-request"
+      condition: |
+        (
+          $.get('agenda-exists') is True
+          and $.get('websearch-request-status') == 'pending'
+          and $.get('image-bulk-length', 0) > 0
+        )
+      config:
+        action: "bulk-save"
+        embed-vector: false
+        force-update: true
+      document_name: "'web-image'"
+      documents:
+        items: "$.get('parsed-items', [])"
+      inputs:
+        parsed-items: "$.get('image-bulk')[:10]"
+      outputs:
+        websearch-request-status: "'executed'"
+        workflow-status: "'executed'"
+
+    # load-searches-and-scrapings
+    - type: "document"
+      name: "load-searches-and-scrapings"
+      condition: |
+        (
+          $.(agenda-exists) is True
+          and '$.(websearch-request-status)' == 'executed'
+        )
+      config:
+        action: "search"
+        search-limit: 100
+        search-vector: false
+        search-sorters: ["value.version_control.updated", 1]
+      filters:
+        metadata.content-group: "$.get('content-group', '')"
+        metadata.content-name: "$.get('content-name', '')"
+        metadata.content-topic: "$.get('content-topic', '')"
+      inputs:
+        name: "{'$in': ['web-search', 'web-scraping']}"
+      outputs:
+        web-research-items: "$.get('documents', [])"
+
+    # mapping web-research-items
+    - type: "mapping"
+      name: "coverage-mapping-image-research-items"
+      condition: |
+        (
+          $.(agenda-exists) is True
+          and '$.(websearch-request-status)' == 'executed'
+        )
+      inputs:
+        _documents: "$.get('web-research-items', [])"
+      outputs:
+        have-content-to-process: |
+          (
+            $.(agenda-exists) is True
+            and len($.get('web-research-finished')) > 0
+            and len($.get('web-research-pending')) == 0
+          )
+        web-research-items: "$.get('web-research-items', [])"
+        web-research-finished: "len($.get('web-research-finished', []))"
+        web-research-processing: "len($.get('web-research-processing', []))"
+        web-research-pending: "len($.get('web-research-pending', []))"
+        workflow-status: |
+          (
+            $.(agenda-exists) is True
+            and len($.get('web-research-finished')) > 0
+            and len($.get('web-research-pending')) == 0
+          ) and 'executed' or $.get('workflow-status')
+        websearch-request-status: |
+          (
+            $.(agenda-exists) is True
+            and len($.get('web-research-finished')) > 0
+            and len($.get('web-research-pending')) == 0
+          ) and 'finished' or $.get('websearch-request-status')
+        
+    # # prompt-coverage-reporter-image-executor
+    # - type: prompt
+    #   name: prompt-coverage-reporter-image-executor
+    #   description: "prompt-images"
+    #   condition: |
+    #     (
+    #       $.get('agenda-exists') is True
+    #       and $.get('snippets-length', 0) > 0
+    #     )
+    #   connector:
+    #     name: "machina-ai"
+    #     command: "invoke_prompt"
+    #     model: "gpt-4.1"
+    #   inputs:
+    #     doc_context: "$.get('snippets-bulk', [])[:10] if $.get('snippets-bulk') else []"
+    #     instruction: "$.get('script-instructions')"
+    #   outputs:
+    #     generated-content-images: "$.get('questions', [])"
+    #     images-control-status: "'executed'"
+    #     workflow-status: "'executed'"
+
+    # # save / update documents
+
+    # # 0 bulk-content-images
+    # - type: "document"
+    #   name: "bulk-content-images"
+    #   condition: |
+    #     (
+    #       $.get('agenda-exists') is True
+    #       and $.get('required-agenda-length') == $.get('existing-agenda-length')
+    #       and $.get('snippets-length') > 0
+    #     )
+    #   description: "Bulk save the images."
+    #   config:
+    #     action: "bulk-save"
+    #     embed-vector: false
+    #   document_name: "'content-image'"
+    #   documents:
+    #     items: "$.get('parsed_images', [])"
+    #   inputs:
+    #     parsed_images: |
+    #       [
+    #         {
+    #           **c,
+    #           "metadata": {
+    #             "content-group": "$.(content-group)",
+    #             "content-name": "$.(content-name)",
+    #             "content-topic": "$.(content-topic)",
+    #             "event_code": "$.(event_code)",
+    #             "language": "en"
+    #           },
+    #           "version_control": {
+    #             "embed_image_status": "pending"
+    #           }
+    #         }
+    #         for c in $.get('generated-content-images', [])
+    #       ]
+
+    # document-agenda-control
+    - type: document
+      name: coverage-agenda-control-update
+      condition: "$.get('agenda-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      filters:
+        document_id: "$.get('agenda-document-id')"
+      documents:
+        content-agenda: |
+          {
+            **$.get('agenda-value', {}),
+            'agenda-control': {
+              **$.get('agenda-control', {}),
+              'counter': $.get('agenda-counter', 0) + 1,
+              'finished': $.get('agenda-control-finished', False),
+              'processing': False,
+              'updated': datetime.utcnow()
+            },
+            'images-control': {
+              **$.get('images-control', {}),
+              'status': $.get('images-control-status')
+            },
+            'websearch-request': {
+              **$.get('websearch-request', {}),
+              'pending': $.get('web-research-pending', []),
+              'processing': $.get('web-research-processing', []),
+              'finished': $.get('web-research-finished', []),
+              'status': $.get('websearch-request-status')
+            }
+          }

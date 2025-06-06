@@ -1,0 +1,38 @@
+prompts:
+
+  # prompt-coverage-researcher-stats-reasoning
+  - type: prompt
+    name: prompt-coverage-researcher-stats-reasoning
+    title: "Coverage - Researcher Stats Generator"
+    description: "Generate editorial briefing script for a game"
+    schema:
+      title: "PromptGameCoverageGenerator"
+      description: "Generate editorial briefing script for a game"
+      required: [
+        "title",
+        "content",
+        "subject",
+        "script_code",
+        "home_perspective",
+        "away_perspective",
+      ]
+      type: "object"
+      properties:
+        content:
+          type: "string"
+          description: "Brief editorial outline highlighting key focus points and angles for the game coverage"
+        title:
+          type: "string"
+          description: "Engaging title highlighting the game"
+        subject:
+          type: "string"
+          description: "Main focus of the coverage (e.g., 'Arsenal vs Liverpool preview', 'Real Madrid Champions League preparation')"
+        script_code:
+          type: "string"
+          description: "Game coverage type code in format GAME_NEWS"
+        home_perspective:
+          type: "string"
+          description: "The name of the home team"
+        away_perspective:
+          type: "string"
+          description: "The name of the away team"

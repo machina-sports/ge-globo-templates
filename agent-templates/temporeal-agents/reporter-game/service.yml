@@ -1,0 +1,150 @@
+workflow:
+
+  name: coverage-reporter-game-service
+  title: "Coverage - Reporter Game Service"
+  description: "Coverage - Reporter Game Service"
+  inputs:
+    event_code: "$.get('event_code') or None"
+  outputs:
+    workflow-status: "$.get('game-exists') is not True and 'skipped' or 'executed'"
+  tasks:
+
+    # load-game-by-code
+    - type: document
+      name: "load-game-by-code"
+      condition: "$.get('event_code') is not None"
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["start_time", 1]
+      filters:
+        metadata.event_code: "$.get('event_code')"
+      inputs:
+        name: "{'$in': ['soccer-game']}"
+      outputs:
+        game-exists: "len($.get('documents', [])) > 0 if $.get('documents') else False"
+        game-metadata: "$.get('documents')[0].get('metadata', {}) if $.get('documents') else None"
+        game-value: "$.get('documents')[0].get('value', {}) if $.get('documents') else None"
+        reporter-game-control: "$.get('documents')[0].get('value', {}).get('reporter-game-control', {}) if $.get('documents') else None"
+
+    # load-game-by-schedule
+    - type: document
+      name: load-game-by-schedule
+      condition: "$.get('game-exists') is not True"
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["value.version_control.updated", 1]
+      filters:
+        value.start_time: "{'$gt': datetime.utcnow() - timedelta(hours=1), '$lt': datetime.utcnow() + timedelta(hours=24)}"
+        value.reporter-game-control.finished: "{'$ne': True}"
+        value.reporter-game-control.processing: "{'$ne': True}"
+        value.version_control.processing: "{'$ne': True}"
+        value.version_control.finished: "{'$ne': True}"
+      inputs:
+        name: "{'$in': ['soccer-game']}"
+      outputs:
+        event_code: "$.get('documents')[0].get('metadata', {}).get('event_code', None)"
+        game-exists: "len($.get('documents', [])) > 0 if $.get('documents') else False"
+        game-metadata: "$.get('documents')[0].get('metadata', {}) if $.get('documents') else None"
+        game-value: "$.get('documents')[0].get('value', {}) if $.get('documents') else None"
+        reporter-game-control: "$.get('documents')[0].get('value', {}).get('reporter-game-control', {}) if $.get('documents') else None"
+
+    # coverage-mapping-reporter-game-summary
+    - type: mapping
+      name: coverage-mapping-reporter-game-summary
+      condition: "$.get('game-exists') is True"
+      inputs:
+        game_metadata: "$.get('game-metadata')"
+        game_selected: "$.get('game-value', {})"
+      outputs:
+        title: "$.get('title')"
+        game-short-name: "$.get('game-short-name')"
+
+    # reporter-game-version-control
+    - type: document
+      name: reporter-game-version-control
+      condition: "$.get('game-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      documents:
+        soccer-game: |
+          {
+            **$.get('game-value', {}),
+            'reporter-game-control': {
+              **$.get('reporter-game-control', {}),
+              'processing': True
+            }
+          }
+      metadata:
+        event_code: "$.get('event_code')"
+
+    # mapping-date-prefix
+    - type: mapping
+      name: coverage-mapping-date-prefix
+      condition: "$.get('game-exists') is True"
+      outputs:
+        date_prefix: "$.get('date_prefix')"
+
+    # mapping-reporter-game-service
+    - type: mapping
+      name: coverage-mapping-reporter-game-service
+      condition: "$.get('game-exists') is True"
+      inputs:
+        date_prefix: "$.get('date_prefix')"
+        game-short-name: "$.get('game-short-name')"
+        script_name: "'REPORTER_GAME'"
+      outputs:
+        agenda-required: "$.get('agenda-required')"
+        content-group: "$.get('content-group')"
+        content-name: "$.get('content-name')"
+        coverage-indexes: "$.get('coverage-indexes')"
+
+    # reporter-game-populate-scripts
+    - type: document
+      name: reporter-game-populate-scripts
+      condition: "$.get('game-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      documents:
+        content-script: |
+          {
+            "title": $.get('content-name'),
+            "description": "Soccer Event Pre-Match Reporter Game",
+            "name": "content-script",
+            "indexes": $.get('coverage-indexes'),
+            "agenda-required": $.get('agenda-required'),
+            "web-search-limit": 3
+          }
+      metadata:
+        content-group: "$.get('content-group')"
+        content-name: "$.get('content-name')"
+        event_code: "$.get('event_code')"
+
+    # reporter-game-version-control
+    - type: document
+      name: reporter-game-version-control
+      description: "Update the events document version control."
+      condition: "$.get('game-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      documents:
+        soccer-game: |
+          {
+            **$.get('game-value', {}),
+            'reporter-game-control': {
+              **$.get('reporter-game-control', {}),
+              'finished': True,
+              'processing': False
+            }
+          }
+      metadata:
+        event_code: "$.get('event_code')"

@@ -1,0 +1,75 @@
+agent:
+  name: populate-data-conmebol
+  title: "Populate - Conmebol"
+  description: "Populate Content from Sync Workflows"
+  workflows:
+
+    # # sync soccer competitions
+    # - name: "sportradar-soccer-sync-competitions"
+    #   description: "sync-competitions"
+    #   outputs:
+    #     sync-competitions-status: "$.get('workflow-status', False)"
+
+    # # sync Brasileirao - seasons
+    # - name: "sportradar-soccer-sync-seasons"
+    #   description: "sync-seasons"
+    #   inputs:
+    #     competition_id: "'sr:competition:325'"
+    #   outputs:
+    #     sync-seasons-status: "$.get('workflow-status', False)"
+
+    # # update Brasileirao - competition
+    # - name: "sportradar-soccer-update-competition"
+    #   description: "update-competition"
+    #   inputs:
+    #     season_id: "'sr:season:128461'"
+    #   outputs:
+    #     update-competition-status: "$.get('workflow-status', False)"
+
+    # # sync Brasileirao - schedules
+    # - name: "sportradar-soccer-sync-schedules"
+    #   description: "sync-schedules"
+    #   inputs:
+    #     season_id: "'sr:season:128461'"
+    #   outputs:
+    #     sync-schedules-status: "$.get('workflow-status', False)"
+
+    # # sync Brasileirao - competitors
+    # - name: "sportradar-soccer-sync-competitors"
+    #   description: "sync-competitors"
+    #   inputs:
+    #     season_id: "'sr:season:128461'"
+    #   outputs:
+    #     sync-competitors-status: "$.get('workflow-status', False)"
+    # sync Brasileirao - seasons
+    
+    # World Cup - Eliminatórias
+    - name: "sportradar-soccer-sync-seasons"
+      description: "sync-seasons"
+      inputs:
+        competition_id: "'sr:competition:295'"
+      outputs:
+        sync-seasons-status: "$.get('workflow-status', False)"
+
+    - name: "sportradar-soccer-update-competition"
+      description: "update-competition"
+      inputs:
+        season_id: "'sr:season:109025'"
+      outputs:
+        update-competition-status: "$.get('workflow-status', False)"
+
+    - name: "sportradar-soccer-sync-schedules"
+      description: "sync-schedules"
+      inputs:
+        season_id: "'sr:season:109025'"
+      outputs:
+        sync-schedules-status: "$.get('workflow-status', False)"
+
+    - name: "sportradar-soccer-sync-competitors"
+      description: "sync-competitors"
+      inputs:
+        season_id: "'sr:season:109025'"
+      outputs:
+        sync-competitors-status: "$.get('workflow-status', False)"
+
+# sr:sport_event:60376737

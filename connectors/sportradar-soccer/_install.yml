@@ -1,0 +1,70 @@
+setup:
+  title: Sportradar Soccer v4
+  description: Connect to the SportRadar Soccer API to get live and historical data.
+  category:
+    - data-acquisition
+    - soccer
+  estimatedTime: 1 minute
+  features:
+    - Real-time game updates
+    - Vast database of supplementary statistics
+    - Data collected via Sportradar on-venue scouts and in-house operators
+    - Over 650 unique competitions are available in one package
+    - See our Coverage Matrix for a detailed breakdown of competitions and data offered
+    - Consistent structure, format and behavior with the other General Sport APIs
+    - Primary feeds will return seasons, competitions, team/player data and real-time scores
+    - Additional feeds provide a host of complementary stats, including
+      - Live standings for top leagues
+      - League leaders
+      - Win probabilities for every match
+      - Lineups with formations
+      - Seasonal statistics
+      - Season leaders
+      - Missing/Injured players
+      - Live ball-spotting data (x,y coordinates for events on the field)
+      - Head-to-head statistics
+      - Fun facts
+    - Real-time customers are also offered two delivery Push Feeds to enhance speed
+    - An extra package containing extended statistics is also available. This package includes live extended match player stats for
+      - Minutes
+      - Passing
+      - Tackles
+    - Crosses
+    - Blocks/Saves
+    - Fouls
+    - Offsides
+
+  integrations:
+    - sportradar
+  status: available
+  value: connectors/sportradar-soccer
+  version: 4.0.0
+
+datasets:
+
+  - type: "connector"
+    path: "sportradar-soccer.yml"
+
+  - type: "mappings"
+    path: "mappings/event-summary.yml"
+  - type: "mappings"
+    path: "mappings/last-match.yml"
+  - type: "mappings"
+    path: "mappings/version-control.yml"
+  
+  - type: "workflow"
+    path: "sync-competitions.yml"
+  - type: "workflow"
+    path: "sync-competitors.yml"
+  - type: "workflow"
+    path: "sync-schedules.yml"
+  - type: "workflow"
+    path: "sync-seasons.yml"
+  - type: "workflow"
+    path: "update-competition.yml"
+  - type: "workflow"
+    path: "update-live.yml"
+  - type: "workflow"
+    path: "update-postlive.yml"
+  - type: "workflow"
+    path: "update-prelive.yml"

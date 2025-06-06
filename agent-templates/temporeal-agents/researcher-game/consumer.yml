@@ -1,0 +1,30 @@
+agent:
+
+  name: coverage-researcher-game-consumer
+  title: "Coverage - Researcher Game"
+  description: "Workflow to consume researcher game."
+  # context:
+  #   config-frequency: 0.2
+  inputs:
+    event_code: "$.get('event_code') or None"
+  workflows:
+
+    # coverage researcher game service
+    - name: "coverage-researcher-game-service"
+      description: "Coverage Researcher Game Service"
+      inputs:
+        event_code: $.get('event_code')
+      outputs:
+        researcher-service-status: "$.get('workflow-status', False)"
+
+    # coverage researcher game reasoning
+    - name: "coverage-researcher-game-reasoning"
+      description: "Coverage Researcher Game Reasoning"
+      outputs:
+        researcher-reasoning-status: "$.get('workflow-status', False)"
+
+    # coverage researcher game executor
+    - name: "coverage-researcher-game-executor"
+      description: "Coverage Researcher Game Executor"
+      outputs:
+        researcher-executor-status: "$.get('workflow-status', False)"

@@ -1,0 +1,165 @@
+prompts:
+
+  # prompt-coverage-reporter-image-executor
+  - type: prompt
+    name: prompt-coverage-reporter-image-executor
+    title: "Coverage - Images Executor"
+    description: "This prompt generates short and engaging IMAGE questions for TV, inviting fans' OPINIONS or PREDICTIONS about the match, using context data."
+    schema:
+      title: "ImageContentEnglish"
+      description: |
+        RULES FOR OPINION/PREDICTION IMAGES ON TV:
+
+        MAIN OBJECTIVE:
+        - Engagement: Create questions that encourage participation, debate, and expression of the fan's OPINION or EXPECTATION about the game.
+        - Context: Use information from the Reference Document (`doc_context`) as BACKGROUND to make the question relevant and informed, but the final answer is the public's OPINION.
+
+        IMAGE STRUCTURE:
+        - Question: Short, direct, and formulated to ask for an opinion, prediction, or evaluation (Ex: "Who do you think...?", "What is the biggest challenge...?", "What to expect from...?", "How do you rate...?", "Could it be that...?").
+        - Options: 2 to 4 SHORT answer options representing different viewpoints, feelings, or plausible predictions.
+        - Variation: Avoid repeating the same type of question or answer structure in sequence.
+      type: "object"
+      properties:
+        questions:
+          type: "array"
+          description: "Array containing engaging images questions."
+          minItems: 5
+          maxItems: 5
+          items:
+            type: "object"
+            properties:
+              title:
+                type: "string"
+                description: "SHORT and ENGAGING question asking for OPINION or PREDICTION."
+              title_es:
+                type: "string"
+                description: "SHORT and ENGAGING question in Spanish."
+              title_it:
+                type: "string"
+                description: "SHORT and ENGAGING question in Italian."
+              title_de:
+                type: "string"
+                description: "SHORT and ENGAGING question in German."
+              title_fr:
+                type: "string"
+                description: "SHORT and ENGAGING question in French."
+              title_pt:
+                type: "string"
+                description: "SHORT and ENGAGING question in Brazilian Portuguese."
+              title_ja:
+                type: "string"
+                description: "SHORT and ENGAGING question in Japanese."
+              title_he:
+                type: "string"
+                description: "SHORT and ENGAGING question in Hebrew."
+              title_ar:
+                type: "string"
+                description: "SHORT and ENGAGING question in Arabic."
+              answers:
+                type: "array"
+                description: "2 to 4 SHORT answer options reflecting OPINIONS/PREDICTIONS."
+                minItems: 2
+                maxItems: 4
+                items:
+                  type: "object"
+                  description: "Answer option (opinion-based)."
+                  properties:
+                    title:
+                      type: "string"
+                      description: "SHORT option expressing an OPINION/PREDICTION."
+                    title_es:
+                      type: "string"
+                      description: "SHORT option in Spanish."
+                    title_it:
+                      type: "string"
+                      description: "SHORT option in Italian."
+                    title_de:
+                      type: "string"
+                      description: "SHORT option in German."
+                    title_fr:
+                      type: "string"
+                      description: "SHORT option in French."
+                    title_pt:
+                      type: "string"
+                      description: "SHORT option in Brazilian Portuguese."
+                    title_ja:
+                      type: "string"
+                      description: "SHORT option in Japanese."
+                    title_he:
+                      type: "string"
+                      description: "SHORT option in Hebrew."
+                    title_ar:
+                      type: "string"
+                      description: "SHORT option in Arabic."
+                  required:
+                    - title
+                    - title_es
+                    - title_it
+                    - title_de
+                    - title_fr
+                    - title_pt
+                    - title_ja
+                    - title_he
+                    - title_ar
+            required:
+              - title
+              - title_es
+              - title_it
+              - title_de
+              - title_fr
+              - title_pt
+              - title_ja
+              - title_he
+              - title_ar
+              - answers
+
+  # prompt-coverage-reporter-image-generator
+  - type: prompt
+    name: prompt-coverage-reporter-image-generator
+    title: "Coverage - Images Generator"
+    description: "Generate editorial briefing script for planning match coverage from a specific team's perspective"
+    schema:
+      title: "PromptTeamMatchCoverageImagesGenerator"
+      description: "Generate editorial briefing script for planning match coverage from a specific team's perspective"
+      required:
+        - title
+        - content
+        - subject
+        - script_code
+        - team_perspective
+        - opponent_team
+        - search_queries
+      type: "object"
+      properties:
+        content:
+          type: "string"
+          description: "Brief editorial outline highlighting key focus points and angles for the match coverage"
+        title:
+          type: "string"
+          description: "Engaging title highlighting the matchup from the specified team's perspective"
+        subject:
+          type: "string"
+          description: "Main focus of the coverage (e.g., 'Arsenal vs Liverpool preview', 'Real Madrid Champions League preparation')"
+        script_code:
+          type: "string"
+          description: "Match coverage type code in format TEAMA_X_TEAMB_HOME_NEWS or TEAMA_X_TEAMB_AWAY_NEWS, determining the perspective of content generation"
+        team_perspective:
+          type: "string"
+          description: "The team from whose perspective the content is being generated"
+        opponent_team:
+          type: "string"
+          description: "The opposing team in the match"
+        search_queries:
+          type: "array"
+          minItems: 1
+          maxItems: 2
+          items:
+            type: "object"
+            description: "List of images topics to be searched"
+            required:
+              - "query"
+              - "type"
+            properties:
+              query:
+                type: "string"
+                description: "The actual image topic to be searched"

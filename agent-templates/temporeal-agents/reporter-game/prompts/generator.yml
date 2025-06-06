@@ -1,0 +1,97 @@
+prompts:
+
+  # prompt-coverage-reporter-game-generator
+  - type: prompt
+    name: prompt-coverage-reporter-game-generator
+    title: "Coverage - Reporter Game Generator"
+    description: "Gere um roteiro editorial para um especial sobre o contexto histórico do clube antes da Copa do Mundo de Clubes da FIFA 2025. O roteiro deve sugerir tópicos que ajudem a contar a trajetória do time até o torneio, incluindo eras de ouro, campanhas marcantes, evolução do elenco, conquistas, rivalidades históricas, impacto social e expectativas para a competição."
+    schema:
+      title: "PromptTeamMatchCoverageReporterTeamGenerator"
+      description: |
+        Gere um roteiro editorial para um especial sobre a história e o legado do clube, com foco em sua preparação e contexto antes da Copa do Mundo de Clubes da FIFA 2025. Os tópicos devem abordar desde a fundação, grandes conquistas, jogadores lendários, campanhas históricas, até o momento atual e a expectativa para o torneio.
+      required:
+        - title
+        - content
+        - subject
+        - script_code
+        - team_perspective
+        - opponent_team
+        - reporter-game_topics
+      type: "object"
+      properties:
+        content:
+          type: "string"
+          description: "Resumo editorial destacando os principais pontos de atenção, ângulos de abordagem e temas que devem ser explorados na cobertura do jogo."
+        title:
+          type: "string"
+          description: "Título envolvente que destaque o confronto sob a ótica do time selecionado, podendo trazer provocações, curiosidades ou fatos históricos."
+        subject:
+          type: "string"
+          description: "Foco principal da cobertura (ex: 'Prévia Arsenal x Liverpool', 'Preparação do Real Madrid para a Champions League')."
+        script_code:
+          type: "string"
+          description: "Código do tipo de cobertura, no formato TEAMA_X_TEAMB_HOME_NEWS ou TEAMA_X_TEAMB_AWAY_NEWS, determinando a perspectiva do conteúdo."
+        team_perspective:
+          type: "string"
+          description: "Time cuja perspectiva será priorizada na geração do conteúdo."
+        opponent_team:
+          type: "string"
+          description: "Time adversário no confronto."
+        reporter-game_topics:
+          type: "array"
+          minItems: 1
+          maxItems: 2
+          items:
+            type: "object"
+            description: "Lista de tópicos para enquetes ou debates, cobrindo tanto o contexto atual quanto fatos históricos, curiosidades, transferências, eras marcantes, jogadores lendários, campanhas históricas, rivalidades, impacto social, etc."
+            required:
+              - "query"
+              - "type"
+            properties:
+              query:
+                type: "string"
+                description: |
+                  Tema da enquete ou debate a ser gerado. Para tópicos históricos, inclua contexto relevante como temporadas, décadas, jogadores lendários, campanhas marcantes, transferências, impacto fora de campo, etc. Exemplos:
+                  - 'Qual foi a era mais dominante do Bayern de Munique?'
+                  - 'Jogadores do Bayern que venceram a Copa do Mundo enquanto estavam no clube'
+                  - 'Qual a transferência mais impactante da história do clube?'
+                  - 'Como a torcida influenciou a virada histórica em 2013?'
+                  - 'Quais os maiores rivais do clube e por quê?'
+              type:
+                type: "string"
+                enum:
+                  - "ULTIMOS_5_JOGOS"
+                  - "DECLARACOES_TECNICO"
+                  - "JOGADORES_DESTAQUE"
+                  - "HISTORICO_CONFRONTOS"
+                  - "NOTICIAS_LESOES"
+                  - "MOMENTO_RECENTE"
+                  - "COMPARACAO_LENDAS"
+                  - "TEMPORADA_HISTORICA"
+                  - "ERA_DE_OURO"
+                  - "MOMENTOS_RIVALIDADE"
+                  - "MAIOR_CONQUISTA_TIME"
+                  - "IMPACTO_JOGADOR_HISTORICO"
+                  - "TRANSFERENCIAS_MARCANTES"
+                  - "IMPACTO_FORA_DE_CAMPO"
+                  - "CULTURA_TORCIDA"
+                  - "EVOLUCAO_ESTRUTURA"
+                description: |
+                  Tipo de tema a ser gerado para enquete ou debate, abrangendo tópicos atuais, históricos, de bastidores, impacto social, cultura, transferências, eras, rivalidades, etc. Exemplos:
+                  - ULTIMOS_5_JOGOS: Análise dos últimos resultados do time
+                  - DECLARACOES_TECNICO: Frases e opiniões recentes do treinador
+                  - JOGADORES_DESTAQUE: Foco em jogadores que se destacaram recentemente
+                  - HISTORICO_CONFRONTOS: Retrospecto do confronto entre os times
+                  - NOTICIAS_LESOES: Atualização sobre lesões e desfalques
+                  - MOMENTO_RECENTE: Situação atual do time na temporada
+                  - COMPARACAO_LENDAS: Comparação entre ídolos de diferentes épocas
+                  - TEMPORADA_HISTORICA: Destaque para campanhas históricas
+                  - ERA_DE_OURO: Análise de períodos de maior sucesso do clube
+                  - MOMENTOS_RIVALIDADE: Grandes momentos em rivalidades
+                  - MAIOR_CONQUISTA_TIME: A maior conquista da história do clube
+                  - IMPACTO_JOGADOR_HISTORICO: Como um jogador marcou época no clube
+                  - TRANSFERENCIAS_MARCANTES: Transferências que mudaram a história do time
+                  - IMPACTO_FORA_DE_CAMPO: Ações sociais, engajamento e influência do clube além do futebol
+                  - CULTURA_TORCIDA: Tradições, festas e influência da torcida
+                  - EVOLUCAO_ESTRUTURA: Mudanças em estádio, centro de treinamento, etc.
+          

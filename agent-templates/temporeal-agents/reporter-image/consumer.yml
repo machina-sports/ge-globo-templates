@@ -1,0 +1,30 @@
+agent:
+
+  name: coverage-reporter-image-consumer
+  title: "Coverage - Reporter Image"
+  description: "Workflow to consume images."
+  # context:
+  #   config-frequency: 0.2
+  inputs:
+    article-content-id: "$.get('article-content-id') or None"
+  workflows:
+
+    # coverage image service
+    - name: coverage-reporter-image-service
+      description: "Coverage Images Service"
+      inputs:
+        article-content-id: $.get('article-content-id')
+      outputs:
+        images-service-status: "$.get('workflow-status', False)"
+
+    # coverage image generator
+    - name: coverage-reporter-image-generator
+      description: "Coverage Images Generator"
+      outputs:
+        images-generator-status: "$.get('workflow-status', False)"
+
+    # coverage image executor
+    - name: coverage-reporter-image-executor
+      description: "Coverage Images Executor"
+      outputs:
+        images-executor-status: "$.get('workflow-status', False)"

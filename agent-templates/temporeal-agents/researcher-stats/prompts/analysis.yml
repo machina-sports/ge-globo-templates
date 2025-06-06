@@ -1,0 +1,70 @@
+prompts:
+
+  # prompt-coverage-researcher-stats-analysis
+  - type: prompt
+    name: prompt-coverage-researcher-stats-analysis
+    title: "Coverage - Research Stats Analysis"
+    description: "Extract and analyze specific information from the provided research documents only"
+    schema:
+      title: "SoccerCoverageResearchAnalysis"
+      description: "Extract specific snippets from the provided research documents - NO GENERATED CONTENT ALLOWED"
+      type: "object"
+      properties:
+        snippets:
+          type: "array"
+          description: "Exact excerpts from the provided research documents that contain specific subjects - must be direct quotes or paraphrases from the source material only"
+          minItems: 1
+          maxItems: 20
+          items:
+            type: "object"
+            required:
+              - title
+              - content
+              - subject
+              - script_code
+              - start_index
+              - end_index
+            properties:
+              content:
+                type: "string"
+                description: "ONLY extract actual content from the provided documents. Include exact quotes, specific statistics, actual dates mentioned, real player names cited, concrete facts stated in the source material. DO NOT generate, assume, or create any information not explicitly present in the documents. If the document mentions 'Roberto Martinez said X on Tuesday', include that exact information. If it mentions specific scores, dates, or statistics, include those exact details."
+              title:
+                type: "string"
+                description: "Create a title based ONLY on the actual content found in the documents. Use real names, dates, and facts mentioned in the source material."
+              subject:
+                type: "string"
+                description: "Identify the specific subject based ONLY on what is actually mentioned in the provided documents. Use exact names, teams, competitions, and topics as they appear in the source text. Do not generalize or create generic descriptions."
+              script_code:
+                type: "string"
+                description: |
+                  Content type code that categorizes the snippet based on what is actually in the document. Categories include:
+                  Current news: PLAYER_TRANSFER_NEWS, GAME_TRANSFER_NEWS, GAME_MERCHANDISE_EVENT, PLAYER_RELEASE_EVENT, MANAGER_STATEMENTS
+                  Historical facts: PLAYER_HISTORIC_STATS, GAME_HISTORIC_ACHIEVEMENT, LEGENDARY_PLAYER_CAREER, HISTORIC_SEASON_REVIEW
+                  Competition records: COMPETITION_RECORD_GOALS, COMPETITION_RECORD_TITLES, HISTORIC_DERBY_STATS
+                  Player achievements: PLAYER_AWARDS_HISTORY, PLAYER_SEASON_STATS, PLAYER_COMPETITION_RECORDS
+                  Game history: GAME_GOLDEN_ERA, GAME_TROPHY_HISTORY, GAME_HISTORIC_LINEUP
+                enum:
+                  - PLAYER_TRANSFER_NEWS
+                  - GAME_TRANSFER_NEWS
+                  - GAME_MERCHANDISE_EVENT
+                  - PLAYER_RELEASE_EVENT
+                  - MANAGER_STATEMENTS
+                  - PLAYER_HISTORIC_STATS
+                  - GAME_HISTORIC_ACHIEVEMENT
+                  - LEGENDARY_PLAYER_CAREER
+                  - HISTORIC_SEASON_REVIEW
+                  - COMPETITION_RECORD_GOALS
+                  - COMPETITION_RECORD_TITLES
+                  - HISTORIC_DERBY_STATS
+                  - PLAYER_AWARDS_HISTORY
+                  - PLAYER_SEASON_STATS
+                  - PLAYER_COMPETITION_RECORDS
+                  - GAME_GOLDEN_ERA
+                  - GAME_TROPHY_HISTORY
+                  - GAME_HISTORIC_LINEUP
+              start_index:
+                type: "integer"
+                description: "The exact start character position in the source document where this information begins"
+              end_index:
+                type: "integer"
+                description: "The exact end character position in the source document where this information ends"

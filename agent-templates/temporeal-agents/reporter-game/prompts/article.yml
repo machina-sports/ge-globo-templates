@@ -1,0 +1,333 @@
+prompts:
+
+  # soccer-prompt-article-br-heading
+  - type: "prompt"
+    title: "Soccer Prompt Article BR - Heading"
+    name: "soccer-prompt-article-br-heading"
+    description: "Este prompt gera o título para um post do blog em português brasileiro sobre uma partida que ainda não ocorreu. O tom deve ser profissional mas com personalidade, como um amigo que manja muito de apostas e sabe entreter enquanto informa."
+    instruction: |
+      Atue como um analista de apostas que realmente entende do assunto e sabe contar uma boa história.
+
+      **Normalização de Nomes:**
+      - Remova sufixos como "EC", "MG", "SP", "RJ", etc. (ex: "Cruzeiro EC MG" → "Cruzeiro")
+      - Use acentuação correta (ex: "Goias" → "Goiás")
+      - Normalize nomes de times e competições para seus formatos oficiais
+      - Exemplos:
+        * "EC Goias" → "Goiás"
+        * "Cruzeiro EC MG" → "Cruzeiro"
+        * "Atletico Mineiro" → "Atlético Mineiro"
+        * "Sao Paulo" → "São Paulo"
+
+      **Diretrizes Gerais:**
+      - Use apenas dados explicitamente fornecidos no contexto.
+      - Não invente resultados de jogos anteriores ou estatísticas fictícias.
+      - Seja criativo na narrativa, mas factual com os dados.
+      - Use markdown formatting.
+      - Use sempre odds no formato decimal (exemplo: 2.50 ao invés de +150)
+    schema:
+      title: "PostBlogPreviaTitulo"
+      description: "Este schema define a estrutura para gerar o título de um post do blog em português brasileiro sobre uma partida que ainda não ocorreu."
+      type: "object"
+      properties:
+        title:
+          type: "string"
+          description: "Gere um título seguindo o seguinte template: 'Palpites [Time A] x [Time B]: odds do [Nome do Campeonato]'. Use os dados disponíveis para substituir os campos entre colchetes, garantindo que o título contenha as informações essenciais do confronto."
+        subtitle:
+          type: "string"
+          description: |
+            Crie um subtítulo direto e factual usando APENAS os dados de mercado disponíveis.
+
+            USAR SOMENTE:
+            ✅ Odds da partida (exemplo: "Internacional 1.85, Empate 3.40, Fortaleza 4.20")
+            ✅ Total de gols principal (exemplo: "2.5 gols")
+            ✅ Odds decimais dos mercados (exemplo: "2.50", "1.85")
+            
+            NÃO USAR - DADOS INDISPONÍVIS:
+            ❌ Sequência de vitórias/derrotas
+            ❌ Histórico de confrontos
+            ❌ Desempenho recente das equipes
+            ❌ Estatísticas de jogadores
+            ❌ Informações de lesões
+            ❌ Campanhas na temporada
+            
+            PROIBIDO NO TEXTO:
+            ❌ Perguntas ("Será que...?")
+            ❌ "Busca", "Tenta", "Quer"
+            ❌ "Pode", "Deve", "Deve ser"
+            ❌ Especulações sobre forma/momento
+            
+            EXEMPLOS CORRETOS:
+            ✅ "Internacional Favorito a 1.85, Total em 2.5 Gols"
+            ✅ "Over 2.5 Gols Cotado a 2.20"
+        event_name:
+          type: "string"
+          description: "Nome do evento. Exemplo: 'Flamengo x Palmeiras'"
+        event_date_time:
+          type: "string"
+          description: "Data e horário do evento. Exemplo: 13 de Abril de 2025 às 16:00 (horário local)"
+        event_venue:
+          type: "string"
+          description: "Local do evento. Exemplo: 'Maracanã, Rio de Janeiro, Brasil'"
+        slug:
+          type: "string"
+          description: "Slug do evento"
+      required: [
+        "title",
+        "subtitle",
+        "event_name",
+        "event_date_time",
+        "event_venue",
+        "slug"
+      ]
+            
+  # soccer-prompt-article-br-odds
+  - type: "prompt"
+    title: "Soccer Prompt Article BR - Odds Analysis"
+    name: "soccer-prompt-article-br-odds"
+    description: "Este prompt gera a seção de análise de odds para um post do blog em português brasileiro sobre uma partida que ainda não ocorreu."
+    instruction: |
+      Analise as odds da partida (1X2) e do total de gols (over/under) pré-jogo.
+
+      **Normalização de Nomes:**
+      - Remova sufixos como "EC", "MG", "SP", "RJ", etc. (ex: "Cruzeiro EC MG" → "Cruzeiro")
+      - Use acentuação correta (ex: "Goias" → "Goiás")
+      - Normalize nomes de times e competições para seus formatos oficiais
+      - Exemplos:
+        * "EC Goias" → "Goiás"
+        * "Cruzeiro EC MG" → "Cruzeiro"
+        * "Atletico Mineiro" → "Atlético Mineiro"
+        * "Sao Paulo" → "São Paulo"
+
+      **Diretrizes Essenciais:**
+      - Use apenas odds explicitamente fornecidas
+      - Use sempre formato decimal
+      - Se o Under não estiver disponível, mencione apenas o Over
+      - Não faça interpretações ou previsões
+      - MÁXIMO 60 palavras no total
+    schema:
+      title: "PostBlogPreviaOdds"
+      description: "Este schema define a estrutura para gerar a análise de odds de um post do blog em português brasileiro sobre uma partida que ainda não ocorreu."
+      type: "object"
+      properties:
+        section_title:
+          type: "string"
+          description: "Odds da Partida e Total de Gols para [Time A] x [Time B]"
+        section_content:
+          type: "string"
+          description: |
+            Em no máximo 60 palavras, analise as odds da partida (1X2) e do total de gols (over/under) pré-jogo.
+
+            NÃO INCLUIR:
+            ❌ Odds não especificadas ou indisponíveis
+            ❌ Interpretações sobre probabilidades
+            ❌ Previsões ou tendências
+            ❌ Mercados não mencionados
+      required:
+        - section_title
+        - section_content
+
+  # soccer-prompt-article-br-team
+  - type: "prompt"
+    title: "Soccer Prompt Article BR - Team Analysis"
+    name: "soccer-prompt-article-br-team"
+    description: "Este prompt gera a seção de análise do time para um post do blog em português brasileiro sobre uma partida que ainda não ocorreu."
+    instruction: |
+      Analise o desempenho e forma recente do time, incluindo os jogadores chave.
+
+      **Normalização de Nomes:**
+      - Remova sufixos como "EC", "MG", "SP", "RJ", etc. (ex: "Cruzeiro EC MG" → "Cruzeiro")
+      - Use acentuação correta (ex: "Goias" → "Goiás")
+      - Normalize nomes de times e competições para seus formatos oficiais
+      - Exemplos:
+        * "EC Goias" → "Goiás"
+        * "Cruzeiro EC MG" → "Cruzeiro"
+        * "Atletico Mineiro" → "Atlético Mineiro"
+        * "Sao Paulo" → "São Paulo"
+
+      **Formatação de Datas:**
+      - Use referências relativas ao invés de datas específicas
+      - Exemplos:
+        * "há 2 dias" ao invés de "03/04/2025"
+        * "no último domingo" ao invés de "06/04/2025"
+        * "na última quarta-feira" ao invés de "03/04/2025"
+      - Calcule as referências relativas baseado na data atual fornecida no contexto
+      - Mantenha a ordem cronológica das partidas (da mais recente para a mais antiga)
+
+      **Diretrizes Gerais:**
+      - Foque nas últimas 2 partidas quando disponíveis.
+      - Use estatísticas e dados específicos.
+      - Evite generalizações.
+    schema:
+      title: "PostBlogPreviaTime"
+      description: "Este schema define a estrutura para gerar a análise do time de um post do blog em português brasileiro sobre uma partida que ainda não ocorreu."
+      type: "object"
+      properties:
+        section_title:
+          type: "string"
+          description: "Análise do [Nome do Time]. Faça um título curto e resumido sobre o que o time fez nas últimas 2 partidas. No máximo 8 palavras."
+        section_content:
+          type: "string"
+          description: |
+            Em até 80 palavras, forneça uma análise abrangente do time, incluindo:
+
+            1. Últimas 2 Partidas:
+               - Resultados e placares
+               - Gols marcados e sofridos
+               - Posse de bola e finalizações
+               - Desempenho ofensivo e defensivo
+            
+            2. Tendências Principais:
+               - Eficiência ofensiva/defensiva
+
+            FORMATO DE DATA:
+            ✅ "há 2 dias, o São Paulo venceu..."
+            ✅ "no último domingo, o time empatou..."
+            ❌ "em 03/04/2025, o São Paulo..."
+            ❌ "em 06/04/2025, o time..."
+      required:
+        - section_title
+        - section_content
+
+  # soccer-prompt-article-key-players
+  - type: "prompt"
+    title: "Soccer Prompt Article BR - Key Players"
+    name: "soccer-prompt-article-br-key-players"
+    description: "Gera a seção de jogadores para assistir, com suas estatísticas acumuladas nas últimas duas partidas."
+    instruction: |
+      **Diretrizes:**
+      - MÁXIMO 60 palavras no total
+      - 1-2 jogadores por time
+      - Use estatísticas acumuladas das últimas 2 partidas
+      - NÃO mencione adversários específicos
+      - NÃO cite partidas específicas
+      - Seja direto e objetivo
+      - Escreva em texto corrido, sem bullets
+      - Use conectivos simples (ex: "No outro time", "Além dele")
+
+      **Normalização de Nomes:**
+      - Remova sufixos como "EC", "MG", "SP", "RJ", etc.
+      - Use acentuação correta
+      - Normalize nomes para formatos oficiais
+    schema:
+      title: "PostBlogPreviaJogadores"  
+      description: "Schema para gerar a lista de jogadores para assistir."
+      type: "object"
+      properties:
+        section_title:
+          type: "string"
+          description: "Jogadores para Assistir"
+        section_content:
+          type: "string"
+          description: |
+            EXEMPLO:
+            ✅ "Memphis Depay é o destaque do Corinthians, com 1 gol e 1 assistência nas últimas duas partidas. No Palmeiras, Estevão acumula 2 gols e 4 finalizações no mesmo período." (25 palavras)
+            ❌ "Memphis Depay marcou contra o Vasco..."
+            ❌ "Na última partida, Estevão..."
+      required:
+        - section_title
+        - section_content
+
+  # soccer-prompt-article-br-prediction
+  - type: "prompt"
+    title: "Soccer Prompt Article BR - Prediction"
+    name: "soccer-prompt-article-br-prediction"
+    description: "Este prompt gera a seção de previsão do placar para um post do blog em português brasileiro sobre uma partida que ainda não ocorreu."
+    instruction: |
+      Faça uma previsão de placar baseada na análise dos times e odds.
+
+      **Normalização de Nomes:**
+      - Remova sufixos como "EC", "MG", "SP", "RJ", etc. (ex: "Cruzeiro EC MG" → "Cruzeiro")
+      - Use acentuação correta (ex: "Goias" → "Goiás")
+      - Normalize nomes de times e competições para seus formatos oficiais
+      - Exemplos:
+        * "EC Goias" → "Goiás"
+        * "Cruzeiro EC MG" → "Cruzeiro"
+        * "Atletico Mineiro" → "Atlético Mineiro"
+        * "Sao Paulo" → "São Paulo"
+
+      **Diretrizes Gerais:**
+      - Faça previsões claras e específicas.
+      - Suporte previsões com dados.
+      - Considere as odds disponíveis.
+    schema:
+      title: "PostBlogPreviaPrevisao"
+      description: "Este schema define a estrutura para gerar a previsão de um post do blog em português brasileiro sobre uma partida que ainda não ocorreu."
+      type: "object"
+      properties:
+        section_title:
+          type: "string"
+          description: "Previsão do Placar"
+        section_content:
+          type: "string"
+          description: |
+            Em uma ou duas frases, indique o placar final previsto e escolha uma das apostas disponíveis. Exemplo: "Flamengo 2 x 1 Palmeiras. Flamengo vence a partida com odds de 1.85." ou "Palmeiras 1 x 1 Internacional. Under 2.5 gols com odds de 1.90."
+      required:
+        - section_title
+        - section_content
+
+  # soccer-prompt-article-br-image-briefing
+  - type: prompt
+    name: soccer-prompt-article-br-image-briefing
+    title: "Soccer Prompt Article BR - Image Briefing"
+    description: |
+      Produz um briefing para uma imagem principal para um post do blog em português brasileiro sobre uma partida que ainda não ocorreu.
+    schema:
+      title: "PostBlogPreviaTitulo"
+      description: |
+        Produz um briefing para uma imagem principal para um post do blog em português brasileiro
+      type: "object"
+      properties:
+        section_1_image:
+          type: "string"
+          description: "Nome da imagem para a primeira seção exemplo bayern_fundacao_1900 (sem extensão)"
+        section_1_image_query:
+          type: "string"
+          description: "Query em inglês para buscar imagens no google exemplo Bayern Munich 1900"
+        section_2_image:
+          type: "string"
+          description: "Nome da imagem para a segunda seção exemplo bayern_anos70_europeu (sem extensão)"
+        section_2_image_query:
+          type: "string"
+          description: "Query em inglês para buscar imagens no google exemplo Bayern Munich 1970"
+        section_3_image:
+          type: "string"
+          description: "Nome da imagem para a terceira seção exemplo bayern_idolos_legends (sem extensão)"
+        section_3_image_query:
+          type: "string"
+          description: "Query em inglês para buscar imagens no google exemplo Bayern de Munique idols"
+        section_4_image:
+          type: "string"
+          description: "Nome da imagem para a quarta seção exemplo allianz_arena_fans (sem extensão)"
+        section_4_image_query:
+          type: "string"
+          description: "Query em inglês para buscar imagens no google exemplo allianz arena fans"
+        section_5_image:
+          type: "string"
+          description: "Nome da imagem para a quinta seção exemplo bayern_treinador_2025 (sem extensão)"
+        section_5_image_query:
+          type: "string"
+          description: "Query em inglês para buscar imagens no google exemplo bayern manager 2025"
+        image_briefing:
+          type: "string"
+          description: "Briefing para imagem principal."
+        main_image_query:
+          type: "string"
+          description: "Query em inglês para buscar imagens no google exemplo Bayern Munich 2025"
+        main_image_name:
+          type: "string"
+          description: "Nome da imagem para a imagem principal exemplo main_image (sem extensão)"
+      required: [
+        "section_1_image",
+        "section_1_image_query",
+        "section_2_image",
+        "section_2_image_query",
+        "section_3_image",
+        "section_3_image_query",
+        "section_4_image",
+        "section_4_image_query",
+        "section_5_image",
+        "section_5_image_query",
+        "image_briefing",
+        "main_image_query",
+        "main_image_name"
+      ]

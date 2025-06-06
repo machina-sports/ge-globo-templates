@@ -1,0 +1,26 @@
+prompts:
+
+  - type: "prompt"
+    title: "Content Snippet Prompt"
+    name: "content-snippet-prompt"
+    description: "This prompt generates a content snippet to summarize the content."
+    schema:
+      title: "ContentSnippet"
+      description: "This schema defines the structure for generating content snippets."
+      type: "object"
+      properties:
+        snippets:
+          type: "array"
+          description: "An array of snippets analyzing the content."
+          items:
+            type: "object"
+            properties:
+              title:
+                type: "string"
+                description: "The title of the snippet."
+              content:
+                type: "string"
+                description: "The content of the snippet."
+            required: ["title", "content"]
+          minItems: 1
+          maxItems: 10

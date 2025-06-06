@@ -1,0 +1,132 @@
+mappings:
+
+  # coverage-mapping-game-control
+  - type: mapping
+    name: coverage-mapping-game-control
+    title: "Coverage - Mapping Researcher Game Control"
+    description: "Mapping data from researcher game"
+    outputs:
+      game-control: |
+        $.get('_document', {}).get('game-control', {}) if $.get('_document') else {}
+      game-control-status: |
+        $.get('_document', {}).get('game-control', {}).get('status', 'pending') if $.get('_document') else 'pending'
+      game-control-new-queries: |
+        [
+          {
+            'metadata': {
+              'content-group': $.get('_metadata', {}).get('content-group', ''),
+              'content-name': $.get('_metadata', {}).get('content-name', ''),
+              'content-topic': $.get('_metadata', {}).get('content-topic', ''),
+              'event_code': $.get('_metadata', {}).get('event_code', '')
+            },
+            'game-control': {
+              'finished': False,
+              'processing': False,
+              'updated': datetime.utcnow()
+            },
+            'web-search-udm': 1,
+            'web-search-limit': 2,
+            'web-search-topic': 'TEAM_LATEST_NEWS',
+            'title': f"(Football) UEFA Nations League {$.get('_document', {}).get('agenda-object', {}).get('home_perspective', '')} latest news",
+            'web-search-query': f"(Football) UEFA Nations League {$.get('_document', {}).get('agenda-object', {}).get('home_perspective', '')} latest news"
+          },
+          {
+            'metadata': {
+              'content-group': $.get('_metadata', {}).get('content-group', ''),
+              'content-name': $.get('_metadata', {}).get('content-name', ''),
+              'content-topic': $.get('_metadata', {}).get('content-topic', ''),
+              'event_code': $.get('_metadata', {}).get('event_code', '')
+            },
+            'game-control': {
+              'finished': False,
+              'processing': False,
+              'updated': datetime.utcnow()
+            },
+            'web-search-udm': 1,
+            'web-search-limit': 2,
+            'web-search-topic': 'TEAM_LATEST_NEWS',
+            'title': f"(Football) UEFA Nations League {$.get('_document', {}).get('agenda-object', {}).get('away_perspective', '')} latest news",
+            'web-search-query': f"(Football) UEFA Nations League {$.get('_document', {}).get('agenda-object', {}).get('away_perspective', '')} latest news"
+          }
+        ]
+      game-control-queries: |
+        [
+          {
+            'metadata': {
+              'content-group': $.get('_metadata', {}).get('content-group', ''),
+              'content-name': $.get('_metadata', {}).get('content-name', ''),
+              'content-topic': $.get('_metadata', {}).get('content-topic', ''),
+              'event_code': $.get('_metadata', {}).get('event_code', '')
+            },
+            'game-control': {
+              'finished': False,
+              'processing': False,
+              'updated': datetime.utcnow()
+            },
+            'web-search-udm': $.get('_document', {}).get('agenda-object', {}).get('web-search-udm', 12),
+            'web-search-limit': $.get('_document', {}).get('agenda-object', {}).get('web-search-limit', 10),
+            'web-search-topic': item.get('type'),
+            'web-search-query': item.get('query'),
+          }
+          for item in $.get('_document', {}).get('agenda-object', {}).get('search_queries', [])
+        ]
+
+  # mapping-soccer-game-summary
+  - type: mapping
+    name: mapping-soccer-game-summary
+    title: "Mapping Soccer Game Summary"
+    description: "Mapping data from soccer game summary"
+    outputs:
+      event_code: |
+        $.get('game_metadata', {}).get('event_code', '')
+      game-short-name: |
+        $.get('game_selected', {}).get('title', '').upper().replace(' ', '_')
+
+  # coverage-mapping-researcher-game-items
+  - type: mapping
+    name: coverage-mapping-researcher-game-items
+    title: "Coverage - Mapping Researcher Game Items"
+    description: "Mapping data from researcher game items"
+    outputs:
+      researcher-game-items: |
+        [
+          {
+            **d.get('value', {}),
+            'metadata': d.get('metadata', {})
+          }
+          for d in $.get('_documents', [])
+          if d.get('name', '') == 'web-scraping'
+        ]
+      researcher-game-finished: |
+        [
+          item
+          for item in $.get('_documents', [])
+          if item.get('value', {}).get('version_control', {}).get('finished', False) == True
+        ]
+      researcher-game-processing: |
+        [
+          item
+          for item in $.get('_documents', [])
+          if item.get('value', {}).get('version_control', {}).get('processing', False) == True
+        ]
+      researcher-game-pending: |
+        [
+          item
+          for item in $.get('_documents', [])
+          if item.get('value', {}).get('version_control', {}).get('finished', False) == False
+        ]
+
+  # coverage-mapping-researcher-game-service
+  - type: mapping
+    name: coverage-mapping-researcher-game-service
+    title: "Coverage - Mapping Researcher Game Service"
+    description: "Mapping data from researcher game service"
+    outputs:
+      content-group: |
+        f"{$.('script_name')}"
+      content-name: |
+        f"{$.('date_prefix')}_{$.('game-short-name')}"
+      coverage-indexes: |
+        [
+          f"{$.('date_prefix')}_{$.('game-short-name')}_GAME_NEWS"
+        ]

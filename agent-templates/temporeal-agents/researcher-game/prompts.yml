@@ -1,0 +1,136 @@
+prompts:
+
+  # prompt-coverage-researcher-game-analysis
+  - type: prompt
+    name: prompt-coverage-researcher-game-analysis
+    title: "Coverage - Research Game Analysis"
+    description: "Extract and analyze specific information from the provided research documents only"
+    schema:
+      title: "SoccerCoverageResearchAnalysis"
+      description: "Extract specific snippets from the provided research documents - NO GENERATED CONTENT ALLOWED"
+      type: "object"
+      properties:
+        snippets:
+          type: "array"
+          description: "Exact excerpts from the provided research documents that contain specific subjects - must be direct quotes or paraphrases from the source material only"
+          minItems: 1
+          maxItems: 20
+          items:
+            type: "object"
+            required:
+              - title
+              - content
+              - subject
+              - script_code
+              - start_index
+              - end_index
+            properties:
+              content:
+                type: "string"
+                description: "ONLY extract actual content from the provided documents. Include exact quotes, specific statistics, actual dates mentioned, real player names cited, concrete facts stated in the source material. DO NOT generate, assume, or create any information not explicitly present in the documents. If the document mentions 'Roberto Martinez said X on Tuesday', include that exact information. If it mentions specific scores, dates, or statistics, include those exact details."
+              title:
+                type: "string"
+                description: "Create a title based ONLY on the actual content found in the documents. Use real names, dates, and facts mentioned in the source material."
+              subject:
+                type: "string"
+                description: "Identify the specific subject based ONLY on what is actually mentioned in the provided documents. Use exact names, teams, competitions, and topics as they appear in the source text. Do not generalize or create generic descriptions."
+              script_code:
+                type: "string"
+                description: |
+                  Content type code that categorizes the snippet based on what is actually in the document. Categories include:
+                  Current news: PLAYER_TRANSFER_NEWS, GAME_TRANSFER_NEWS, GAME_MERCHANDISE_EVENT, PLAYER_RELEASE_EVENT, MANAGER_STATEMENTS
+                  Historical facts: PLAYER_HISTORIC_STATS, GAME_HISTORIC_ACHIEVEMENT, LEGENDARY_PLAYER_CAREER, HISTORIC_SEASON_REVIEW
+                  Competition records: COMPETITION_RECORD_GOALS, COMPETITION_RECORD_TITLES, HISTORIC_DERBY_STATS
+                  Player achievements: PLAYER_AWARDS_HISTORY, PLAYER_SEASON_STATS, PLAYER_COMPETITION_RECORDS
+                  Game history: GAME_GOLDEN_ERA, GAME_TROPHY_HISTORY, GAME_HISTORIC_LINEUP
+                enum:
+                  - PLAYER_TRANSFER_NEWS
+                  - GAME_TRANSFER_NEWS
+                  - GAME_MERCHANDISE_EVENT
+                  - PLAYER_RELEASE_EVENT
+                  - MANAGER_STATEMENTS
+                  - PLAYER_HISTORIC_STATS
+                  - GAME_HISTORIC_ACHIEVEMENT
+                  - LEGENDARY_PLAYER_CAREER
+                  - HISTORIC_SEASON_REVIEW
+                  - COMPETITION_RECORD_GOALS
+                  - COMPETITION_RECORD_TITLES
+                  - HISTORIC_DERBY_STATS
+                  - PLAYER_AWARDS_HISTORY
+                  - PLAYER_SEASON_STATS
+                  - PLAYER_COMPETITION_RECORDS
+                  - GAME_GOLDEN_ERA
+                  - GAME_TROPHY_HISTORY
+                  - GAME_HISTORIC_LINEUP
+              start_index:
+                type: "integer"
+                description: "The exact start character position in the source document where this information begins"
+              end_index:
+                type: "integer"
+                description: "The exact end character position in the source document where this information ends"
+
+  # prompt-coverage-researcher-game-reasoning
+  - type: prompt
+    name: prompt-coverage-researcher-game-reasoning
+    title: "Coverage - Researcher Game Generator"
+    description: "Generate editorial briefing script for a game"
+    schema:
+      title: "PromptGameCoverageGenerator"
+      description: "Generate editorial briefing script for a game"
+      required: [
+        "title",
+        "content",
+        "subject",
+        "script_code",
+        "home_perspective",
+        "away_perspective",
+        "search_queries"
+      ]
+      type: "object"
+      properties:
+        content:
+          type: "string"
+          description: "Brief editorial outline highlighting key focus points and angles for the game coverage"
+        title:
+          type: "string"
+          description: "Engaging title highlighting the game"
+        subject:
+          type: "string"
+          description: "Main focus of the coverage (e.g., 'Arsenal vs Liverpool preview', 'Real Madrid Champions League preparation')"
+        script_code:
+          type: "string"
+          description: "Game coverage type code in format GAME_NEWS"
+        home_perspective:
+          type: "string"
+          description: "The name of the home team"
+        away_perspective:
+          type: "string"
+          description: "The name of the away team"
+        search_queries:
+          type: "array"
+          minItems: 2
+          maxItems: 3
+          items:
+            type: "object"
+            description: "List of search queries with their types to gather information about the game, 2 queries minimum, 3 queries maximum"
+            properties:
+              query:
+                type: "string"
+                description: |
+                  The actual search query to be executed:
+                  - 'Arsenal vs Liverpool recent form'
+                  - 'Arsenal vs Liverpool injury news'
+                  - 'Arsenal vs Liverpool manager quotes'
+                  - 'Arsenal vs Liverpool head to head history'
+                  - 'Arsenal vs Liverpool key players'
+                  - 'Arsenal vs Liverpool competition history'
+              type:
+                type: "string"
+                enum:
+                  - "TEAM_RECENT_FORM"
+                  - "TEAM_INJURY_NEWS"
+                  - "TEAM_MANAGER_QUOTES"
+                  - "HEAD_TO_HEAD_HISTORY"
+                  - "TEAM_KEY_PLAYERS"
+                  - "PLAYER_COMPETITION_STATS"
+                description: "The type of search being performed"

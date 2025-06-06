@@ -1,0 +1,59 @@
+workflow:
+  name: "content-embedding"
+  title: "Content Embedding"
+  description: "Workflow to execute a content embedding."
+  context-variables:
+    debugger:
+      enabled: true
+    machina-ai:
+      api_key: "$TEMP_CONTEXT_VARIABLE_SDK_OPENAI_API_KEY"
+  inputs:
+    content: "$.get('content')"
+    content_type: "$.get('content_type')"
+    content_subject: "$.get('content_subject')"
+  outputs:
+    snippets: "$.get('snippets-bulk')"
+    workflow-status: "$.get('snippets-bulk') is not None and 'executed' or 'skipped'"
+  tasks:
+
+    - type: "prompt"
+      name: "content-snippet-prompt"
+      description: "Content Snippet."
+      condition: "$.get('content_type') is not None"
+      connector:
+        name: "machina-ai"
+        command: "invoke_prompt"
+        model: "gpt-4.1"
+      inputs:
+        content: "$.get('content')"
+      outputs:
+        snippets-bulk: |
+          [
+            {
+              'text': c.get('content', ''),
+              'title': f"$.(content_subject) - {c.get('title', '')}",
+              'metadata': {
+                'event_code': '$.(event_code)',
+                'language': 'en'
+              }
+            }
+            for c in $.get('snippets', [])
+          ]
+    
+    - type: "document"
+      name: "update-snippets"
+      condition: "$.get('content_type') is not None"
+      description: "Update the snippets."
+      config:
+        action: "bulk-save"
+        embed-vector: true
+        force-update: true
+      connector:
+        name: "machina-ai"
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      document_name: "$.get('content_type')"
+      documents:
+        items: "$.get('parsed-items')"
+      inputs:
+        parsed-items: "$.get('snippets-bulk')"

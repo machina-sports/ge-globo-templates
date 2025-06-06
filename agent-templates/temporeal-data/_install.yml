@@ -1,0 +1,34 @@
+setup:
+  title: "Tempo Real Data"
+  description: AI-powered data for Tempo Real.
+  category:
+    - special-templates
+  estimatedTime: 15 minutes
+  features:
+    - Competitions
+    - Schedules
+    - Competitors
+    - Teams
+    - Seasons
+    - Players
+    - Stats
+  integrations:
+    - sportradar
+  status: available
+  value: "agent-templates/temporeal-data"
+  version: 1.0.0
+
+datasets:
+  
+  - type: "workflow"
+    path: "folders/folders-config.yml"  
+
+  - type: "agent"
+    path: "folders/folders-installer.yml"
+
+  - type: "agent"
+    path: "sportradar-bra-seriea.yml"
+
+  - type: "agent"
+    path: "sportradar-conmebol.yml"
+

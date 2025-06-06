@@ -1,0 +1,745 @@
+workflow:
+
+  name: coverage-reporter-game-executor
+  title: "Coverage - Reporter Game Executor"
+  description: "Workflow to execute reporter-game."
+  context-variables:
+    debugger:
+      enabled: true
+    machina-ai:
+      api_key: "$TEMP_CONTEXT_VARIABLE_SDK_OPENAI_API_KEY"
+    tallysight:
+      key: "$TEMP_CONTEXT_VARIABLE_TALLYSIGHT_API_KEY"
+  inputs:
+    disable_tallysight: "$.get('disable_tallysight') or False"
+  outputs:
+    workflow-status: "$.get('workflow-status', 'skipped')"
+  tasks:
+
+    # load-next-agenda
+    - type: document
+      name: load-next-agenda
+      connector:
+        name: "machina-ai"
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["value.agenda-control.updated", 1]
+      filters:
+        metadata.content-group: "{'$in': ['REPORTER_GAME']}"
+        value.agenda-control.processing: "{'$ne': True}"
+        value.agenda-control.finished: "{'$ne': True}"
+      inputs:
+        name: "'content-agenda'"
+      outputs:
+        agenda-exists: "len($.get('documents', [])) > 0 if $.get('documents') else False"
+        agenda-document: "$.get('documents', [{}])[0] if $.get('documents') else None"
+        agenda-document-id: "$.get('documents', [{}])[0].get('_id', '') if $.get('documents') else ''"
+        agenda-metadata: "$.get('documents', [{}])[0].get('metadata', {}) if $.get('documents') else None"
+        agenda-value: "$.get('documents', [{}])[0].get('value', {}) if $.get('documents') else None"
+
+    # document-agenda-control
+    - type: document
+      name: coverage-agenda-control-processing
+      condition: "$.get('agenda-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      filters:
+        document_id: "$.get('agenda-document-id')"
+      documents:
+        content-agenda: |
+          {
+            **$.get('agenda-value', {}),
+            'agenda-control': {
+              **$.get('agenda-control', {}),
+              'processing': True,
+              'updated': datetime.utcnow()
+            }
+          }
+
+    # mapping agenda-control
+    - type: mapping
+      name: coverage-mapping-agenda-control
+      condition: "$.get('agenda-exists') is True"
+      inputs:
+        _document: "$.get('agenda-value')"
+        _metadata: "$.get('agenda-metadata')"
+      outputs:
+        agenda-control: "$.get('agenda-control')"
+        agenda-control-finished: "$.get('agenda-control').get('finished', False)"
+        agenda-counter: "$.get('agenda-counter')"
+        content-group: "$.get('content-group')"
+        content-name: "$.get('content-name')"
+        content-topic: "$.get('content-topic')"
+        event_code: "$.get('event_code')"
+        script-instructions: "$.get('script-instructions')"
+
+    # mapping reporter-game-control
+    - type: mapping
+      name: coverage-mapping-reporter-game-control
+      condition: "$.get('agenda-exists') is True"
+      inputs:
+        _document: "$.get('agenda-value')"
+        _metadata: "$.get('agenda-metadata')"
+      outputs:
+        agenda-required: "$.get('agenda-required')"
+        reporter-game-control: "$.get('reporter-game-control')"
+        reporter-game-control-status: "$.get('reporter-game-control-status')"
+
+    # load-required-agenda
+    - type: document
+      name: load-required-agenda
+      condition: "$.get('agenda-exists') is True"
+      connector:
+        name: "machina-ai"
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      config:
+        action: "search"
+        search-limit: 100
+        search-vector: false
+        search-sorters: ["value.agenda-control.updated", 1]
+      filters:
+        metadata.content-group: "{'$in': ['COVERAGE_RESEARCHER_TEAM', 'COVERAGE_RESEARCHER_ODDS', 'COVERAGE_RESEARCHER_STATS']}"
+        metadata.content-topic: "{'$in': $.get('agenda-required', [])}"
+        value.agenda-control.processing: "{'$ne': True}"
+        value.agenda-control.finished: "True"
+      inputs:
+        name: "'content-agenda'"
+      outputs:
+        required-agenda-results: "$.get('documents', []) if $.get('documents') else []"
+        required-agenda-length: |
+          len($.context('agenda-required'))
+        existing-agenda-length: |
+          len($.get('documents', []))
+
+    # load-related-snippets
+    - type: document
+      name: load-related-snippets
+      condition: |
+        (
+          $.get('agenda-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+        )
+      connector:
+        name: "machina-ai"
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      config:
+        action: "search"
+        search-limit: 100
+        search-vector: false
+        search-sorters: ["updated", -1]
+      filters:
+        metadata.content-group: "{'$in': ['COVERAGE_RESEARCHER_TEAM', 'COVERAGE_RESEARCHER_ODDS', 'COVERAGE_RESEARCHER_STATS']}"
+        metadata.content-topic: "{'$in': $.get('agenda-required', [])}"
+      inputs:
+        name: "'content-snippet'"
+      outputs:
+        snippets: "$.get('documents', []) if $.get('documents') else []"
+        snippets-length: |
+          len($.get('documents', []))
+        snippets-bulk: |
+          [
+            d.get('value', {})
+            for d in $.get('documents', [])
+          ]
+  
+    # start-reporter-game-executor
+
+    # 0 load-game-by-code
+    - type: document
+      name: load-game-by-code
+      condition: "$.get('event_code') is not None"
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["start_time", 1]
+      filters:
+        metadata.event_code: "$.get('event_code')"
+      inputs:
+        name: "{'$in': ['soccer-game']}"
+      outputs:
+        game-exists: "len($.get('documents', [])) > 0 if $.get('documents') else False"
+        game-metadata: "$.get('documents')[0].get('metadata', {}) if $.get('documents') else None"
+        game-value: "$.get('documents')[0].get('value', {}) if $.get('documents') else None"
+
+    # 1 mapping reporter-game-results
+    - type: mapping
+      name: coverage-mapping-reporter-game-results
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      inputs:
+        _document: "$.get('agenda-value')"
+        _metadata: "$.get('agenda-metadata')"
+      outputs:
+        agenda-control-finished: "True"
+        images-control: "$.get('images-control')"
+        reporter-game-control-status: "'executed'"
+        workflow-status: "'executed'"
+
+    # 2 coverage-mapping-sportradar-soccer
+    - type: mapping
+      name: coverage-mapping-sportradar-soccer
+      description: "Transform the sportradar soccer data"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      inputs:
+        event_selected: "$.get('game-value')"
+      outputs:
+        article_count: "$.get('article_count')"
+        competition_id: "$.get('competition_id')"
+        day_before: "$.get('event_day_before')"
+        event_date: "$.get('event_date')"
+        event_date_time: "$.get('event_date_time')"
+        event_day_of_week: "$.get('event_day_of_week')"
+        team_home_name: "$.get('team_home_name')"
+        team_away_name: "$.get('team_away_name')"
+        team_home_id: "$.get('team_home_id')"
+        team_away_id: "$.get('team_away_id')"
+        title: "$.get('title')"
+        venue_title: "$.get('venue_title')"
+        widget-match-embed: "$.get('widget-match-embed')"
+
+    ## load knowledge base
+
+    # # 4 Load event documents
+    # - type: "document"
+    #   name: "load-event-documents"
+    #   description: "Load event documents"
+    #   condition: "$.get('game-exists') is True"
+    #   config:
+    #     action: "search"
+    #     threshold-docs: 100
+    #     threshold-similarity: 0.01
+    #     search-limit: 1000
+    #     search-vector: true
+    #   connector:
+    #     name: "machina-ai"
+    #     command: "invoke_embedding"
+    #     model: "text-embedding-3-small"
+    #   inputs:
+    #     name: "'content-snippet'"
+    #     search-limit: "'1000'"
+    #     search-query: "$.get('messages')"
+    #   outputs:
+    #     event_documents: "$.get('documents', [])"
+
+    # 4 Load home latest match analysis
+    - type: "document"
+      name: "load-home-latest-matches-analysis"
+      description: "Load home latest matches analysis"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      config:
+        action: "search"
+        search-vector: false
+        search-limit: 50
+      filters:
+        metadata.competitor_id: "$.get('team_home_id')"
+        metadata.content_type: "'last-match-analysis'"
+        metadata.event_code: "$.get('event_code')"
+      inputs:
+        name: "'content-snippet'"
+        search-limit: "'50'"
+      outputs:
+        docs_home_latest_match_analysis: |
+          [
+            {
+              **x.get('value', '')
+            }
+            for x in $.get('documents', [])
+          ]
+
+    # 5 Load away latest match analysis
+    - type: "document"
+      name: "load-away-latest-match-analysis"
+      description: "Load away latest match analysis"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      config:
+        action: "search"
+        search-vector: false
+        search-limit: 50
+      filters:
+        metadata.competitor_id: "$.get('team_away_id')"
+        metadata.content_type: "'last-match-analysis'"
+        metadata.event_code: "$.get('event_code')"
+      inputs:
+        name: "'content-snippet'"
+        search-limit: "'50'"
+      outputs:
+        docs_away_latest_match_analysis: |
+          [
+            {
+              **x.get('value', '')
+            }
+            for x in $.get('documents', [])
+          ]
+
+    # 6 Load home key players
+    - type: "document"
+      name: "load-home-key-players"
+      description: "Load home key players"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      config:
+        action: "search"
+        search-vector: false
+        search-limit: 50
+      filters:
+        metadata.competitor_id: "$.get('team_home_id')"
+        metadata.content_type: "'last-match-key-players'"
+        metadata.event_code: "$.get('event_code')"
+      inputs:
+        name: "'content-snippet'"
+        search-limit: "'50'"
+      outputs:
+        docs_home_key_players: |
+          [
+            {
+              **x.get('value', '')
+            }
+            for x in $.get('documents', [])
+          ] 
+
+    # 7 Load away key players
+    - type: "document"
+      name: "load-away-key-players"
+      description: "Load away key players"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      config:
+        action: "search"
+        search-vector: false
+        search-limit: 50
+      filters:
+        metadata.competitor_id: "$.get('team_away_id')"
+        metadata.content_type: "'last-match-key-players'"
+        metadata.event_code: "$.get('event_code')"
+      inputs:
+        name: "'content-snippet'"
+        search-limit: "'50'"
+      outputs:
+        docs_away_key_players: |
+          [
+            {
+              **x.get('value', '')
+            }
+            for x in $.get('documents', [])
+          ]
+
+    # 8 Load match odds
+    - type: "document"
+      name: "load-match-odds"
+      description: "Load match odds"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      config:
+        action: "search"
+        search-vector: false
+        search-limit: 50
+      filters:  
+        metadata.content_type: "'odds-analysis'"
+        metadata.event_code: "$.get('event_code')"
+      inputs:
+        name: "'content-snippet'"
+        search-limit: "'50'"
+      outputs:
+        docs_match_odds: |
+          [
+            {
+              **x.get('value', '')
+            } 
+            for x in $.get('documents', [])
+          ] 
+
+    # 9 Load match standings
+    - type: "document"
+      name: "load-match-standings"
+      description: "Load match standings"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      config:
+        action: "search"
+        search-vector: false
+        search-limit: 50
+      filters:
+        metadata.content_type: "'competitors-standings'"
+        metadata.event_code: "$.get('event_code')"    
+      inputs:
+        name: "'content-snippet'"
+        search-limit: "'50'"
+      outputs:
+        docs_match_standings: |
+          [
+            {
+              **x.get('value', '')
+            }
+            for x in $.get('documents', [])
+          ]
+
+    ## generate article
+
+    # 10 soccer-prompt-article-br-heading
+    - type: "prompt"
+      name: "soccer-prompt-article-br-heading"
+      description: "Generate a preview for the upcoming game"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      connector:
+        name: "machina-ai"
+        command: "invoke_prompt"
+        model: "gpt-4.1-mini"
+      inputs:
+        event_date: "$.get('event_date')"
+        event_date_time: "$.get('event_date_time')"
+        event_day_of_week: "$.get('event_day_of_week')"
+        odds-analysis: "$.get('docs_match_odds', [])"
+        standings: "$.get('docs_match_standings', [])"
+        team_home_name: "$.get('team_home_name')"
+        team_away_name: "$.get('team_away_name')"
+        venue_title: "$.get('venue_title')"
+      outputs:
+        reporter-article-br-heading: "$.get('title')"  
+        reporter-article-br-subtitle: "$.get('subtitle')"
+        reporter-article-br-event-name: "$.get('event_name')"
+        reporter-article-br-event-date-time: "$.get('event_date_time')"
+        reporter-article-br-event-venue: "$.get('event_venue')"
+        reporter-article-br-slug: "$.get('slug')"
+
+    # 11 soccer-prompt-article-br-odds
+    - type: "prompt"
+      name: "soccer-prompt-article-br-odds"
+      description: "Generate a preview for the upcoming game"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      connector:
+        name: "machina-ai"
+        command: "invoke_prompt"
+        model: "gpt-4.1-mini"
+      inputs:
+        event_date: "$.get('event_date')"
+        event_date_time: "$.get('event_date_time')"
+        event_day_of_week: "$.get('event_day_of_week')"
+        odds-analysis: "$.get('docs_match_odds', [])"
+      outputs:
+        reporter-article-br-odds-title: "$.get('section_title')"
+        reporter-article-br-odds-content: "$.get('section_content')"
+
+    # 12 soccer-prompt-article-br-team (home)
+    - type: "prompt"
+      name: "soccer-prompt-article-br-team"
+      description: "Generate a preview for the upcoming game"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      connector:
+        name: "machina-ai"
+        command: "invoke_prompt"
+        model: "gpt-4.1-mini"
+      inputs:
+        event_date: "$.get('event_date')"
+        event_date_time: "$.get('event_date_time')"
+        event_day_of_week: "$.get('event_day_of_week')"
+        docs_home_latest_match_analysis: "$.get('docs_home_latest_match_analysis', [])"
+      outputs:
+        reporter-article-br-home-team-title: "$.get('section_title')"
+        reporter-article-br-home-team-content: "$.get('section_content')"
+
+    # 13 soccer-prompt-article-br-team (away)
+    - type: "prompt"
+      name: "soccer-prompt-article-br-team"
+      description: "Generate a preview for the upcoming game"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      connector:
+        name: "machina-ai"
+        command: "invoke_prompt"
+        model: "gpt-4.1-mini"
+      inputs:
+        event_date: "$.get('event_date')"
+        event_date_time: "$.get('event_date_time')"
+        event_day_of_week: "$.get('event_day_of_week')"
+        docs_away_latest_match_analysis: "$.get('docs_away_latest_match_analysis', [])"
+      outputs:
+        reporter-article-br-away-team-title: "$.get('section_title')"
+        reporter-article-br-away-team-content: "$.get('section_content')"
+
+    # 14 soccer-prompt-article-br-key-players
+    - type: "prompt"
+      name: "soccer-prompt-article-br-key-players"
+      description: "Generate a preview for the upcoming game"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      connector:
+        name: "machina-ai"
+        command: "invoke_prompt"
+        model: "gpt-4.1-mini"
+      inputs:
+        event_date: "$.get('event_date')"
+        event_date_time: "$.get('event_date_time')"
+        event_day_of_week: "$.get('event_day_of_week')"
+        event_title: "$.get('title')"
+        venue_title: "$.get('venue_title')"
+        team_home_name: "$.get('team_home_name')"
+        team_away_name: "$.get('team_away_name')"
+        last_matches_home_key_players: "$.get('docs_home_key_players', [])"
+        last_matches_away_key_players: "$.get('docs_away_key_players', [])"
+      outputs:
+        reporter-article-br-key-players-title: "$.get('section_title')"
+        reporter-article-br-key-players-content: "$.get('section_content')"
+
+    # 15 soccer-prompt-article-br-prediction
+    - type: "prompt"
+      name: "soccer-prompt-article-br-prediction"
+      description: "Generate a prediction for the upcoming game"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      connector:
+        name: "machina-ai"
+        command: "invoke_prompt"
+        model: "gpt-4.1-mini"
+      inputs:
+        event_date: "$.get('event_date')"
+        event_date_time: "$.get('event_date_time')"
+        event_day_of_week: "$.get('event_day_of_week')"
+        reporter-article-br-home-team: "$.get('reporter-article-br-home-team-content')"
+        reporter-article-br-away-team: "$.get('reporter-article-br-away-team-content')"
+        reporter-article-br-players: "$.get('reporter-article-br-key-players-content')"
+        reporter-article-br-odds: "$.get('reporter-article-br-odds-content')"
+      outputs:
+        reporter-article-br-prediction-title: "$.get('section_title')"
+        reporter-article-br-prediction-content: "$.get('section_content')"
+
+    ## map tallysight widget
+
+    # load site-leagues
+    - type: document
+      name: "load-site-leagues"
+      description: "Search for registered site leagues."
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('disable_tallysight') is False
+          and $.get('snippets-length') > 0
+        )
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+      inputs:
+        name: "'site-leagues'"
+      outputs:
+        result-site-leagues: "$.get('documents', [])[0].get('value', {}) if $.get('documents') else None"
+
+    # tallysight-leagues-mapping
+    - type: mapping
+      name: "tallysight-leagues-mapping"
+      description: "Transform the tallysight leagues data"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('disable_tallysight') is False
+          and $.get('snippets-length') > 0
+        )
+      inputs:
+        competition_id: "$.get('competition_id')"
+        site_leagues: "$.get('result-site-leagues')"
+      outputs:
+        league_code: "$.get('league_code')"
+
+    # tallysight-load-match-embed
+    - type: connector
+      name: "tallysight-load-match-embed"
+      description: "Load match embed from Tallysight"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('disable_tallysight') is False
+          and $.get('league_code') is not None
+          and $.get('snippets-length') > 0
+        )
+      continue_on_error: True
+      connector:
+        name: "tallysight"
+        command: "get-api/v2/widgets/tiles/gamelines/leagues/{league}/matchup/{team1}/{team2}/{date}"
+        command_attribute:
+          league: "$.get('league_code')"
+          team1: "$.get('team_home_name')"
+          team2: "$.get('team_away_name')"
+          date: "$.get('event_date')"
+      outputs:
+        widget-match-embed: "$"
+
+    # tallysight-load-match-embed-day-before
+    - type: connector
+      name: "tallysight-load-match-embed-day-before"
+      description: "Load match embed from Tallysight"
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('disable_tallysight') is False
+          and $.get('league_code') is not None
+          and $.get('widget-match-embed') is None
+          and $.get('snippets-length') > 0
+        )
+      continue_on_error: True
+      connector:
+        name: "tallysight"
+        command: "get-api/v2/widgets/tiles/gamelines/leagues/{league}/matchup/{team1}/{team2}/{date}"
+        command_attribute:
+          league: "$.get('league_code')"
+          team1: "$.get('team_home_name')"
+          team2: "$.get('team_away_name')"
+          date: "$.get('day_before')"
+      outputs:
+        widget-match-embed: "$"
+
+    ## save / update article
+
+    # 16 update-article-br
+    - type: "document"
+      name: "update-article-br"
+      description: "Update the document."
+      condition: |
+        (
+          $.get('game-exists') is True
+          and $.get('required-agenda-length') == $.get('existing-agenda-length')
+          and $.get('snippets-length') > 0
+        )
+      config:
+        action: "update"
+        embed-vector: true
+        force-update: true
+      connector:
+        name: "machina-ai"
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      documents:
+        content-article: |
+          {
+            'images-control': $.get('images-control', {}),
+            'section_1_title': $.get('reporter-article-br-odds-title'),
+            'section_1_content': $.get('reporter-article-br-odds-content'),
+            'section_2_title': $.get('reporter-article-br-home-team-title'),
+            'section_2_content': $.get('reporter-article-br-home-team-content'),
+            'section_3_title': $.get('reporter-article-br-away-team-title'),
+            'section_3_content': $.get('reporter-article-br-away-team-content'),
+            'section_4_title': $.get('reporter-article-br-key-players-title'),
+            'section_4_content': $.get('reporter-article-br-key-players-content'),
+            'section_5_title': $.get('reporter-article-br-prediction-title'),
+            'section_5_content': $.get('reporter-article-br-prediction-content'),
+            'execution': datetime.utcnow(),
+            'event-details': {
+              'match': $.get('reporter-article-br-event-name'),
+              'when': $.get('reporter-article-br-event-date-time'),
+              'venue': $.get('reporter-article-br-event-venue')
+            },
+            'slug': f"{$.get('reporter-article-br-slug')}-br",
+            'title': $.get('reporter-article-br-heading'),
+            'subtitle': $.get('reporter-article-br-subtitle'),
+            'status': 'active',
+            'widget-match-embed': $.get('widget-match-embed'),
+          }
+      metadata:
+        content-group: "$.get('content-group')"
+        content-name: "$.get('content-name')"
+        content-topic: "$.get('content-topic')"
+        document_type: "'content-article'"
+        competition: "$.get('competition_id')"
+        event_code: "$.get('event_code')"
+        event_type: "$.get('event_type')"
+        language: "'br'"
+  
+    # document-agenda-control
+    - type: document
+      name: coverage-agenda-control-update
+      condition: "$.get('agenda-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      filters:
+        document_id: "$.get('agenda-document-id')"
+      documents:
+        content-agenda: |
+          {
+            **$.get('agenda-value', {}),
+            'agenda-control': {
+              **$.get('agenda-control', {}),
+              'counter': $.get('agenda-counter', 0) + 1,
+              'finished': $.get('agenda-control-finished', False),
+              'processing': False,
+              'updated': datetime.utcnow()
+            },
+            'reporter-game-control': {
+              **$.get('reporter-game-control', {}),
+              'status': $.get('reporter-game-control-status')
+            }
+          }

@@ -1,0 +1,138 @@
+workflow:
+
+  name: coverage-reporter-image-service
+  title: "Coverage - Images Service"
+  description: "Coverage Images Service"
+  context-variables:
+    debugger:
+      enabled: true
+  inputs:
+    article-content-id: "$.get('article-content-id') or None"
+  outputs:
+    workflow-status: "$.get('content-exists') is not True and 'skipped' or 'executed'"
+  tasks:
+
+    # load-content-document-id
+    - type: document
+      name: "load-content-document-id"
+      condition: "$.get('article-content-id') is not None"
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["start_time", 1]
+      filters:
+        document_id: "$.get('article-content-id')"
+      outputs:
+        content-id: "$.get('documents')[0].get('_id') if $.get('documents') else None"
+        content-exists: "len($.get('documents', [])) > 0 if $.get('documents') else False"
+        content-metadata: "$.get('documents')[0].get('metadata', {}) if $.get('documents') else None"
+        content-value: "$.get('documents')[0].get('value', {}) if $.get('documents') else None"
+        images-control: "$.get('documents')[0].get('value', {}).get('images-control', {}) if $.get('documents') else None"
+
+    # load-content-by-schedule
+    - type: document
+      name: load-content-by-schedule
+      condition: "$.get('content-exists') is not True"
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["value.version_control.updated", 1]
+      filters:
+        value.images-control.installed: "{'$ne': True}"
+        value.images-control.processing: "{'$ne': True}"
+        value.version_control.processing: "{'$ne': True}"
+        value.version_control.finished: "{'$ne': True}"
+      inputs:
+        name: "{'$in': ['content-article']}"
+      outputs:
+        content-id: "$.get('documents')[0].get('_id') if $.get('documents') else None"
+        content-exists: "len($.get('documents', [])) > 0 if $.get('documents') else False"
+        content-metadata: "$.get('documents')[0].get('metadata', {}) if $.get('documents') else None"
+        content-value: "$.get('documents')[0].get('value', {}) if $.get('documents') else None"
+        images-control: "$.get('documents')[0].get('value', {}).get('images-control', {}) if $.get('documents') else None"
+
+    # content-version-control
+    - type: document
+      name: content-version-control
+      condition: "$.get('content-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      filters:
+        document_id: "$.get('content-id')"
+      documents:
+        content-article: |
+          {
+            **$.get('content-value', {}),
+            'images-control': {
+              'processing': True
+            }
+          }
+
+    # mapping-date-prefix
+    - type: mapping
+      name: coverage-mapping-date-prefix
+      condition: "$.get('content-exists') is True"
+      outputs:
+        date_prefix: "$.get('date_prefix')"
+
+    # mapping-images-service
+    - type: mapping
+      name: coverage-mapping-images-service
+      condition: "$.get('content-exists') is True"
+      inputs:
+        date_prefix: "$.get('date_prefix')"
+        article_content_group: "$.get('content-metadata', {}).get('content-group', '')"
+        article_content_id: "$.get('content-metadata', {}).get('content-id', '')"
+        article_content_name: "$.get('content-metadata', {}).get('content-name', '')"
+      outputs:
+        image-content-group: "$.get('content-group')"
+        image-content-name: "$.get('content-name')"
+        image-coverage-indexes: "$.get('coverage-indexes')"
+
+    # images-populate-scripts
+    - type: document
+      name: images-populate-scripts
+      condition: "$.get('content-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      documents:
+        content-script: |
+          {
+            "title": $.get('image-content-name'),
+            "description": $.get('image-content-group'),
+            "indexes": $.get('image-coverage-indexes'),
+            "web-search-limit": 3,
+            "web-search-udm": 2
+          }
+      metadata:
+        content-group: "$.get('image-content-group')"
+        content-id: "$.get('content-id')"
+        content-name: "$.get('image-content-name')"
+
+    # content-version-control
+    - type: document
+      name: content-version-control
+      description: "Update the events document version control."
+      condition: "$.get('content-exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      filters:
+        document_id: "$.get('content-id')"
+      documents:
+        content-article: |
+          {
+            **$.get('content-value', {}),
+            'images-control': {
+              'finished': False,
+              'installed': True,
+              'processing': False
+            }
+          }
