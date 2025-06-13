@@ -98,7 +98,6 @@ workflow:
         schedules: |
           {
             'sid': $.get('season_id'),
-            'data': $.get('schedules'),
             'index': $.get('schedules_parsed_index'),
             'title': f"{$.get('season', {}).get('value', {}).get('title', '')} - All Schedules",
             'execution': datetime.utcnow(),
