@@ -3,6 +3,8 @@ workflow:
   title: "Soccer - Competitors"
   description: "Workflow to synchronize a season competitors from SportRadar API to Machina."
   context-variables:
+    debugger:
+      enabled: true
     sportradar-soccer:
       api_key: "$TEMP_CONTEXT_VARIABLE_SPORTRADAR_SOCCER_V4_API_KEY"
   inputs:
@@ -68,21 +70,16 @@ workflow:
         api_key: "$.get('api_key')"
       outputs:
         competitors: "$.get('season_competitors')"
-        competitors_parsed: |
-          [
-            {
-              **c,
-              'metadata': {
-                'team_code': c.get('id', '')
-              },
-              'version_control': {
-                'updated': datetime.utcnow()
-              },
-              'title': f"{c.get('name', {})}",
-              'selected': False
-            }
-            for c in $.get('season_competitors')
-          ]
+
+    # integration-mapper-sportradar-competitor
+    - type: mapping
+      name: integration-mapper-sportradar-competitor
+      description: "Mapping competitors for integration."
+      inputs:
+        competitors_list: "$.get('competitors')"
+      outputs:
+        competitors_parsed: "$.get('competitors_parsed')"
+        competitors_parsed_index: "$.get('competitors_parsed_index')"
 
     # update-competitors
     - type: "document"
@@ -102,17 +99,18 @@ workflow:
           {
             'sid': $.get('season_id'),
             'data': $.get('competitors'),
+            'index': $.get('competitors_parsed_index'),
             'title': f"{$.get('season', {}).get('value', {}).get('title', '')} - All Competitors",
             'execution': datetime.utcnow(),
             'status': 'active'
           }
       metadata:
         sid: "$.get('season_id')"
-        document_type: "'synchronization'"
+        document_type: "'synchronization-soccer-team'"
 
-    # bulk-save-schedules
+    # bulk-save-competitors
     - type: "document"
-      name: "bulk-save-schedules"
+      name: "bulk-save-competitors"
       condition: "$.get('should_update') == True and $.get('season') is not None"
       description: "Bulk save the competitors."
       config:

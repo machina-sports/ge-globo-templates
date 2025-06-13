@@ -50,6 +50,8 @@ datasets:
   - type: "mappings"
     path: "mappings/last-match.yml"
   - type: "mappings"
+    path: "mappings/integration.yml"
+  - type: "mappings"
     path: "mappings/version-control.yml"
   
   - type: "workflow"

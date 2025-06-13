@@ -1,0 +1,67 @@
+mappings:
+
+  # integration-mapper-sportradar-competitor
+  - type: mapping
+    name: integration-mapper-sportradar-competitor
+    title: "SportRadar - Competitor Integration"
+    description: "Mapping data from SportRadar competitor"
+    outputs:
+      competitors_parsed: |
+        [
+          {
+            **c,
+            'metadata': {
+              'team_code': f"{c.get('id', '')}",
+              'integration_code': f"SRE_TEAM_{c.get('abbreviation', '')}"
+            },
+            'version_control': {
+              'updated': datetime.utcnow()
+            },
+            'title': f"{c.get('name', {})}",
+            'selected': False
+          }
+          for c in $.get('competitors_list')
+        ]
+      competitors_parsed_index: |
+        [
+          {
+            'integration_code': f"SRE_TEAM_{c.get('abbreviation', '')}",
+            'team_code': f"{c.get('id', '')}",
+            'title': f"{c.get('name', {})}",
+          }
+          for c in $.get('competitors_list')
+        ]
+
+  # integration-mapper-sportradar-schedule
+  - type: mapping
+    name: integration-mapper-sportradar-schedule
+    title: "SportRadar - Schedule Integration"
+    description: "Mapping data from SportRadar schedule"
+    outputs:
+      schedules_parsed: |
+        [
+          {
+            **c,
+            'metadata': {
+              'event_code': c.get('sport_event', {}).get('id', ''),
+              'integration_code': f"SRE_GAME_{c.get('sport_event', {}).get('sport_event_context', {}).get('round', {}).get('number', '')}_{c.get('sport_event', {}).get('competitors', [{}])[0].get('abbreviation', '')}_{c.get('sport_event', {}).get('competitors', [{}])[1].get('abbreviation', '')}"
+            },
+            'version_control': {
+              **c.get('value', {}).get('version_control', {}),
+              'updated': datetime.utcnow()
+            },
+            'start_time': datetime.fromisoformat(c.get('sport_event', {}).get('start_time', '')),
+            'title': f"{c.get('sport_event', {}).get('competitors', [{}])[0].get('name', '')} v {c.get('sport_event', {}).get('competitors', [{}])[1].get('name', '')}",
+            'selected': False
+          }
+          for c in $.get('schedules_list')
+        ]
+      schedules_parsed_index: |
+        [
+          {
+            'event_code': c.get('sport_event', {}).get('id', ''),
+            'integration_code': f"SRE_GAME_{c.get('sport_event', {}).get('sport_event_context', {}).get('round', {}).get('number', '')}_{c.get('sport_event', {}).get('competitors', [{}])[0].get('abbreviation', '')}_{c.get('sport_event', {}).get('competitors', [{}])[1].get('abbreviation', '')}",
+            'title': f"{c.get('sport_event', {}).get('competitors', [{}])[0].get('name', '')} v {c.get('sport_event', {}).get('competitors', [{}])[1].get('name', '')}",
+          }
+          for c in $.get('schedules_list')
+        ]

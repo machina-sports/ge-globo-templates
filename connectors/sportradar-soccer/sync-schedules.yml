@@ -70,23 +70,16 @@ workflow:
         start: "$.get('start')"
       outputs:
         schedules: "$.get('schedules')"
-        schedules_parsed: |
-          [
-            {
-              **c,
-              'metadata': {
-                'event_code': c.get('sport_event', {}).get('id', '')
-              },
-              'version_control': {
-                **c.get('value', {}).get('version_control', {}),
-                'updated': datetime.utcnow()
-              },
-              'start_time': datetime.fromisoformat(c.get('sport_event', {}).get('start_time', '')),
-              'title': f"{c.get('sport_event', {}).get('competitors', [{}])[0].get('name', '')} v {c.get('sport_event', {}).get('competitors', [{}])[1].get('name', '')}",
-              'selected': False
-            }
-            for c in $.get('schedules')
-          ]
+
+    # integration-mapper-sportradar-schedule
+    - type: mapping
+      name: integration-mapper-sportradar-schedule
+      description: "Mapping schedules for integration."
+      inputs:
+        schedules_list: "$.get('schedules')"
+      outputs:
+        schedules_parsed: "$.get('schedules_parsed')"
+        schedules_parsed_index: "$.get('schedules_parsed_index')"
 
     # update-schedules
     - type: "document"
@@ -106,13 +99,14 @@ workflow:
           {
             'sid': $.get('season_id'),
             'data': $.get('schedules'),
+            'index': $.get('schedules_parsed_index'),
             'title': f"{$.get('season', {}).get('value', {}).get('title', '')} - All Schedules",
             'execution': datetime.utcnow(),
             'status': 'active'
           }
       metadata:
         sid: "$.get('season_id')"
-        document_type: "'synchronization'"
+        document_type: "'synchronization-soccer-game'"
 
     # bulk-save-schedules
     - type: "document"
