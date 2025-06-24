@@ -25,7 +25,7 @@ workflow:
         action: "search"
         search-limit: 1
         search-vector: false
-        search-sorters: ["start_time", 1]
+        search-sorters: ["value.start_time", 1]
       filters:
         metadata.event_code: "$.get('event_code')"
       inputs:
@@ -119,8 +119,10 @@ workflow:
         event_exists: "'status' in $.get('sport_event_status')"
         event_start: |
           datetime.fromisoformat($.get('sport_event', {}).get('start_time', ''))
+        event_start_brt: |
+          (datetime.fromisoformat($.get('sport_event', {}).get('start_time', '')) - timedelta(hours=3)).strftime('%d/%m/%y %H:%M')
         event_title: |
-          f"{$.get('sport_event', {}).get('sport_event_context', {}).get('category', {}).get('name', '')} {$.get('sport_event', {}).get('sport_event_context', {}).get('season', {}).get('name', '')}: {$.get('sport_event', {}).get('sport_event_context', {}).get('round', {}).get('number', '')} - {$.get('sport_event', {}).get('competitors', [{}])[0].get('name', '')} v {$.get('sport_event', {}).get('competitors', [{}])[1].get('name', '')}"
+          f"{$.get('sport_event', {}).get('competitors', [{}])[0].get('name', '')} v {$.get('sport_event', {}).get('competitors', [{}])[1].get('name', '')}"
         event_status: "$.get('sport_event_status').get('status')"
         update_event_summary_status: "'processed'"
         update_event_summary_count: |
@@ -271,6 +273,7 @@ workflow:
             'sport_event_statistics': $.get('result-event-statistics') or $.get('event_value', {}).get('sport_event_statistics', {}),
             'sport_event_timeline': $.get('result-event-timeline') or $.get('event_value', {}).get('sport_event_timeline', {}),
             'start_time': $.get('event_start'),
+            'start_time_brt': $.get('event_start_brt'),
             'title': $.get('event_title'),
             'version_control': {
               **$.get('version_control', {}),

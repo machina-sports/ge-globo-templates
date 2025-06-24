@@ -47,10 +47,13 @@ datasets:
 
   - type: "mappings"
     path: "mappings/event-summary.yml"
+
+  - type: "mappings"
+    path: "mappings/event-statistics.yml"
+
   - type: "mappings"
     path: "mappings/last-match.yml"
-  - type: "mappings"
-    path: "mappings/integration.yml"
+  
   - type: "mappings"
     path: "mappings/version-control.yml"
   
@@ -63,9 +66,13 @@ datasets:
   - type: "workflow"
     path: "sync-seasons.yml"
   - type: "workflow"
+    path: "sync-standings.yml"
+  - type: "workflow"
     path: "update-competition.yml"
   - type: "workflow"
     path: "update-live.yml"
+  - type: "workflow"
+    path: "update-longterm.yml"
   - type: "workflow"
     path: "update-postlive.yml"
   - type: "workflow"

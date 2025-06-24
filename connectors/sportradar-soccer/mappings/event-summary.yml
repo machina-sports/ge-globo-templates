@@ -7,9 +7,12 @@ mappings:
     outputs:
       article_count: "$.get('event_selected', {}).get('version_control', {}).get('article_count', 0)"
       event_code: "$.get('event_selected', {}).get('sport_event', {}).get('id')"
+      event_date_brt: "$.get('event_selected', {}).get('start_time_brt')"
+      event_datetime: "$.get('event_selected', {}).get('sport_event', {}).get('start_time')"
       image_count: "$.get('event_selected', {}).get('version_control', {}).get('image_count', 0)"
       last_home: "$.get('event_selected', {}).get('competitors_home_last_matches', [])"
       last_away: "$.get('event_selected', {}).get('competitors_away_last_matches', [])"
+      live_lineups: "$.get('event_selected', {}).get('event_live', {}).get('lineups', {}).get('snippets', [])"
       match_status: "$.get('event_selected', {}).get('sport_event_status', {}).get('status')"
       research_news_count: "$.get('event_selected', {}).get('version_control', {}).get('research_news_count', 0)"
       research_odds_count: "$.get('event_selected', {}).get('version_control', {}).get('research_odds_count', 0)"
@@ -22,7 +25,9 @@ mappings:
       sport_event_statistics: "$.get('event_selected', {}).get('sport_event_statistics', {})"
       sport_event_status: "$.get('event_selected', {}).get('sport_event_status', {})"
       sport_event_timeline: "$.get('event_selected', {}).get('sport_event_timeline', {})"
+      team_home_abbreviation: "$.get('event_selected', {}).get('sport_event', {}).get('competitors', [])[0].get('abbreviation')"
       team_home_name: "$.get('event_selected', {}).get('sport_event', {}).get('competitors', [])[0].get('name')"
+      team_away_abbreviation: "$.get('event_selected', {}).get('sport_event', {}).get('competitors', [])[1].get('abbreviation')"
       team_away_name: "$.get('event_selected', {}).get('sport_event', {}).get('competitors', [])[1].get('name')"
       team_home_id: "$.get('event_selected', {}).get('sport_event', {}).get('competitors', [])[0].get('id')"
       team_away_id: "$.get('event_selected', {}).get('sport_event', {}).get('competitors', [])[1].get('id')"
@@ -30,6 +35,13 @@ mappings:
       team_away_stats: "$.get('event_selected', {}).get('sport_event_statistics', {}).get('totals', {}).get('competitors', [])[1] if $.get('event_selected', {}).get('sport_event_statistics', {}).get('totals', {}).get('competitors', []) else {}"
       title: "$.get('event_selected', {}).get('title')"
       version_control: "$.get('event_selected', {}).get('version_control', {})"
+      venue_title: f"{$.get('event_selected', {}).get('sport_event', {}).get('venue', {}).get('name')} - {$.get('event_selected', {}).get('sport_event', {}).get('venue', {}).get('city_name')}"
+      match_service_summary: |
+        " | ".join([
+          f"Evento: {$.get('event_selected', {}).get('title')}",
+          f"Data: {$.get('event_selected', {}).get('start_time_brt')}",
+          f"Estadio: {$.get('event_selected', {}).get('sport_event', {}).get('venue', {}).get('name')} - {$.get('event_selected', {}).get('sport_event', {}).get('venue', {}).get('city_name')}",
+        ])
 
   - type: "mapping"
     title: "Soccer - Event Summary Status"
@@ -44,17 +56,13 @@ mappings:
       played: "$.get('item').get('clock', {}).get('played')"
       period_scores: "$.get('item').get('period_scores')"
       status: "$.get('item').get('status')"
-
-  - type: "mapping"
-    title: "Soccer - Player Statistics Mapping"
-    name: "mapping-soccer-player-stats"
-    description: "Mapping data from sportradar soccer data"
-    outputs:
-      player_stats: |
-        [
-          {
-            **player,
-          }
-          for player in $.get('_players', [])
-          if player.get('id') == $.('_player_id')
-        ]
+      match_status_summary: |
+        " | ".join([
+          f"Played: {$.get('item').get('clock', {}).get('played')}",
+          f"Score: {$.get('item').get('home_score')} x {$.get('item').get('away_score')}",
+          f"Match Status: {$.get('item').get('match_status')}",
+          f"Match situation: {$.get('item').get('match_situation')}",
+          f"Ball Locations: {$.get('item').get('ball_locations')}",
+          f"Period Scores: {$.get('item').get('period_scores')}",
+          f"Status: {$.get('item').get('status')}",
+        ])

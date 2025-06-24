@@ -25,7 +25,7 @@ workflow:
         action: "search"
         search-limit: 1
         search-vector: false
-        search-sorters: ["start_time", 1]
+        search-sorters: ["value.start_time", 1]
       filters:
         metadata.season_id: "$.get('season_id')"
       inputs:
