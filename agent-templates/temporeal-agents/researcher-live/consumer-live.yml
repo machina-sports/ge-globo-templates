@@ -24,8 +24,10 @@ agent:
     #   outputs:
     #     standings: "$.get('standings', {})"
 
-    # # Workflow Event Live Executor
-    # - name: "coverage-researcher-live-executor"
-    #   description: "Coverage Researcher Live Executor"
-    #   outputs:
-    #     researcher-executor-status: "$.get('workflow-status', False)"
+    # Workflow Event Live Executor
+    - name: "coverage-researcher-live-executor"
+      description: "Coverage Researcher Live Executor"
+      inputs:
+        event_code: "$.get('event_code')"
+      outputs:
+        researcher-executor-status: "$.get('workflow-status', False)"

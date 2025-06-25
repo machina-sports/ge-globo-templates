@@ -12,6 +12,8 @@ workflow:
       api_key: "$TEMP_CONTEXT_VARIABLE_SDK_GROQ_API_KEY"
     sportradar-soccer:
       sportradar_api_key: "$TEMP_CONTEXT_VARIABLE_SPORTRADAR_SOCCER_V4_API_KEY"
+  inputs:
+    event_code: "$.get('event_code')"
   outputs:
     workflow-status: "'executed'"
   tasks:
@@ -24,34 +26,153 @@ workflow:
       name: load-game-by-code
       config:
         action: "search"
-        search-limit: 100
+        search-limit: 1
         search-vector: false
         search-sorters: ["value.start_time", 1]
+      filters:
+        metadata.event_code: "$.get('event_code')"
       inputs:
         name: "{'$in': ['soccer-game']}"
       outputs:
-        games: "$.get('documents') if $.get('documents') else None"
-        games-parsed: |
+        event_exists: "len($.get('documents', [])) > 0"
+        event_metadata: "$.get('documents', [])[0].get('metadata', {}) if $.get('documents') else None"
+        event_value: "$.get('documents', [])[0].get('value', {}) if $.get('documents') else None"
+        summary_data: "[]"
+
+    # 2 mapping-soccer-version-control
+    - type: "mapping"
+      name: "mapping-soccer-version-control"
+      description: "Transform the sportradar soccer data"
+      condition: "$.get('event_exists') is True"
+      inputs:
+        item: "$.get('event_value', [])"
+      outputs:
+        content_name: "$.get('content_name')"
+        content_group: "$.get('content_group')"
+        content_topic: "$.get('content_topic')"
+        have_lineups: "$.get('have_lineups')"
+        have_last_home_matches: "$.get('have_last_home_matches')"
+        have_last_away_matches: "$.get('have_last_away_matches')"
+        have_timeline: "$.get('have_timeline')"
+
+    # mapping-soccer-event-summary
+    - type: "mapping"
+      name: "mapping-soccer-event-summary"
+      condition: "$.get('event_exists') is True"
+      inputs:
+        event_selected: "$.get('event_value')"
+      outputs:
+        event_status: "$.get('sport_event_status')"
+        match_prelive_lineups: "$.get('match_prelive_lineups')"
+        match_service_summary: "$.get('match_service_summary')"
+        match_timeline: "$.get('match_timeline')"
+
+    # sportradar-soccer-mapping-status
+    - type: "mapping"
+      name: "mapping-soccer-event-summary-status"
+      description: "Transform the sportradar soccer data"
+      condition: "$.get('event_exists') is True"
+      inputs:
+        item: "$.get('event_status')"
+      outputs:
+        match_status_summary: "$.get('match_status_summary')"
+
+    # sbot-game-event-mapping
+    - type: mapping
+      name: sbot-event-mapping
+      condition: "$.get('event_exists') is True"
+      inputs:
+        _items: "[$.get('event_value')]"
+      outputs:
+        event-list-mapped: "$.get('event-list-mapped')"
+
+    # sbot-game-stats-mapping
+    - type: mapping
+      name: sbot-game-stats-mapping
+      condition: "$.get('event_exists') is True"
+      inputs:
+        _items: "[$.get('event_value')]"
+      outputs:
+        game-stats-mapped: "$.get('game-stats-mapped')"
+        players-stats-mapped: "$.get('players-stats-mapped')"
+
+    # load-snippets-by-code
+    - type: document
+      name: load-snippets-by-code
+      config:
+        action: "search"
+        search-limit: 100
+        search-vector: false
+        search-sorters: ["created", -1]
+      filters:
+        metadata.event_code: "$.get('event_code')"
+      inputs:
+        name: "{'$in': ['content-snippet']}"
+      outputs:
+        retrieved-snippets: "$.get('documents', [])" 
+        retrieved-snippets-parsed: |
           [
-            {
-              'event_code': game.get('value', {}).get('sport_event', {}).get('id'),
-              'start_time_brt': game.get('value', {}).get('start_time_brt'),
-              'status': game.get('value', {}).get('sport_event_status', {}).get('status'),
-              'score': f"{game.get('value', {}).get('sport_event_status', {}).get('home_score', 0)} - {game.get('value', {}).get('sport_event_status', {}).get('away_score', 0)}",
-              'title': game.get('value', {}).get('title'),
-            }
-            for game in $.get('documents', [])
+            " ".join([
+              f"{c.get('value', {}).get('momento', '')} {c.get('value', {}).get('periodo', '')} {c.get('value', {}).get('title', '')} {c.get('value', {}).get('subject', '')} {c.get('value', {}).get('content', '')}"
+              for c in $.get('documents', [])
+            ])
           ]
 
-    # document-update-game-schedule
+    # prompt-live-event-analysis
+    - type: prompt
+      name: prompt-live-event-analysis
+      condition: "$.get('event_exists') is True"
+      connector:
+        name: "machina-ai"
+        command: "invoke_prompt"
+        model: "gpt-4.1"
+      inputs:
+        history-snippets: "$.get('retrieved-snippets-parsed')"
+        context-match-summary: "$.get('match_service_summary')"
+        context-lineups: "$.get('match_prelive_lineups') if $.get('have_lineups') is True else None"
+        context-status: "$.get('match_status_summary')"
+        data-timeline: "$.get('match_timeline')"
+        data-events: "$.get('event-list-mapped')"
+        data-team-stats: "$.get('game-stats-mapped')"
+        data-player-stats: "$.get('players-stats-mapped')"
+      outputs:
+        prompt-output-lineups: "$"
+        prompt-output-snippets: "$.get('snippets', [])"
+        snippets-bulk: |
+          [
+            {
+              'text': c.get('content', ''),
+              'title': c.get('title', ''),
+              'subject': c.get('subject', ''),
+              'momento': c.get('momento', ''),
+              'periodo': c.get('periodo', ''),
+              'metadata': {
+                'content-group': '$.(content-group)',
+                'content-name': '$.(content-name)',
+                'content-topic': '$.(content-topic)',
+                'event_code': '$.(event_code)'
+              }
+            }
+            for c in $.get('snippets', [])
+          ]
+
+    # save-live-game-snippets
     - type: document
-      name: update-game-schedule
+      name: save-live-game-snippets
+      condition: "$.get('event_exists') is True"
       config:
-        action: "update"
-        embed-vector: false
+        action: "bulk-save"
+        embed-vector: true
         force-update: true
+      connector:
+        name: machina-ai
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      document_name: "'content-snippet'"
       documents:
-        content-game-schedule: |
-          {
-            'games': $.get('games-parsed')
-          }
+        items: "$.get('parsed-items')"
+      inputs:
+        parsed-items: |
+          [
+            *$.get('snippets-bulk', [])
+          ]

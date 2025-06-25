@@ -1,0 +1,165 @@
+prompts:
+
+  # prompt-live-event-analysis
+  - type: prompt
+    name: prompt-live-event-analysis
+    title: "Cobertura - Análise de Eventos ao Vivo"
+    description: "Extrair e analisar informações específicas de eventos de futebol ao vivo em diferentes fases da partida"
+    instruction: |
+      Extrair e analisar informações específicas de eventos de futebol ao vivo em diferentes fases da partida. 
+      TODAS as respostas devem ser escritas em português brasileiro. 
+      
+      COMO USAR OS DADOS FORNECIDOS:
+      
+      1. HISTORY-SNIPPETS (Evitar Repetição):
+      - Contém os últimos snippets já gerados para este evento
+      - USAR APENAS para verificar o que JÁ foi reportado
+      - NÃO repetir informações que já aparecem nestes snippets
+      - Se todos os eventos novos já foram cobertos, definir no_news = true
+      
+      2. CONTEXT (Contextualização - NÃO extrair como novidade):
+      - context-match-summary: Informações básicas do jogo (times, data, estádio)
+      - context-lineups: Escalações dos times (usar apenas como contexto)
+      - context-status: Status atual da partida (placar, tempo)
+      - USAR para contextualizar eventos, mas NÃO como fonte de novos snippets
+      
+      3. DATA (Dados novos para análise - FONTE DOS SNIPPETS):
+      - data-timeline: Cronologia de eventos da partida
+      - data-events: Lista de eventos mapeados
+      - data-team-stats: Estatísticas das equipes
+      - data-player-stats: Estatísticas individuais dos jogadores
+      - ANALISAR estes dados para encontrar NOVOS eventos não cobertos no history-snippets
+      
+      PROCESSO DE ANÁLISE:
+      1. Verificar history-snippets para saber o que JÁ foi reportado
+      2. Usar context para entender o cenário da partida
+      3. Analisar data-timeline, data-events, data-team-stats, data-player-stats
+      4. Identificar eventos NOVOS que não estão no history-snippets
+      5. Criar snippets apenas para eventos verdadeiramente novos
+      6. Se não houver novidades, definir no_news = true
+      
+      ATENÇÃO ESPECIAL PARA FIM DE JOGO:
+      - Quando data-timeline contém "match_ended", há MUITO conteúdo pós-jogo disponível
+      - Estatísticas finais das equipes podem gerar múltiplos snippets únicos
+      - Análises de desempenho individual de jogadores
+      - Comparações estatísticas finais entre as equipes
+      - Momentos decisivos da partida
+      - Análise de posse de bola, chutes, cartões, etc.
+      - CADA estatística pode ser um snippet diferente e único
+      - NÃO definir no_news = true apenas porque o jogo terminou
+      
+      OPORTUNIDADES PÓS-JOGO (período POS_JOGO ou POS_JOGO_AO_VIVO):
+      - Estatísticas finais de posse de bola por equipe
+      - Análise de eficiência nos chutes (total vs no gol)
+      - Disciplina: total de cartões por equipe
+      - Performance de jogadores específicos (artilheiros, assistências)
+      - Comparação estatística entre os times
+      - Momentos que definiram o resultado
+      - Análise de substituições e seu impacto
+      - Estatísticas de escanteios, faltas, impedimentos
+      
+      UTILIZAR ESTATÍSTICAS DETALHADAS para contextualizar eventos novos:
+      
+      ESTATÍSTICAS DE EQUIPE (data-team-stats):
+      - Posse de bola (ball_possession): Comparar percentuais entre os times
+      - Chutes totais (shots_total) vs chutes no gol (shots_on_target) vs chutes para fora (shots_off_target)
+      - Faltas cometidas (fouls) e cobranças de falta (free_kicks)
+      - Cartões amarelos (yellow_cards) e vermelhos (red_cards + yellow_red_cards)
+      - Escanteios (corners) e impedimentos (offsides)
+      
+      ESTATÍSTICAS DE JOGADORES (data-player-stats):
+      - Gols marcados (goals_scored) e assistências (assists)
+      - Performance individual: chutes, chutes no gol, chutes para fora
+      - Disciplina: cartões amarelos e vermelhos por jogador
+      - Substituições: jogadores que entraram (substituted_in) e saíram (substituted_out)
+      - Cobranças de escanteio (corner_kicks) e impedimentos por jogador
+      
+      ANÁLISE COMPARATIVA:
+      - Comparar estatísticas atuais com dados do history-snippets
+      - Identificar mudanças significativas na posse de bola, chutes, cartões
+      - Destacar evoluções no desempenho de jogadores específicos
+      - Relacionar eventos novos com o contexto estatístico
+      - Mostrar como eventos impactam o equilíbrio da partida
+      
+      CONTEXTUALIZAÇÃO TEMPORAL:
+      - Relacionar estatísticas com o período da partida (primeiro tempo, segundo tempo, prorrogação)
+      - Mostrar progressão das estatísticas ao longo do jogo
+      - Identificar momentos de virada no controle da partida baseado em dados
+    schema:
+      title: "AnaliseEventoAoVivo"
+      description: "Extrair trechos específicos dos eventos ao vivo fornecidos em português brasileiro - NENHUM CONTEÚDO GERADO PERMITIDO"
+      type: "object"
+      required:
+        - snippets
+        - no_news
+      properties:
+        no_news:
+          type: "boolean"
+          description: "Definir como true se não houver eventos novos ou diferentes em relação às últimas 3 mensagens geradas. Se todos os eventos já foram reportados nas mensagens anteriores, marcar como true para evitar repetição."
+        snippets:
+          type: "array"
+          description: "Trechos exatos dos eventos ao vivo fornecidos que contêm informações específicas sobre a partida em andamento - devem ser citações diretas ou paráfrases apenas do material fonte. APENAS incluir eventos novos não mencionados nas últimas 3 mensagens."
+          minItems: 0
+          maxItems: 10
+          items:
+            type: "object"
+            required:
+              - title
+              - content
+              - subject
+              - momento
+              - periodo
+            properties:
+              content:
+                type: "string"
+                description: "APENAS extrair informações reais dos eventos da partida mencionados nos documentos fornecidos que NÃO foram reportados nas últimas 3 mensagens, escrevendo SEMPRE em português brasileiro. Criar um texto descritivo de EXATAMENTE 3 frases sobre o evento. Incluir detalhes exatos como: gols marcados, cartões aplicados, substituições realizadas, tempo de jogo, jogadores envolvidos, lances importantes, decisões do árbitro. UTILIZAR estatísticas disponíveis (posse de bola, chutes, faltas, escanteios, passes certos, etc.) para contextualizar e enriquecer o conteúdo. COMPARAR com dados do history-snippets quando relevante para mostrar evolução do jogo. NÃO gerar, assumir ou criar qualquer informação não explicitamente presente nos documentos. 
+                  
+                  EXEMPLOS DE CONTEÚDO VÁLIDO:
+                  - Durante o jogo: 'João Silva marcou o primeiro gol da partida aos 23 minutos do primeiro tempo, aproveitando a maior posse de bola do Flamengo (65%). O atacante recebeu passe de Carlos Santos após uma sequência de 8 passes consecutivos do time rubro-negro. Com este gol, o Flamengo consolida sua superioridade estatística mostrada desde o início da partida.'
+                  - Pós-jogo: 'O Los Angeles FC finalizou a partida com 58% de posse de bola contra 42% do Flamengo. A equipe americana conseguiu 14 chutes totais durante os 90 minutos, sendo 6 no alvo. Esta superioridade ofensiva foi decisiva para o empate conquistado no final da partida.'
+                  - Análise individual: 'Wallace Yan foi o destaque do Flamengo com 1 gol e 3 chutes durante a partida. O atacante teve 89% de passes certos e foi responsável pelo empate aos 85 minutos. Sua entrada no segundo tempo mudou a dinâmica ofensiva da equipe carioca.'"
+              title:
+                type: "string"
+                description: "Criar um título descritivo em português brasileiro baseado APENAS nos eventos reais e NOVOS encontrados nos documentos. Usar informações específicas dos lances, jogadores envolvidos e momentos da partida mencionados no material fonte que não foram cobertos nas últimas 3 mensagens. Exemplo: 'Gol de João Silva abre o placar para o Flamengo'"
+              subject:
+                type: "string"
+                description: "Identificar o evento específico, jogador envolvido ou momento da partida em português brasileiro, baseado APENAS no que está realmente mencionado nos documentos fornecidos e que representa uma novidade em relação às mensagens anteriores. SEMPRE incluir os nomes dos times do confronto no subject. Usar descrições exatas dos eventos como aparecem no texto fonte. Exemplo: 'Flamengo x Vasco - Gol de João Silva' ou 'Palmeiras x Corinthians - Cartão amarelo para Carlos Santos'"
+              momento:
+                type: "string"
+                description: |
+                  Momento específico da partida em que o evento ocorreu, baseado no momento mencionado no documento.
+                  Reportar APENAS em minutos, sem segundos.
+                  Exemplo: "74" para um evento aos 74 minutos (não "74:26")
+                  Se for pré jogo responder "00"
+                  Se for pós jogo responder "90"
+              periodo:
+                type: "string"
+                description: |
+                  Código da fase da partida em que o evento ocorreu, baseado no momento específico mencionado no documento:
+                  PRE_JOGO: Eventos antes do início da partida (aquecimento, hinos, escalações)
+                  PRIMEIRO_TEMPO: Eventos durante os primeiros 45 minutos + acréscimos
+                  INTERVALO: Eventos durante o intervalo entre os tempos
+                  SEGUNDO_TEMPO: Eventos durante os segundos 45 minutos + acréscimos
+                  AGUARDANDO_PRORROGACAO: Período de espera antes da prorrogação
+                  PRIMEIRO_TEMPO_PRORROGACAO: Eventos durante o primeiro tempo da prorrogação
+                  INTERVALO_PRORROGACAO: Intervalo entre os tempos da prorrogação
+                  SEGUNDO_TEMPO_PRORROGACAO: Eventos durante o segundo tempo da prorrogação
+                  AGUARDANDO_PENALIDADES: Período de espera antes dos pênaltis
+                  PENALIDADES: Eventos durante a disputa de pênaltis
+                  FIM_DE_JOGO: Momento final da partida
+                  POS_JOGO_AO_VIVO: Eventos imediatamente após o fim da partida
+                  POS_JOGO: Eventos pós-partida (entrevistas, análises)
+                enum:
+                  - PRE_JOGO
+                  - PRIMEIRO_TEMPO
+                  - INTERVALO
+                  - SEGUNDO_TEMPO
+                  - AGUARDANDO_PRORROGACAO
+                  - PRIMEIRO_TEMPO_PRORROGACAO
+                  - INTERVALO_PRORROGACAO
+                  - SEGUNDO_TEMPO_PRORROGACAO
+                  - AGUARDANDO_PENALIDADES
+                  - PENALIDADES
+                  - FIM_DE_JOGO
+                  - POS_JOGO_AO_VIVO
+                  - POS_JOGO

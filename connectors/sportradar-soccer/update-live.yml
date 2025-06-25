@@ -204,10 +204,6 @@ workflow:
         (
           '$.(event_code)' != None
           and $.(event_exists) is True
-          and (
-            $.(have_timeline) is not True
-            or '$.(event_status)' != 'closed'
-          )
         )
       connector:
         name: "sportradar-soccer"

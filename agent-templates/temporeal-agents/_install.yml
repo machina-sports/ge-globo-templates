@@ -92,6 +92,9 @@ datasets:
     path: "researcher-live/executor.yml"
 
   - type: "prompts"
+    path: "researcher-live/prompts/analysis.yml"
+
+  - type: "prompts"
     path: "researcher-live/prompts/lineups.yml"
 
   - type: "agent"
