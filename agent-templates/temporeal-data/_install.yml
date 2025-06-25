@@ -32,3 +32,5 @@ datasets:
   - type: "agent"
     path: "sportradar-conmebol.yml"
 
+  - type: "agent"
+    path: "sportradar-cwc.yml"

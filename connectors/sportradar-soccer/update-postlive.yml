@@ -32,6 +32,7 @@ workflow:
         name: "{'$in': ['soccer-game']}"
       outputs:
         event_exists: "len($.get('documents', [])) > 0"
+        event_metadata: "$.get('documents', [])[0].get('metadata', {}) if $.get('documents') else None"
         event_value: "$.get('documents', [])[0].get('value', {}) if $.get('documents') else None"
 
     # 1 load-event-by-schedule (postlive)
@@ -57,6 +58,7 @@ workflow:
       outputs:
         event_exists: "len($.get('documents', [])) > 0"
         event_code: "$.get('documents', [])[0].get('metadata', {}).get('event_code') if $.get('documents') else None"
+        event_metadata: "$.get('documents', [])[0].get('metadata', {}) if $.get('documents') else None"
         event_value: "$.get('documents', [])[0].get('value', {}) if $.get('documents') else None"
 
     # 2 mapping-soccer-version-control
@@ -100,6 +102,7 @@ workflow:
           }
       metadata:
         event_code: "$.get('event_code')"
+        integration_code: "$.get('event_metadata', {}).get('integration_code')"
 
     # 4 fetch-event-summary
     - type: "connector"
@@ -295,3 +298,4 @@ workflow:
           }
       metadata:
         event_code: "$.get('event_code')"
+        integration_code: "$.get('event_metadata', {}).get('integration_code')"

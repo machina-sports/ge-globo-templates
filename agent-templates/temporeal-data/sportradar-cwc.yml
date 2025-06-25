@@ -1,0 +1,43 @@
+agent:
+  name: populate-data-fifa-cwc-2025
+  title: "Populate - FIFA CWC 2025"
+  description: "Populate Content from Sync Workflows"
+  workflows:
+
+    # # sync soccer competitions
+    # - name: "sportradar-soccer-sync-competitions"
+    #   description: "sync-competitions"
+    #   outputs:
+    #     sync-competitions-status: "$.get('workflow-status', False)"
+
+    # update CWC 2025 - competition
+    - name: "sportradar-soccer-update-competition"
+      description: "update-competition"
+      inputs:
+        season_id: "'sr:season:126393'"
+      outputs:
+        update-competition-status: "$.get('workflow-status', False)"
+
+    # sync CWC 2025 - seasons
+    - name: "sportradar-soccer-sync-seasons"
+      description: "sync-seasons"
+      inputs:
+        competition_id: "'sr:competition:357'"
+      outputs:
+        sync-seasons-status: "$.get('workflow-status', False)"
+
+    # sync CWC 2025 - schedules
+    - name: "sportradar-soccer-sync-schedules"
+      description: "sync-schedules"
+      inputs:
+        season_id: "'sr:season:126393'"
+      outputs:
+        sync-schedules-status: "$.get('workflow-status', False)"
+
+    # sync CWC 2025 - competitors
+    - name: "sportradar-soccer-sync-competitors"
+      description: "sync-competitors"
+      inputs:
+        season_id: "'sr:season:126393'"
+      outputs:
+        sync-competitors-status: "$.get('workflow-status', False)"

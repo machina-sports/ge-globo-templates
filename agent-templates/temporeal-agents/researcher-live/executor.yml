@@ -1,0 +1,57 @@
+workflow:
+
+  name: coverage-researcher-live-executor
+  title: "Coverage - Researcher Live Executor"
+  description: "Workflow to execute researcher live."
+  context-variables:
+    debugger:
+      enabled: true
+    machina-ai:
+      api_key: "$TEMP_CONTEXT_VARIABLE_SDK_OPENAI_API_KEY"
+    machina-ai-fast:
+      api_key: "$TEMP_CONTEXT_VARIABLE_SDK_GROQ_API_KEY"
+    sportradar-soccer:
+      sportradar_api_key: "$TEMP_CONTEXT_VARIABLE_SPORTRADAR_SOCCER_V4_API_KEY"
+  outputs:
+    workflow-status: "'executed'"
+  tasks:
+
+    # sportradar-live-requests (have-content-to-process)
+    ## START SPORTRADAR-LIVE-SCHEDULE
+
+    # load-game-by-code
+    - type: document
+      name: load-game-by-code
+      config:
+        action: "search"
+        search-limit: 100
+        search-vector: false
+        search-sorters: ["value.start_time", 1]
+      inputs:
+        name: "{'$in': ['soccer-game']}"
+      outputs:
+        games: "$.get('documents') if $.get('documents') else None"
+        games-parsed: |
+          [
+            {
+              'event_code': game.get('value', {}).get('sport_event', {}).get('id'),
+              'start_time_brt': game.get('value', {}).get('start_time_brt'),
+              'status': game.get('value', {}).get('sport_event_status', {}).get('status'),
+              'score': f"{game.get('value', {}).get('sport_event_status', {}).get('home_score', 0)} - {game.get('value', {}).get('sport_event_status', {}).get('away_score', 0)}",
+              'title': game.get('value', {}).get('title'),
+            }
+            for game in $.get('documents', [])
+          ]
+
+    # document-update-game-schedule
+    - type: document
+      name: update-game-schedule
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      documents:
+        content-game-schedule: |
+          {
+            'games': $.get('games-parsed')
+          }

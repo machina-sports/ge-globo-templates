@@ -86,6 +86,17 @@ datasets:
   - type: "agent"
     path: "researcher-game/consumer.yml"
     
+  # researcher-live
+
+  - type: "workflow"
+    path: "researcher-live/executor.yml"
+
+  - type: "prompts"
+    path: "researcher-live/prompts/lineups.yml"
+
+  - type: "agent"
+    path: "researcher-live/consumer-live.yml"
+
   # researcher-stats
 
   - type: "workflow"

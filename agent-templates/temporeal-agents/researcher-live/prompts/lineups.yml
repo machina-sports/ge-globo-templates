@@ -1,0 +1,64 @@
+prompts:
+
+  # prompt-live-event-lineups
+
+  - type: prompt
+    name: prompt-live-event-lineups
+    title: "Cobertura - Escalações de Eventos ao Vivo"
+    description: "Extrair e analisar informações específicas das escalações dos times fornecidas apenas"
+    schema:
+      title: "EscalacoesFutebolEventoAoVivo"
+      description: "Extrair trechos específicos das escalações dos times fornecidas - NENHUM CONTEÚDO GERADO PERMITIDO"
+      type: "object"
+      properties:
+        snippets:
+          type: "array"
+          description: "Trechos exatos das escalações dos times fornecidas que contêm informações específicas sobre as escalações - devem ser citações diretas ou paráfrases apenas do material fonte"
+          minItems: 1
+          maxItems: 20
+          items:
+            type: "object"
+            required:
+              - title
+              - content
+              - subject
+              - script_code
+            properties:
+              content:
+                type: "string"
+                description: "APENAS extrair informações reais dos jogadores e treinador mencionados nos documentos fornecidos. Incluir nomes exatos dos jogadores, suas posições quando mencionadas, números da camisa se disponíveis, nome do treinador e informações sobre ele. NÃO gerar, assumir ou criar qualquer informação não explicitamente presente nos documentos. Se o documento menciona 'João Silva, camisa 10' ou 'Treinador Carlos Santos', incluir essa informação exata. Se menciona jogadores específicos, suas posições ou informações do treinador, incluir esses detalhes exatos."
+              title:
+                type: "string"
+                description: "Criar um título baseado APENAS nos jogadores e treinador reais encontrados nos documentos. Usar nomes reais de jogadores e treinador mencionados no material fonte."
+              subject:
+                type: "string"
+                description: "Identificar o jogador, grupo de jogadores ou treinador específico baseado APENAS no que está realmente mencionado nos documentos fornecidos. Usar nomes exatos de jogadores e treinador como aparecem no texto fonte. Não generalizar ou criar descrições genéricas."
+              script_code:
+                type: "string"
+                description: |
+                  Código do tipo de conteúdo que categoriza o trecho baseado nos jogadores e treinador mencionados no documento. Categorias incluem:
+                  Jogadores titulares: JOGADORES_TITULARES, JOGADOR_DESTAQUE, CAPITAO_EQUIPE
+                  Informações do jogador: POSICAO_JOGADOR, NUMERO_CAMISA, IDADE_JOGADOR
+                  Status do jogador: JOGADOR_LESIONADO, JOGADOR_SUSPENSO, JOGADOR_DISPONIVEL
+                  Banco de reservas: JOGADORES_RESERVAS, JOGADOR_SUPLENTE
+                  Histórico: JOGADOR_ESTREANTE, JOGADOR_VETERANO, RETORNO_JOGADOR
+                  Treinador: TREINADOR_PRINCIPAL, TREINADOR_ASSISTENTE, DECISOES_TREINADOR, HISTORICO_TREINADOR
+                enum:
+                  - JOGADORES_TITULARES
+                  - JOGADOR_DESTAQUE
+                  - CAPITAO_EQUIPE
+                  - POSICAO_JOGADOR
+                  - NUMERO_CAMISA
+                  - IDADE_JOGADOR
+                  - JOGADOR_LESIONADO
+                  - JOGADOR_SUSPENSO
+                  - JOGADOR_DISPONIVEL
+                  - JOGADORES_RESERVAS
+                  - JOGADOR_SUPLENTE
+                  - JOGADOR_ESTREANTE
+                  - JOGADOR_VETERANO
+                  - RETORNO_JOGADOR
+                  - TREINADOR_PRINCIPAL
+                  - TREINADOR_ASSISTENTE
+                  - DECISOES_TREINADOR
+                  - HISTORICO_TREINADOR

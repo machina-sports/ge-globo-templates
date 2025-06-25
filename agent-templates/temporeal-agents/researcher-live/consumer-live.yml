@@ -1,0 +1,31 @@
+agent:
+
+  name: coverage-live-consumer
+  title: "Coverage - Live Consumer"
+  description: "Workflow to consume researcher live."
+  context:
+    config-frequency: 1
+  inputs:
+    event_code: "$.get('event_code') or None"
+  workflows:
+
+    # Workflow Event Update Live
+    - name: "sportradar-soccer-update-live"
+      description: "Soccer Event Update Live"
+      outputs:
+        event_code: "$.get('event_code')"
+        soccer-event-update: "$.get('workflow-status', False)"
+
+    # # sportradar-soccer-sync-standings
+    # - name: "sportradar-soccer-sync-standings"
+    #   description: "Sync Standings"
+    #   inputs:
+    #     season_id: "'sr:season:126393'"
+    #   outputs:
+    #     standings: "$.get('standings', {})"
+
+    # # Workflow Event Live Executor
+    # - name: "coverage-researcher-live-executor"
+    #   description: "Coverage Researcher Live Executor"
+    #   outputs:
+    #     researcher-executor-status: "$.get('workflow-status', False)"
