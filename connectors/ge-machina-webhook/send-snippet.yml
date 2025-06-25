@@ -1,0 +1,83 @@
+workflow:
+
+  name: send-snippet
+  title: "Send Snippet to GE Machina Webhook"
+  description: "Workflow to find the latest content-snippet by event_code, send it to GE Machina webhook, and mark it as sent."
+  context-variables:
+    debugger:
+      enabled: true
+    ge-machina-webhook:
+      basicAuth: "$TEMP_CONTEXT_VARIABLE_GE_MACHINA_WEBHOOK_API_KEY"
+  inputs:
+    event_code: "$.get('event_code')"
+  outputs:
+    workflow-status: "'executed'"
+    snippet-sent: "$.get('webhook_success', False)"
+    snippet-id: "$.get('snippet_id')"
+  tasks:
+
+    # load-latest-snippet-by-event-code
+    - type: document
+      name: load-latest-snippet-by-event-code
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["created", -1]
+      filters:
+        metadata.event_code: "$.get('event_code')"
+        value.sent: "{'$ne': True}"
+      inputs:
+        name: "{'$in': ['content-snippet']}"
+      outputs:
+        snippet_found: "len($.get('documents', [])) > 0"
+        snippet_data: "$.get('documents', [])[0] if $.get('documents') else None"
+        snippet_id: "$.get('documents', [])[0].get('_id') if $.get('documents') else None"
+        snippet_metadata: "$.get('documents', [])[0].get('metadata', {}) if $.get('documents') else None"
+        snippet_value: "$.get('documents', [])[0].get('value', {}) if $.get('documents') else None"
+        snippet_created: "$.get('documents', [])[0].get('created') if $.get('documents') else None"
+        snippet_updated: "$.get('documents', [])[0].get('updated') if $.get('documents') else None"
+
+    # prepare-webhook-payload
+    - type: mapping
+      name: prepare-webhook-payload
+      condition: "$.get('snippet_found') is True"
+      inputs:
+        snippet_data: "$.get('snippet_data')"
+      outputs:
+        webhook_payload: "$.get('webhook_payload')"
+
+    # send-to-ge-machina-webhook
+    - type: connector
+      name: send-to-ge-machina-webhook
+      condition: "$.get('snippet_found') is True"
+      connector:
+        name: "ge-machina-webhook"
+        command: "post-document/webhook"
+      inputs:
+        body: "$.get('webhook_payload')"
+      outputs:
+        webhook_response: "$"
+        webhook_success: "$.get('status', False)"
+        webhook_status_code: "$.get('status_code', 0)"
+        webhook_message: "$.get('message', '')"
+
+    # update-snippet-as-sent
+    - type: document
+      name: update-snippet-as-sent
+      condition: "$.get('snippet_found') is True and $.get('webhook_success') is True"
+      config:
+        action: "update"
+        force-update: true
+      document_id: "$.get('snippet_id')"
+      documents:
+        content-snippet: |
+          {
+            **$.get('snippet_value', {}),
+            "sent": True,
+            "sent_at": "$.get('current_timestamp')",
+            "webhook_response": $.get('webhook_response', {})
+          }
+      outputs:
+        update_success: "$.get('success', False)"
+        updated_document: "$"

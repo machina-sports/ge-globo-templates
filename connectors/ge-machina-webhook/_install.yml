@@ -1,0 +1,32 @@
+setup:
+  title: GE Machina Webhook
+  description: Connect to the GE Machina webhook API for document processing and data insights.
+  category:
+    - webhooks
+    - data-processing
+  estimatedTime: 2 minutes
+  features:
+    - Document webhook integration
+    - Real-time data processing
+    - Embedding support
+    - Metadata handling
+    - Batch document processing
+    - Document status tracking
+    - JWT Bearer authentication
+  integrations:
+    - webhook-processing
+    - document-management
+    - data-insights
+  status: available
+  value: connectors/ge-machina-webhook
+  version: 1.0.0
+
+datasets:
+  - type: "connector"
+    path: "ge-machina-webhook.yml" 
+
+  - type: "workflow"
+    path: "send-snippet.yml"
+
+  - type: "mappings"
+    path: "mappings.yml"

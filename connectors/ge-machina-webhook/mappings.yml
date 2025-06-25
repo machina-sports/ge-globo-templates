@@ -1,0 +1,28 @@
+mappings:
+
+  # Transform content-snippet data into GE Machina webhook payload format
+  - type: mapping
+    name: "prepare-webhook-payload"
+    title: "GE Machina - Prepare Webhook Payload"
+    description: "Transform content-snippet document into GE Machina webhook payload format"
+    outputs:
+      webhook_payload: |
+        {
+          'data': {
+            '_id': $.get('snippet_data', {}).get('_id'),
+            'created': "$.get('snippet_data', {}).get('created')",
+            'updated': "$.get('snippet_data', {}).get('updated')",
+            'name': 'content-snippet',
+            'metadata': {
+              'event_code': $.get('snippet_data', {}).get('metadata', {}).get('event_code'),
+              'integration_code': $.get('snippet_data', {}).get('metadata', {}).get('integration_code', 'GE_MACHINA_WEBHOOK'),
+            },
+            'value': {
+              'subject': $.get('snippet_data', {}).get('value', {}).get('subject', ''),
+              'title': $.get('snippet_data', {}).get('value', {}).get('title', ''),
+              'text': $.get('snippet_data', {}).get('value', {}).get('text', ''),
+              'moment': $.get('snippet_data', {}).get('value', {}).get('momento', ''),
+              'period': $.get('snippet_data', {}).get('value', {}).get('periodo', '')
+            }
+          }
+        }

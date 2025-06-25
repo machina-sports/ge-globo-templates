@@ -1,0 +1,5 @@
+connector:
+  name: "ge-machina-webhook"
+  description: "This connector integrates with GE Machina webhook API for document processing."
+  filename: "ge-machina-webhook.json"
+  filetype: "restapi" 
