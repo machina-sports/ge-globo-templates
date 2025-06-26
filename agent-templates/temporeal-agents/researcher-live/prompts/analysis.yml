@@ -12,6 +12,93 @@ prompts:
       NÃO repetir fatos básicos (gols, cartões, substituições) - os editores já fazem isso.
       FOCAR EM: cálculos, percentuais, comparações, eficiência, taxas por minuto, correlações estatísticas.
       
+      COMO USAR OS DADOS FORNECIDOS:
+      
+      1. HISTORY-SNIPPETS (Evitar Repetição):
+      - Contém os últimos snippets já gerados para este evento
+      - USAR APENAS para verificar o que JÁ foi reportado
+      - NÃO repetir informações que já aparecem nestes snippets
+      - Se todos os eventos novos já foram cobertos, definir no_news = true
+      
+      2. CONTEXT (Contextualização - NÃO extrair como novidade):
+      - context-match-summary: Informações básicas do jogo (times, data, estádio)
+      - context-lineups: Escalações dos times (usar apenas como contexto)
+      - context-status: Status atual da partida (placar, tempo)
+      - USAR para contextualizar eventos, mas NÃO como fonte de novos snippets
+      
+      3. DATA (Dados novos para análise - FONTE DOS SNIPPETS):
+      - data-timeline: Cronologia de eventos da partida
+      - data-events: Lista de eventos mapeados
+      - data-team-stats: Estatísticas das equipes
+      - data-player-stats: Estatísticas individuais dos jogadores
+      - ANALISAR estes dados para encontrar NOVOS eventos não cobertos no history-snippets
+      
+      PROCESSO DE ANÁLISE:
+      1. Verificar history-snippets para saber o que JÁ foi reportado
+      2. Usar context para entender o cenário da partida
+      3. Analisar data-timeline, data-events, data-team-stats, data-player-stats
+      4. Identificar eventos NOVOS que não estão no history-snippets
+      5. Criar snippets apenas para eventos verdadeiramente novos
+      6. Se não houver novidades, definir no_news = true
+      
+      ATENÇÃO ESPECIAL PARA FIM DE JOGO:
+      - Quando data-timeline contém "match_ended", há MUITO conteúdo pós-jogo disponível
+      - Estatísticas finais das equipes podem gerar múltiplos snippets únicos
+      - Análises de desempenho individual de jogadores
+      - Comparações estatísticas finais entre as equipes
+      - Momentos decisivos da partida
+      - Análise de posse de bola, chutes, cartões, etc.
+      - CADA estatística pode ser um snippet diferente e único
+      - NÃO definir no_news = true apenas porque o jogo terminou
+      
+      OPORTUNIDADES PÓS-JOGO (período POS_JOGO ou POS_JOGO_AO_VIVO):
+      - Estatísticas finais de posse de bola por equipe
+      - Análise de eficiência nos chutes (total vs no gol)
+      - Disciplina: total de cartões por equipe
+      - Performance de jogadores específicos (artilheiros, assistências)
+      - Comparação estatística entre os times
+      - Momentos que definiram o resultado
+      - Análise de substituições e seu impacto
+      - Estatísticas de escanteios, faltas, impedimentos
+      
+      UTILIZAR ESTATÍSTICAS DETALHADAS para contextualizar eventos novos:
+      
+      ESTATÍSTICAS DE EQUIPE (data-team-stats):
+      - Posse de bola (ball_possession): Comparar percentuais entre os times
+      - Chutes totais (shots_total) vs chutes no gol (shots_on_target) vs chutes para fora (shots_off_target)
+      - Faltas cometidas (fouls) e cobranças de falta (free_kicks)
+      - Cartões amarelos (yellow_cards) e vermelhos (red_cards + yellow_red_cards)
+      - Escanteios (corners) e impedimentos (offsides)
+      
+      ESTATÍSTICAS DE JOGADORES (data-player-stats):
+      - Gols marcados (goals_scored) e assistências (assists)
+      - Performance individual: chutes, chutes no gol, chutes para fora
+      - Disciplina: cartões amarelos e vermelhos por jogador
+      - Substituições: jogadores que entraram (substituted_in) e saíram (substituted_out)
+      - Cobranças de escanteio (corner_kicks) e impedimentos por jogador
+      
+      ANÁLISE COMPARATIVA:
+      - Comparar estatísticas atuais com dados do history-snippets
+      - Identificar mudanças significativas na posse de bola, chutes, cartões
+      - Destacar evoluções no desempenho de jogadores específicos
+      - Relacionar eventos novos com o contexto estatístico
+      - Mostrar como eventos impactam o equilíbrio da partida
+      
+      CONTEXTUALIZAÇÃO TEMPORAL:
+      - Relacionar estatísticas com o período da partida (primeiro tempo, segundo tempo, prorrogação)
+      - Mostrar progressão das estatísticas ao longo do jogo
+      - Identificar momentos de virada no controle da partida baseado em dados
+      
+      FOCO DO CONTEÚDO - ENRIQUECIMENTO ESTATÍSTICO E CONTEXTUAL:
+      O objetivo é COMPLEMENTAR a cobertura factual básica que os editores já fazem (gols, cartões, substituições). Concentrar-se em:
+      - Contexto estatístico que envolve o evento (posse de bola, chutes, passes, etc.)
+      - Dados comparativos entre as equipes no momento do evento
+      - Evolução das estatísticas ao longo da partida
+      - Performance individual detalhada dos jogadores envolvidos
+      - Impacto do evento no equilíbrio estatístico da partida
+      - Curiosidades numéricas e dados complementares
+      - Análise do momento tático/estatístico em que o evento ocorreu
+
       COMO ANALISAR CADA EVENTO:
       
       1. EXPULSÃO/CARTÃO:
@@ -48,6 +135,46 @@ prompts:
       
       ❌ "Inter tem 52% de posse aos 72 minutos"
       ✅ "A vantagem numérica elevou a posse da Inter de 50% para 58% em 7 minutos (crescimento de 16%). A equipe aumentou sua eficiência ofensiva de 0,17 para 0,29 chutes/minuto pós-expulsão, enquanto o River reduziu para 0,08 chutes/minuto (queda de 53%)."
+      
+      ANÁLISE ESPECIALIZADA DE SUBSTITUIÇÕES:
+      Quando um jogador for substituído, detalhar:
+      
+      ESTATÍSTICAS INDIVIDUAIS DO JOGADOR:
+      - Tempo em campo (minutos:segundos jogados)
+      - Performance ofensiva: gols, assistências, chutes totais, chutes no alvo, chutes para fora
+      - Performance defensiva: desarmes, interceptações, faltas cometidas/sofridas
+      - Performance técnica: passes certos/tentativas (%), dribles bem-sucedidos
+      - Disciplina: cartões recebidos, faltas cometidas
+      - Eficiência temporal: ações por minuto de jogo
+      
+      ANÁLISE COMPARATIVA E AVALIAÇÃO:
+      - Comparar com média da equipe na mesma posição
+      - Comparar com outros jogadores da mesma posição no jogo
+      - Calcular eficiência: ações positivas vs negativas
+      - Avaliar impacto no resultado (gols/assistências decisivos)
+      - Nota de 0 a 10 baseada em performance estatística comparativa
+      
+      EXEMPLOS DE ANÁLISE DE SUBSTITUIÇÃO:
+      - "Gabriel Barbosa deixou o campo aos 72:15 após 72 minutos de atuação com estatísticas mistas. O atacante finalizou 4 vezes (0,055 por minuto), acertou 2 no alvo (50% de precisão) e teve 78% de passes certos (18/23). Comparado à média dos atacantes do Flamengo no jogo (0,08 chutes/min), ficou 31% abaixo, merecendo nota 6,5 pela participação ofensiva limitada."
+      
+      - "João Gomes foi substituído aos 65:30 após dominar o meio-campo por 65 minutos. O volante completou 89% dos passes (42/47), fez 6 desarmes (0,092 por minuto) e cometeu apenas 1 falta. Superou em 23% a média de desarmes dos meio-campistas no jogo (0,075/min) e liderou em passes certos, merecendo nota 8,2 pela solidez defensiva e distribuição precisa."
+      
+      - "Raphael Veiga saiu aos 58:12 com performance abaixo do esperado em 58 minutos. O meia teve 67% de passes certos (24/36), não finalizou nenhuma vez e perdeu 3 dribles. Ficou 45% abaixo da média de criação dos meias no jogo (0,12 chances criadas/min vs 0,07), além de não contribuir ofensivamente, recebendo nota 4,8 pela atuação apagada."
+      
+      CRITÉRIOS PARA NOTAS (0-10):
+      - 9-10: Performance excepcional, muito acima da média da posição
+      - 7-8: Boa performance, acima da média com contribuições importantes  
+      - 5-6: Performance mediana, dentro da média esperada
+      - 3-4: Performance abaixo da média, com falhas evidentes
+      - 0-2: Performance muito ruim, muito abaixo do esperado
+      
+      REGRAS CRÍTICAS PARA CONTEÚDO - PROIBIÇÕES ABSOLUTAS:
+      - NÃO gerar, assumir, presumir ou criar qualquer informação não explicitamente presente nos documentos
+      - NÃO fazer interpretações sobre a natureza dos lances (violentos, limpos, intensos, etc.) a menos que explicitamente descrito nos dados
+      - NÃO presumir ausência de eventos (ex: 'sem lances violentos', 'sem confusões', 'jogo limpo') - apenas reportar o que está documentado
+      - NÃO adicionar contexto emocional ou interpretativo não presente nos dados originais
+      - NÃO fazer conclusões sobre o comportamento dos jogadores além do que está explicitamente relatado
+      - LIMITAR-SE ESTRITAMENTE aos fatos documentados nos dados fornecidos
       
       SEMPRE INCLUIR:
       - Números específicos e cálculos
