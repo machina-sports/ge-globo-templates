@@ -85,6 +85,41 @@ prompts:
       - Relacionar estatísticas com o período da partida (primeiro tempo, segundo tempo, prorrogação)
       - Mostrar progressão das estatísticas ao longo do jogo
       - Identificar momentos de virada no controle da partida baseado em dados
+      
+      FOCO DO CONTEÚDO - ENRIQUECIMENTO ESTATÍSTICO E CONTEXTUAL:
+      O objetivo é COMPLEMENTAR a cobertura factual básica que os editores já fazem (gols, cartões, substituições). Concentrar-se em:
+      - Contexto estatístico que envolve o evento (posse de bola, chutes, passes, etc.)
+      - Dados comparativos entre as equipes no momento do evento
+      - Evolução das estatísticas ao longo da partida
+      - Performance individual detalhada dos jogadores envolvidos
+      - Impacto do evento no equilíbrio estatístico da partida
+      - Curiosidades numéricas e dados complementares
+      - Análise do momento tático/estatístico em que o evento ocorreu
+      
+      REGRAS CRÍTICAS PARA CONTEÚDO - PROIBIÇÕES ABSOLUTAS:
+      - NÃO gerar, assumir, presumir ou criar qualquer informação não explicitamente presente nos documentos
+      - NÃO fazer interpretações sobre a natureza dos lances (violentos, limpos, intensos, etc.) a menos que explicitamente descrito nos dados
+      - NÃO presumir ausência de eventos (ex: 'sem lances violentos', 'sem confusões', 'jogo limpo') - apenas reportar o que está documentado
+      - NÃO adicionar contexto emocional ou interpretativo não presente nos dados originais
+      - NÃO fazer conclusões sobre o comportamento dos jogadores além do que está explicitamente relatado
+      - LIMITAR-SE ESTRITAMENTE aos fatos documentados nos dados fornecidos
+      
+      EXEMPLOS DE CONTEÚDO VÁLIDO (ENRIQUECIMENTO ESTATÍSTICO):
+      
+      TOM EMOCIONAL/CLUBISTA:
+      - 'Wallace Yan empata para o Flamengo em um momento de total domínio rubro-negro! O gol aconteceu quando o time carioca já comandava com impressionantes 66% de posse de bola e havia disparado 11 chutes contra o gol adversário. A igualdade no placar finalmente fez jus à superioridade estatística flamenguista, que vinha pressionando desde o primeiro minuto.'
+      
+      TOM ESPECIALISTA/ANALÍTICO:
+      - 'O gol de empate de Wallace Yan aos 85 minutos reflete a conversão da superioridade estatística do Flamengo em resultado concreto. Com 66% de posse de bola, 11 chutes totais e 3 no alvo até aquele momento, o time demonstrava clara vantagem ofensiva. A igualdade consolida os números que apontavam para um domínio territorial consistente da equipe carioca.'
+      
+      EXEMPLOS ADICIONAIS:
+      - Análise pós-jogo: 'O Los Angeles FC finalizou a partida com 58% de posse de bola contra 42% do Flamengo, revertendo a tendência do primeiro tempo. A equipe americana conseguiu 14 chutes totais durante os 90 minutos, sendo 6 no alvo, números que explicam a pressão final. Esta inversão estatística foi determinante para o empate conquistado nos minutos decisivos.'
+      - Performance individual: 'Alessandro Bastoni liderou as ações defensivas da Inter com 89% de passes certos e 4 desarmes bem-sucedidos. O zagueiro italiano foi responsável por neutralizar 3 das 7 investidas ofensivas do River Plate no primeiro tempo. Seus números defensivos foram fundamentais para manter o equilíbrio no marcador até o intervalo.'
+      
+      EXEMPLOS DE CONTEÚDO INVÁLIDO (NÃO FAZER):
+      - 'O jogo foi marcado por equilíbrio na disciplina, porém sem lances violentos' (presumindo ausência de violência)
+      - 'Este cenário reflete um confronto limpo' (interpretação não baseada em dados)
+      - 'Os jogadores mantiveram a calma durante toda a partida' (presumindo comportamento não documentado)
     schema:
       title: "AnaliseEventoAoVivo"
       description: "Extrair trechos específicos dos eventos ao vivo fornecidos em português brasileiro - NENHUM CONTEÚDO GERADO PERMITIDO"
@@ -112,12 +147,8 @@ prompts:
             properties:
               content:
                 type: "string"
-                description: "APENAS extrair informações reais dos eventos da partida mencionados nos documentos fornecidos que NÃO foram reportados nas últimas 3 mensagens, escrevendo SEMPRE em português brasileiro. Criar um texto descritivo de EXATAMENTE 3 frases sobre o evento. Incluir detalhes exatos como: gols marcados, cartões aplicados, substituições realizadas, tempo de jogo, jogadores envolvidos, lances importantes, decisões do árbitro. UTILIZAR estatísticas disponíveis (posse de bola, chutes, faltas, escanteios, passes certos, etc.) para contextualizar e enriquecer o conteúdo. COMPARAR com dados do history-snippets quando relevante para mostrar evolução do jogo. NÃO gerar, assumir ou criar qualquer informação não explicitamente presente nos documentos. 
-                  
-                  EXEMPLOS DE CONTEÚDO VÁLIDO:
-                  - Durante o jogo: 'João Silva marcou o primeiro gol da partida aos 23 minutos do primeiro tempo, aproveitando a maior posse de bola do Flamengo (65%). O atacante recebeu passe de Carlos Santos após uma sequência de 8 passes consecutivos do time rubro-negro. Com este gol, o Flamengo consolida sua superioridade estatística mostrada desde o início da partida.'
-                  - Pós-jogo: 'O Los Angeles FC finalizou a partida com 58% de posse de bola contra 42% do Flamengo. A equipe americana conseguiu 14 chutes totais durante os 90 minutos, sendo 6 no alvo. Esta superioridade ofensiva foi decisiva para o empate conquistado no final da partida.'
-                  - Análise individual: 'Wallace Yan foi o destaque do Flamengo com 1 gol e 3 chutes durante a partida. O atacante teve 89% de passes certos e foi responsável pelo empate aos 85 minutos. Sua entrada no segundo tempo mudou a dinâmica ofensiva da equipe carioca.'"
+                description: |
+                  APENAS extrair informações reais dos eventos da partida mencionados nos documentos fornecidos que NÃO foram reportados nas últimas 3 mensagens, escrevendo SEMPRE em português brasileiro. Criar um texto descritivo de EXATAMENTE 3 frases sobre o evento, focando no enriquecimento estatístico e contextual que complementa a cobertura factual básica dos editores. Utilizar estatísticas disponíveis para contextualizar eventos novos. NÃO gerar, assumir ou criar qualquer informação não explicitamente presente nos documentos.
               title:
                 type: "string"
                 description: "Criar um título descritivo em português brasileiro baseado APENAS nos eventos reais e NOVOS encontrados nos documentos. Usar informações específicas dos lances, jogadores envolvidos e momentos da partida mencionados no material fonte que não foram cobertos nas últimas 3 mensagens. Exemplo: 'Gol de João Silva abre o placar para o Flamengo'"
