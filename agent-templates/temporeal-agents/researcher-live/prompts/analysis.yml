@@ -96,6 +96,76 @@ prompts:
       - Curiosidades numéricas e dados complementares
       - Análise do momento tático/estatístico em que o evento ocorreu
       
+      CÁLCULOS ESTATÍSTICOS AVANÇADOS PARA TOM ESPECIALISTA:
+      Quando disponíveis dados suficientes, realizar cálculos como:
+      - Taxa por minuto: chutes/minuto, faltas/minuto, passes/minuto
+      - Percentuais de variação: aumento/diminuição de posse, eficiência, etc.
+      - Eficiência comparativa: defesas/chutes no alvo, passes certos/tentativas
+      - Concentração temporal: eventos nos últimos X minutos vs resto do jogo
+      - Médias móveis: performance em períodos específicos
+      - Correlações: impacto de eventos em estatísticas subsequentes
+      - Distribuição temporal: percentual de eventos por período do jogo
+      - Índices de performance: intervenções por tempo de jogo
+      
+      EXEMPLOS DE CÁLCULOS PRÁTICOS:
+      - "Nos últimos 15 minutos, o Flamengo finalizou 0,8 vezes por minuto (12 chutes), enquanto sua média no restante do jogo foi de 0,4/min"
+      - "A posse de bola do Palmeiras cresceu 31% após a substituição, saltando de 42% para 55% em 20 minutos"
+      - "O goleiro teve 83% de eficiência (5 defesas em 6 chutes no alvo), com 1 intervenção a cada 14,2 minutos"
+      - "A Inter cometeu 9 faltas nos últimos 25 minutos (0,36/min), concentrando 64% das infrações do jogo neste período"
+      - "Após o cartão amarelo aos 34:56, o jogador reduziu em 45% suas ações ofensivas (de 2,2 para 1,2 por 10 minutos)"
+      
+      ANÁLISE ESPECIALIZADA DE SUBSTITUIÇÕES:
+      Quando um jogador for substituído, detalhar:
+      
+      ESTATÍSTICAS INDIVIDUAIS DO JOGADOR:
+      - Tempo em campo (minutos:segundos jogados)
+      - Performance ofensiva: gols, assistências, chutes totais, chutes no alvo, chutes para fora
+      - Performance defensiva: desarmes, interceptações, faltas cometidas/sofridas
+      - Performance técnica: passes certos/tentativas (%), dribles bem-sucedidos
+      - Disciplina: cartões recebidos, faltas cometidas
+      - Eficiência temporal: ações por minuto de jogo
+      
+      ANÁLISE COMPARATIVA E AVALIAÇÃO:
+      - Comparar com média da equipe na mesma posição
+      - Comparar com outros jogadores da mesma posição no jogo
+      - Calcular eficiência: ações positivas vs negativas
+      - Avaliar impacto no resultado (gols/assistências decisivos)
+      - Nota de 0 a 10 baseada em performance estatística comparativa
+      
+      EXEMPLOS DE ANÁLISE DE SUBSTITUIÇÃO:
+      - "Gabriel Barbosa deixou o campo aos 72:15 após 72 minutos de atuação com estatísticas mistas. O atacante finalizou 4 vezes (0,055 por minuto), acertou 2 no alvo (50% de precisão) e teve 78% de passes certos (18/23). Comparado à média dos atacantes do Flamengo no jogo (0,08 chutes/min), ficou 31% abaixo, merecendo nota 6,5 pela participação ofensiva limitada."
+      
+      - "João Gomes foi substituído aos 65:30 após dominar o meio-campo por 65 minutos. O volante completou 89% dos passes (42/47), fez 6 desarmes (0,092 por minuto) e cometeu apenas 1 falta. Superou em 23% a média de desarmes dos meio-campistas no jogo (0,075/min) e liderou em passes certos, merecendo nota 8,2 pela solidez defensiva e distribuição precisa."
+      
+      - "Raphael Veiga saiu aos 58:12 com performance abaixo do esperado em 58 minutos. O meia teve 67% de passes certos (24/36), não finalizou nenhuma vez e perdeu 3 dribles. Ficou 45% abaixo da média de criação dos meias no jogo (0,12 chances criadas/min vs 0,07), além de não contribuir ofensivamente, recebendo nota 4,8 pela atuação apagada."
+      
+      CRITÉRIOS PARA NOTAS (0-10):
+      - 9-10: Performance excepcional, muito acima da média da posição
+      - 7-8: Boa performance, acima da média com contribuições importantes  
+      - 5-6: Performance mediana, dentro da média esperada
+      - 3-4: Performance abaixo da média, com falhas evidentes
+      - 0-2: Performance muito ruim, muito abaixo do esperado
+      
+      ANÁLISE DO JOGADOR QUE ENTRA:
+      Quando disponível, comparar o impacto imediato do substituto:
+      - Primeiras ações do jogador que entrou
+      - Mudança no padrão de jogo da equipe
+      - Comparação estatística inicial vs jogador substituído
+      - Impacto tático da mudança (posição, estilo de jogo)
+      
+      EXEMPLO DE ANÁLISE COMPLETA DE SUBSTITUIÇÃO:
+      - "Aos 68:45, Jorge Jesus substituiu Pedro por Gabigol, trocando eficiência por volume. Pedro saiu com 2 gols em 4 chutes (50% de conversão) e 91% de passes certos em 68 minutos, merecendo nota 9,1 pela precisão letal. Gabigol entrou e nos primeiros 8 minutos já finalizou 2 vezes, sinalizando maior frequência ofensiva (0,25 chutes/min vs 0,058 de Pedro), alterando o padrão de ataque flamenguista."
+      
+      EXEMPLOS POR POSIÇÃO:
+      
+      ZAGUEIRO: "Thiago Silva foi substituído aos 75:20 após 75 minutos de solidez defensiva. Completou 94% dos passes (47/50), fez 8 desarmes (0,107 por minuto) e ganhou 5 dos 6 duelos aéreos (83%). Superou em 34% a média de desarmes dos zagueiros no jogo, liderando também em passes longos certeiros (12/14), merecendo nota 8,7 pela liderança defensiva."
+      
+      LATERAL: "Marcelo saiu aos 62:15 com atuação ofensiva destacada em 62 minutos. O lateral fez 3 cruzamentos certeiros (75% de precisão), completou 2 dribles e teve 86% de passes certos (31/36). Criou 0,048 chances por minuto, 67% acima da média dos laterais no jogo, além de não sofrer dribles, recebendo nota 7,8 pela contribuição ofensiva."
+      
+      VOLANTE: "Casemiro deixou o campo aos 71:30 após controlar o meio-campo por 71 minutos. Fez 11 desarmes (0,155 por minuto), interceptou 7 passes e cometeu apenas 2 faltas táticas. Com 91% de passes certos (43/47) e 3 lançamentos longos certeiros, superou em 28% a média defensiva dos volantes, merecendo nota 8,5 pela proteção eficiente."
+      
+      MEIA OFENSIVO: "Bruno Henrique foi substituído aos 59:45 com números mistos em 59 minutos. Criou 4 chances (0,067 por minuto), tentou 6 dribles (33% de sucesso) e teve 73% de passes certos (22/30). Ficou 15% abaixo da média de criação dos meias atacantes no jogo, sem contribuir com gols ou assistências, recebendo nota 5,9 pela irregularidade criativa."
+      
       REGRAS CRÍTICAS PARA CONTEÚDO - PROIBIÇÕES ABSOLUTAS:
       - NÃO gerar, assumir, presumir ou criar qualquer informação não explicitamente presente nos documentos
       - NÃO fazer interpretações sobre a natureza dos lances (violentos, limpos, intensos, etc.) a menos que explicitamente descrito nos dados
@@ -111,6 +181,12 @@ prompts:
       
       TOM ESPECIALISTA/ANALÍTICO:
       - 'O gol de empate de Wallace Yan aos 85 minutos reflete a conversão da superioridade estatística do Flamengo em resultado concreto. Com 66% de posse de bola, 11 chutes totais e 3 no alvo até aquele momento, o time demonstrava clara vantagem ofensiva. A igualdade consolida os números que apontavam para um domínio territorial consistente da equipe carioca.'
+      
+      TOM ESPECIALISTA AVANÇADO COM CÁLCULOS:
+      - Análise de eficiência: 'O Flamengo converteu sua superioridade numérica em gol com Wallace Yan aos 85:12. A equipe registrava 0,73 chutes por minuto nos últimos 15 minutos (11 chutes totais), enquanto o goleiro adversário fez 8 defesas contra 11 finalizações (72,7% de eficiência). A posse de bola aumentou 23% no segundo tempo, saltando de 53% para 66%.'
+      - Performance temporal: 'Nos últimos 20 minutos, a Inter cometeu 7 faltas (0,35 por minuto), concentrando 58% das infrações do jogo neste período. Alessandro Bastoni manteve 94% de passes certos mesmo com a pressão final, completando 47 de 50 tentativas. O zagueiro teve 2,3 intervenções defensivas por 10 minutos de jogo.'
+      - Análise comparativa: 'O River Plate reduziu sua eficiência ofensiva de 1,2 chutes por 10 minutos no primeiro tempo para 0,4 no segundo. Lucas Martinez Quarta recebeu cartão aos 34:56 após cometer 3 faltas em 8 minutos (0,375 por minuto). A equipe perdeu 12% de posse de bola após a advertência, caindo de 48% para 36%.'
+      - Estatísticas de goleiro: 'O goleiro do LAFC teve 85% de eficiência nas defesas (6 defesas em 7 chutes no alvo), registrando 1 intervenção a cada 12,8 minutos. Nos últimos 30 minutos, enfrentou 0,8 chutes por 10 minutos, mantendo concentração mesmo com menor volume de trabalho. Sua distribuição atingiu 78% de acerto em 23 lançamentos.'
       
       EXEMPLOS ADICIONAIS:
       - Análise pós-jogo: 'O Los Angeles FC finalizou a partida com 58% de posse de bola contra 42% do Flamengo, revertendo a tendência do primeiro tempo. A equipe americana conseguiu 14 chutes totais durante os 90 minutos, sendo 6 no alvo, números que explicam a pressão final. Esta inversão estatística foi determinante para o empate conquistado nos minutos decisivos.'
@@ -159,10 +235,11 @@ prompts:
                 type: "string"
                 description: |
                   Momento específico da partida em que o evento ocorreu, baseado no momento mencionado no documento.
-                  Reportar APENAS em minutos, sem segundos.
-                  Exemplo: "74" para um evento aos 74 minutos (não "74:26")
-                  Se for pré jogo responder "00"
-                  Se for pós jogo responder "90"
+                  SEMPRE reportar no formato MM:SS (minutos:segundos).
+                  Exemplos: "74:26" para um evento aos 74 minutos e 26 segundos, "05:00" para 5 minutos exatos.
+                  Se for pré jogo responder "00:00"
+                  Se for pós jogo responder "90:00"
+                  NUNCA usar apenas minutos (ex: "74") - sempre incluir os segundos.
               periodo:
                 type: "string"
                 description: |
