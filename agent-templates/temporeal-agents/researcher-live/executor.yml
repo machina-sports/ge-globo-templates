@@ -115,7 +115,7 @@ workflow:
           [
             " ".join([
               f"{c.get('value', {}).get('momento', '')} {c.get('value', {}).get('periodo', '')} {c.get('value', {}).get('title', '')} {c.get('value', {}).get('subject', '')} {c.get('value', {}).get('content', '')}"
-              for c in $.get('documents', [])
+              for c in $.get('documents', [])[:10]
             ])
           ]
 
