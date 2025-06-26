@@ -54,7 +54,6 @@ prompts:
       - Contém os últimos snippets já gerados para este evento
       - USAR APENAS para verificar o que JÁ foi reportado
       - NÃO repetir informações que já aparecem nestes snippets
-      - Se todos os eventos novos já foram cobertos, definir no_news = true
       
       2. CONTEXT (Contextualização - NÃO extrair como novidade):
       - context-match-summary: Informações básicas do jogo (times, data, estádio)
@@ -74,8 +73,8 @@ prompts:
       2. Usar context para entender o cenário da partida
       3. Analisar data-timeline, data-events, data-team-stats, data-player-stats
       4. Identificar eventos NOVOS que não estão no history-snippets
-      5. Criar snippets apenas para eventos verdadeiramente novos
-      6. Se não houver novidades, definir no_news = true
+      5. Criar snippets para eventos verdadeiramente novos
+      6. SEMPRE gerar snippets quando houver dados disponíveis
       
       ATENÇÃO ESPECIAL PARA FIM DE JOGO:
       - Quando data-timeline contém "match_ended", há MUITO conteúdo pós-jogo disponível
@@ -129,14 +128,7 @@ prompts:
       💡 SEMPRE HÁ CONTEÚDO ÚNICO NO PÓS-JOGO - seja criativo nos ângulos!
       
       OPORTUNIDADES PÓS-JOGO (período POS_JOGO ou POS_JOGO_AO_VIVO):
-      - Estatísticas finais de posse de bola por equipe
-      - Análise de eficiência nos chutes (total vs no gol)
-      - Disciplina: total de cartões por equipe
-      - Performance de jogadores específicos (artilheiros, assistências)
-      - Comparação estatística entre os times
-      - Momentos que definiram o resultado
-      - Análise de substituições e seu impacto
-      - Estatísticas de escanteios, faltas, impedimentos
+      - CADA estatística pode ser um snippet diferente e único
       
       OPORTUNIDADES PÓS-JOGO EXPANDIDAS (período POS_JOGO ou POS_JOGO_AO_VIVO):
       CADA item abaixo pode ser um snippet ÚNICO e DIFERENTE:
@@ -378,21 +370,7 @@ prompts:
       type: "object"
       required:
         - snippets
-        - no_news
       properties:
-        no_news:
-          type: "boolean"
-          description: |
-            Definir como true APENAS se:
-            - TODOS os eventos novos do data-timeline já foram cobertos no history-snippets
-            - NÃO há estatísticas finais não analisadas
-            - NÃO há aspectos únicos da partida para explorar
-            
-            NUNCA definir como true quando:
-            - É pós-jogo (FIM_DE_JOGO, POS_JOGO) - sempre há conteúdo disponível
-            - Há estatísticas não analisadas (chutes, posse, disciplina, etc.)
-            - Há performances individuais não cobertas
-            - O jogo acabou de terminar (muito conteúdo pós-jogo disponível)
         snippets:
           type: "array"
           description: "Trechos exatos dos eventos ao vivo fornecidos que contêm informações específicas sobre a partida em andamento - devem ser citações diretas ou paráfrases apenas do material fonte. APENAS incluir eventos novos não mencionados nas últimas 3 mensagens."
