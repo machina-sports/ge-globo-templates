@@ -87,6 +87,47 @@ prompts:
       - CADA estatística pode ser um snippet diferente e único
       - NÃO definir no_news = true apenas porque o jogo terminou
       
+      REGRA CRÍTICA PARA no_news:
+      
+      ✅ DEFINIR no_news = true APENAS quando:
+      - TODOS os eventos novos do data-timeline já foram cobertos no history-snippets
+      - NÃO há nenhuma estatística final não analisada
+      - NÃO há nenhum aspecto da partida que possa ser explorado
+      
+      ❌ NUNCA definir no_news = true quando:
+      - É pós-jogo (FIM_DE_JOGO, POS_JOGO, POS_JOGO_AO_VIVO) - sempre há conteúdo
+      - Há estatísticas finais não analisadas (chutes, posse, cartões, etc.)
+      - Há jogadores com performances não analisadas individualmente
+      - Há aspectos da partida não cobertos (eficiência, disciplina, etc.)
+      - O jogo acabou de terminar - há MUITO conteúdo pós-jogo disponível
+      
+      LEMBRE-SE: Pós-jogo é o momento com MAIS oportunidades de snippets únicos!
+      
+      QUANDO PARECER QUE "TUDO JÁ FOI DITO" NO PÓS-JOGO:
+      
+      Mesmo que history-snippets tenha muitas análises, SEMPRE há ângulos únicos:
+      
+      🔍 PROCURE POR ASPECTOS NÃO COBERTOS:
+      - Se já falou de posse geral → fale de posse por período (1°T vs 2°T)
+      - Se já falou de gols → fale da eficiência dos goleiros
+      - Se já falou de cartões → fale do timing dos cartões (quando aconteceram)
+      - Se já falou de chutes → fale da precisão e zonas de finalização
+      - Se já falou de um jogador → fale de outro jogador importante
+      
+      📊 DIFERENTES ÂNGULOS DA MESMA ESTATÍSTICA:
+      - Posse de bola: geral → por tempo → por zona do campo
+      - Chutes: total → precisão → eficiência → timing
+      - Faltas: quantidade → contexto → impacto no jogo
+      - Passes: quantidade → precisão → passes decisivos
+      
+      🎭 PERSONALIZE AS ANÁLISES:
+      - Se já analisou o time → analise jogadores individuais
+      - Se já falou do ataque → fale da defesa
+      - Se já cobriu estatísticas → fale de momentos decisivos
+      - Se já falou do resultado → fale do processo
+      
+      💡 SEMPRE HÁ CONTEÚDO ÚNICO NO PÓS-JOGO - seja criativo nos ângulos!
+      
       OPORTUNIDADES PÓS-JOGO (período POS_JOGO ou POS_JOGO_AO_VIVO):
       - Estatísticas finais de posse de bola por equipe
       - Análise de eficiência nos chutes (total vs no gol)
@@ -341,7 +382,17 @@ prompts:
       properties:
         no_news:
           type: "boolean"
-          description: "Definir como true se não houver eventos novos ou diferentes em relação às últimas 3 mensagens geradas. Se todos os eventos já foram reportados nas mensagens anteriores, marcar como true para evitar repetição."
+          description: |
+            Definir como true APENAS se:
+            - TODOS os eventos novos do data-timeline já foram cobertos no history-snippets
+            - NÃO há estatísticas finais não analisadas
+            - NÃO há aspectos únicos da partida para explorar
+            
+            NUNCA definir como true quando:
+            - É pós-jogo (FIM_DE_JOGO, POS_JOGO) - sempre há conteúdo disponível
+            - Há estatísticas não analisadas (chutes, posse, disciplina, etc.)
+            - Há performances individuais não cobertas
+            - O jogo acabou de terminar (muito conteúdo pós-jogo disponível)
         snippets:
           type: "array"
           description: "Trechos exatos dos eventos ao vivo fornecidos que contêm informações específicas sobre a partida em andamento - devem ser citações diretas ou paráfrases apenas do material fonte. APENAS incluir eventos novos não mencionados nas últimas 3 mensagens."
