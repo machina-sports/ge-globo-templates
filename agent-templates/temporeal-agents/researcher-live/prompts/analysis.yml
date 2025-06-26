@@ -97,6 +97,81 @@ prompts:
       - Análise de substituições e seu impacto
       - Estatísticas de escanteios, faltas, impedimentos
       
+      OPORTUNIDADES PÓS-JOGO EXPANDIDAS (período POS_JOGO ou POS_JOGO_AO_VIVO):
+      CADA item abaixo pode ser um snippet ÚNICO e DIFERENTE:
+      
+      📊 ESTATÍSTICAS OFENSIVAS FINAIS:
+      - Eficiência de finalização por equipe (chutes no alvo vs total)
+      - Análise de precisão: percentual de chutes certeiros
+      - Produtividade ofensiva: chutes por minuto de cada time
+      - Zonas de finalização: de onde vieram os chutes
+      - Tempo médio entre chutes de cada equipe
+      
+      🎯 ANÁLISE INDIVIDUAL DOS ARTILHEIROS:
+      - Performance completa de cada goleador (chutes, precisão, tempo)
+      - Comparação entre os atacantes das duas equipes
+      - Eficiência dos meio-campistas ofensivos
+      - Jogadores que mais criaram chances
+      - Análise dos jogadores que desperdiçaram oportunidades
+      
+      🛡️ BATALHA DEFENSIVA:
+      - Desarmes por equipe e eficiência defensiva
+      - Interceptações e cortes por time
+      - Performance dos goleiros (defesas, tipo de chutes defendidos)
+      - Solidez defensiva: gols sofridos vs chutes no alvo
+      - Falhas defensivas que resultaram em gols
+      
+      ⚡ INTENSIDADE E RITMO:
+      - Faltas por minuto de cada equipe
+      - Momentos de maior intensidade (mais faltas/cartões)
+      - Períodos de domínio territorial
+      - Variação do ritmo ao longo dos 90 minutos
+      - Impacto das substituições no ritmo de jogo
+      
+      🔥 DISCIPLINA E TEMPERAMENTO:
+      - Cartões por equipe e contexto (quando foram mostrados)
+      - Jogadores mais "brigões" (faltas cometidas)
+      - Momentos de tensão (concentração de cartões)
+      - Impacto disciplinar: como cartões mudaram o jogo
+      - Comparação de fair play entre as equipes
+      
+      🎭 PROTAGONISTAS E COADJUVANTES:
+      - MVP da partida baseado em estatísticas
+      - Jogador que mais decepcionou (estatisticamente)
+      - Revelações da partida (performance acima da média)
+      - Veteranos vs jovens: quem se destacou
+      - Capitães: liderança em campo (estatísticas)
+      
+      ⏱️ ANÁLISE TEMPORAL:
+      - Primeiro tempo vs segundo tempo (estatísticas comparativas)
+      - Momentos decisivos: quando o jogo mudou
+      - Acréscimos: o que aconteceu nos minutos extras
+      - Períodos de pressão: quando cada time atacou mais
+      - Viradas estatísticas ao longo da partida
+      
+      🏆 CONTEXTO HISTÓRICO:
+      - Comparação com outros jogos recentes das equipes
+      - Recordes quebrados ou igualados
+      - Sequências mantidas ou interrompidas
+      - Estatísticas raras ou curiosas da partida
+      - Marcos individuais alcançados pelos jogadores
+      
+      💪 IMPACTO DAS SUBSTITUIÇÕES:
+      - Análise detalhada de cada troca (quem saiu vs quem entrou)
+      - Impacto estatístico das substituições
+      - Timing das trocas: cedo, tarde, ou na hora certa
+      - Jogadores que mudaram o jogo entrando do banco
+      - Substituições defensivas vs ofensivas e seus resultados
+      
+      🎨 ASPECTOS TÉCNICOS:
+      - Passes certos vs errados por equipe
+      - Dribles bem-sucedidos e tentativas
+      - Cruzamentos: tentativas vs conversões
+      - Escanteios: aproveitamento e desperdício
+      - Impedimentos: disciplina tática
+      
+      IMPORTANTE: Não repetir análises similares - cada snippet deve abordar um aspecto ÚNICO da partida!
+      
       UTILIZAR ESTATÍSTICAS DETALHADAS para contextualizar eventos novos:
       
       ESTATÍSTICAS DE EQUIPE (data-team-stats):
@@ -239,6 +314,23 @@ prompts:
       - Taxas por minuto que revelam INTENSIDADE ou PREGUIÇA
       - Correlações que contam HISTÓRIAS ÉPICAS
       - Eficiências que provam CLASSE ou expõem AMADORISMO
+
+      EXEMPLOS DE ANÁLISES PÓS-JOGO VARIADAS:
+      
+      🎯 EFICIÊNCIA OFENSIVA:
+      "A Inter foi CIRÚRGICA nas finalizações! Converteu 2 gols em apenas 8 chutes no alvo (25% de eficiência LETAL), enquanto o River DESPERDIÇOU 12 chances claras sem balançar as redes. A diferença na precisão foi BRUTAL: Inter 62,5% de chutes no alvo vs River 41,7% - uma SUPERIORIDADE técnica que definiu o resultado!"
+      
+      🛡️ BATALHA DEFENSIVA:
+      "O goleiro da Inter foi um MURO INTRANSPONÍVEL! Fez 8 defesas decisivas (72,7% de aproveitamento), enquanto o River conseguiu apenas 3 defesas em 8 chutes sofridos. A diferença entre os arqueiros foi GRITANTE: um HERÓI absoluto contra um que SUCUMBIU à pressão interista!"
+      
+      🔥 DISCIPLINA:
+      "O River PERDEU A CABEÇA na reta final! Cometeu 18 faltas vs 12 da Inter (50% mais violento), culminando na expulsão FATAL aos 72 minutos. A indisciplina CUSTOU CARO: após o cartão vermelho, o River teve apenas 0,08 chutes/minuto, uma QUEDA LIVRE de 67% na produção ofensiva!"
+      
+      ⏱️ VIRADA TEMPORAL:
+      "A Inter EXPLODIU no segundo tempo! Passou de 47% para 59% de posse de bola, um CRESCIMENTO AVASSALADOR de 25,5%. O primeiro tempo foi equilibrado (1-0), mas a segunda etapa foi um MASSACRE estatístico: Inter 6 chutes vs River 2, mostrando quem DOMINA quando a pressão aumenta!"
+      
+      🎭 MVP DA PARTIDA:
+      "Alessandro Bastoni foi o SENHOR DA PARTIDA! O zagueiro teve 94% de passes certos (34/36), fez 3 desarmes CIRÚRGICOS, e ainda marcou o gol que SELOU a vitória. Comparado aos outros defensores, foi 31% mais eficiente nos passes e 100% mais decisivo - um GIGANTE em campo!"
     schema:
       title: "AnaliseEventoAoVivo"
       description: "Extrair trechos específicos dos eventos ao vivo fornecidos em português brasileiro - NENHUM CONTEÚDO GERADO PERMITIDO"
