@@ -24,6 +24,7 @@ workflow:
     # load-game-by-code
     - type: document
       name: load-game-by-code
+      condition: "$.get('event_code') is not None"
       config:
         action: "search"
         search-limit: 1
