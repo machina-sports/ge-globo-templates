@@ -6,196 +6,55 @@ prompts:
     title: "Cobertura - Análise de Eventos ao Vivo"
     description: "Extrair e analisar informações específicas de eventos de futebol ao vivo em diferentes fases da partida"
     instruction: |
-      Extrair e analisar informações específicas de eventos de futebol ao vivo em diferentes fases da partida. 
-      TODAS as respostas devem ser escritas em português brasileiro. 
+      OBJETIVO: Gerar análises estatísticas avançadas que COMPLEMENTAM a cobertura factual básica dos editores.
       
-      COMO USAR OS DADOS FORNECIDOS:
+      REGRA FUNDAMENTAL: 
+      NÃO repetir fatos básicos (gols, cartões, substituições) - os editores já fazem isso.
+      FOCAR EM: cálculos, percentuais, comparações, eficiência, taxas por minuto, correlações estatísticas.
       
-      1. HISTORY-SNIPPETS (Evitar Repetição):
-      - Contém os últimos snippets já gerados para este evento
-      - USAR APENAS para verificar o que JÁ foi reportado
-      - NÃO repetir informações que já aparecem nestes snippets
-      - Se todos os eventos novos já foram cobertos, definir no_news = true
+      COMO ANALISAR CADA EVENTO:
       
-      2. CONTEXT (Contextualização - NÃO extrair como novidade):
-      - context-match-summary: Informações básicas do jogo (times, data, estádio)
-      - context-lineups: Escalações dos times (usar apenas como contexto)
-      - context-status: Status atual da partida (placar, tempo)
-      - USAR para contextualizar eventos, mas NÃO como fonte de novos snippets
+      1. EXPULSÃO/CARTÃO:
+      - Calcular impacto nas estatísticas (antes vs depois)
+      - Analisar faltas/minuto do jogador expulso
+      - Comparar disciplina das equipes (faltas, cartões por tempo)
+      - Projetar impacto tático baseado em números
       
-      3. DATA (Dados novos para análise - FONTE DOS SNIPPETS):
-      - data-timeline: Cronologia de eventos da partida
-      - data-events: Lista de eventos mapeados
-      - data-team-stats: Estatísticas das equipes
-      - data-player-stats: Estatísticas individuais dos jogadores
-      - ANALISAR estes dados para encontrar NOVOS eventos não cobertos no history-snippets
+      2. GOL:
+      - Eficiência de conversão (chutes vs gols)
+      - Tempo médio entre chutes e gol
+      - Impacto na posse de bola pós-gol
+      - Performance do artilheiro (chutes/minuto, precisão)
       
-      PROCESSO DE ANÁLISE:
-      1. Verificar history-snippets para saber o que JÁ foi reportado
-      2. Usar context para entender o cenário da partida
-      3. Analisar data-timeline, data-events, data-team-stats, data-player-stats
-      4. Identificar eventos NOVOS que não estão no history-snippets
-      5. Criar snippets apenas para eventos verdadeiramente novos
-      6. Se não houver novidades, definir no_news = true
+      3. SUBSTITUIÇÃO:
+      - Estatísticas completas do substituído (tempo, ações/minuto)
+      - Comparação com média da posição
+      - Nota 0-10 baseada em números
+      - Impacto esperado do substituto
       
-      ATENÇÃO ESPECIAL PARA FIM DE JOGO:
-      - Quando data-timeline contém "match_ended", há MUITO conteúdo pós-jogo disponível
-      - Estatísticas finais das equipes podem gerar múltiplos snippets únicos
-      - Análises de desempenho individual de jogadores
-      - Comparações estatísticas finais entre as equipes
-      - Momentos decisivos da partida
-      - Análise de posse de bola, chutes, cartões, etc.
-      - CADA estatística pode ser um snippet diferente e único
-      - NÃO definir no_news = true apenas porque o jogo terminou
+      4. ESTATÍSTICAS GERAIS:
+      - Calcular eficiências (chutes no alvo/total, passes certos/tentativas)
+      - Taxas por minuto (finalizações, faltas, escanteios)
+      - Variações percentuais ao longo do jogo
+      - Correlações entre eventos e performance
       
-      OPORTUNIDADES PÓS-JOGO (período POS_JOGO ou POS_JOGO_AO_VIVO):
-      - Estatísticas finais de posse de bola por equipe
-      - Análise de eficiência nos chutes (total vs no gol)
-      - Disciplina: total de cartões por equipe
-      - Performance de jogadores específicos (artilheiros, assistências)
-      - Comparação estatística entre os times
-      - Momentos que definiram o resultado
-      - Análise de substituições e seu impacto
-      - Estatísticas de escanteios, faltas, impedimentos
+      EXEMPLOS DO QUE QUEREMOS:
       
-      UTILIZAR ESTATÍSTICAS DETALHADAS para contextualizar eventos novos:
+      ❌ "Martinez Quarta foi expulso aos 65 minutos"
+      ✅ "Martinez Quarta foi expulso após cometer 0,43 faltas/minuto (4 faltas em 65min), 28% acima da média dos zagueiros no jogo. Sua expulsão reduziu a eficiência defensiva do River de 2,1 para 1,7 desarmes/10min, impactando diretamente no gol sofrido 6 minutos depois."
       
-      ESTATÍSTICAS DE EQUIPE (data-team-stats):
-      - Posse de bola (ball_possession): Comparar percentuais entre os times
-      - Chutes totais (shots_total) vs chutes no gol (shots_on_target) vs chutes para fora (shots_off_target)
-      - Faltas cometidas (fouls) e cobranças de falta (free_kicks)
-      - Cartões amarelos (yellow_cards) e vermelhos (red_cards + yellow_red_cards)
-      - Escanteios (corners) e impedimentos (offsides)
+      ❌ "Esposito marcou aos 71 minutos"  
+      ✅ "Esposito converteu aos 71:15 sua única finalização no alvo (100% de eficiência), contrastando com a Inter que tinha 16,7% de conversão (2 no alvo em 12 chutes). O gol veio 6:15 após a expulsão, quando a Inter elevou de 0,18 para 0,31 chutes/minuto, aproveitando a vantagem numérica."
       
-      ESTATÍSTICAS DE JOGADORES (data-player-stats):
-      - Gols marcados (goals_scored) e assistências (assists)
-      - Performance individual: chutes, chutes no gol, chutes para fora
-      - Disciplina: cartões amarelos e vermelhos por jogador
-      - Substituições: jogadores que entraram (substituted_in) e saíram (substituted_out)
-      - Cobranças de escanteio (corner_kicks) e impedimentos por jogador
+      ❌ "Inter tem 52% de posse aos 72 minutos"
+      ✅ "A vantagem numérica elevou a posse da Inter de 50% para 58% em 7 minutos (crescimento de 16%). A equipe aumentou sua eficiência ofensiva de 0,17 para 0,29 chutes/minuto pós-expulsão, enquanto o River reduziu para 0,08 chutes/minuto (queda de 53%)."
       
-      ANÁLISE COMPARATIVA:
-      - Comparar estatísticas atuais com dados do history-snippets
-      - Identificar mudanças significativas na posse de bola, chutes, cartões
-      - Destacar evoluções no desempenho de jogadores específicos
-      - Relacionar eventos novos com o contexto estatístico
-      - Mostrar como eventos impactam o equilíbrio da partida
-      
-      CONTEXTUALIZAÇÃO TEMPORAL:
-      - Relacionar estatísticas com o período da partida (primeiro tempo, segundo tempo, prorrogação)
-      - Mostrar progressão das estatísticas ao longo do jogo
-      - Identificar momentos de virada no controle da partida baseado em dados
-      
-      FOCO DO CONTEÚDO - ENRIQUECIMENTO ESTATÍSTICO E CONTEXTUAL:
-      O objetivo é COMPLEMENTAR a cobertura factual básica que os editores já fazem (gols, cartões, substituições). Concentrar-se em:
-      - Contexto estatístico que envolve o evento (posse de bola, chutes, passes, etc.)
-      - Dados comparativos entre as equipes no momento do evento
-      - Evolução das estatísticas ao longo da partida
-      - Performance individual detalhada dos jogadores envolvidos
-      - Impacto do evento no equilíbrio estatístico da partida
-      - Curiosidades numéricas e dados complementares
-      - Análise do momento tático/estatístico em que o evento ocorreu
-      
-      CÁLCULOS ESTATÍSTICOS AVANÇADOS PARA TOM ESPECIALISTA:
-      Quando disponíveis dados suficientes, realizar cálculos como:
-      - Taxa por minuto: chutes/minuto, faltas/minuto, passes/minuto
-      - Percentuais de variação: aumento/diminuição de posse, eficiência, etc.
-      - Eficiência comparativa: defesas/chutes no alvo, passes certos/tentativas
-      - Concentração temporal: eventos nos últimos X minutos vs resto do jogo
-      - Médias móveis: performance em períodos específicos
-      - Correlações: impacto de eventos em estatísticas subsequentes
-      - Distribuição temporal: percentual de eventos por período do jogo
-      - Índices de performance: intervenções por tempo de jogo
-      
-      EXEMPLOS DE CÁLCULOS PRÁTICOS:
-      - "Nos últimos 15 minutos, o Flamengo finalizou 0,8 vezes por minuto (12 chutes), enquanto sua média no restante do jogo foi de 0,4/min"
-      - "A posse de bola do Palmeiras cresceu 31% após a substituição, saltando de 42% para 55% em 20 minutos"
-      - "O goleiro teve 83% de eficiência (5 defesas em 6 chutes no alvo), com 1 intervenção a cada 14,2 minutos"
-      - "A Inter cometeu 9 faltas nos últimos 25 minutos (0,36/min), concentrando 64% das infrações do jogo neste período"
-      - "Após o cartão amarelo aos 34:56, o jogador reduziu em 45% suas ações ofensivas (de 2,2 para 1,2 por 10 minutos)"
-      
-      ANÁLISE ESPECIALIZADA DE SUBSTITUIÇÕES:
-      Quando um jogador for substituído, detalhar:
-      
-      ESTATÍSTICAS INDIVIDUAIS DO JOGADOR:
-      - Tempo em campo (minutos:segundos jogados)
-      - Performance ofensiva: gols, assistências, chutes totais, chutes no alvo, chutes para fora
-      - Performance defensiva: desarmes, interceptações, faltas cometidas/sofridas
-      - Performance técnica: passes certos/tentativas (%), dribles bem-sucedidos
-      - Disciplina: cartões recebidos, faltas cometidas
-      - Eficiência temporal: ações por minuto de jogo
-      
-      ANÁLISE COMPARATIVA E AVALIAÇÃO:
-      - Comparar com média da equipe na mesma posição
-      - Comparar com outros jogadores da mesma posição no jogo
-      - Calcular eficiência: ações positivas vs negativas
-      - Avaliar impacto no resultado (gols/assistências decisivos)
-      - Nota de 0 a 10 baseada em performance estatística comparativa
-      
-      EXEMPLOS DE ANÁLISE DE SUBSTITUIÇÃO:
-      - "Gabriel Barbosa deixou o campo aos 72:15 após 72 minutos de atuação com estatísticas mistas. O atacante finalizou 4 vezes (0,055 por minuto), acertou 2 no alvo (50% de precisão) e teve 78% de passes certos (18/23). Comparado à média dos atacantes do Flamengo no jogo (0,08 chutes/min), ficou 31% abaixo, merecendo nota 6,5 pela participação ofensiva limitada."
-      
-      - "João Gomes foi substituído aos 65:30 após dominar o meio-campo por 65 minutos. O volante completou 89% dos passes (42/47), fez 6 desarmes (0,092 por minuto) e cometeu apenas 1 falta. Superou em 23% a média de desarmes dos meio-campistas no jogo (0,075/min) e liderou em passes certos, merecendo nota 8,2 pela solidez defensiva e distribuição precisa."
-      
-      - "Raphael Veiga saiu aos 58:12 com performance abaixo do esperado em 58 minutos. O meia teve 67% de passes certos (24/36), não finalizou nenhuma vez e perdeu 3 dribles. Ficou 45% abaixo da média de criação dos meias no jogo (0,12 chances criadas/min vs 0,07), além de não contribuir ofensivamente, recebendo nota 4,8 pela atuação apagada."
-      
-      CRITÉRIOS PARA NOTAS (0-10):
-      - 9-10: Performance excepcional, muito acima da média da posição
-      - 7-8: Boa performance, acima da média com contribuições importantes  
-      - 5-6: Performance mediana, dentro da média esperada
-      - 3-4: Performance abaixo da média, com falhas evidentes
-      - 0-2: Performance muito ruim, muito abaixo do esperado
-      
-      ANÁLISE DO JOGADOR QUE ENTRA:
-      Quando disponível, comparar o impacto imediato do substituto:
-      - Primeiras ações do jogador que entrou
-      - Mudança no padrão de jogo da equipe
-      - Comparação estatística inicial vs jogador substituído
-      - Impacto tático da mudança (posição, estilo de jogo)
-      
-      EXEMPLO DE ANÁLISE COMPLETA DE SUBSTITUIÇÃO:
-      - "Aos 68:45, Jorge Jesus substituiu Pedro por Gabigol, trocando eficiência por volume. Pedro saiu com 2 gols em 4 chutes (50% de conversão) e 91% de passes certos em 68 minutos, merecendo nota 9,1 pela precisão letal. Gabigol entrou e nos primeiros 8 minutos já finalizou 2 vezes, sinalizando maior frequência ofensiva (0,25 chutes/min vs 0,058 de Pedro), alterando o padrão de ataque flamenguista."
-      
-      EXEMPLOS POR POSIÇÃO:
-      
-      ZAGUEIRO: "Thiago Silva foi substituído aos 75:20 após 75 minutos de solidez defensiva. Completou 94% dos passes (47/50), fez 8 desarmes (0,107 por minuto) e ganhou 5 dos 6 duelos aéreos (83%). Superou em 34% a média de desarmes dos zagueiros no jogo, liderando também em passes longos certeiros (12/14), merecendo nota 8,7 pela liderança defensiva."
-      
-      LATERAL: "Marcelo saiu aos 62:15 com atuação ofensiva destacada em 62 minutos. O lateral fez 3 cruzamentos certeiros (75% de precisão), completou 2 dribles e teve 86% de passes certos (31/36). Criou 0,048 chances por minuto, 67% acima da média dos laterais no jogo, além de não sofrer dribles, recebendo nota 7,8 pela contribuição ofensiva."
-      
-      VOLANTE: "Casemiro deixou o campo aos 71:30 após controlar o meio-campo por 71 minutos. Fez 11 desarmes (0,155 por minuto), interceptou 7 passes e cometeu apenas 2 faltas táticas. Com 91% de passes certos (43/47) e 3 lançamentos longos certeiros, superou em 28% a média defensiva dos volantes, merecendo nota 8,5 pela proteção eficiente."
-      
-      MEIA OFENSIVO: "Bruno Henrique foi substituído aos 59:45 com números mistos em 59 minutos. Criou 4 chances (0,067 por minuto), tentou 6 dribles (33% de sucesso) e teve 73% de passes certos (22/30). Ficou 15% abaixo da média de criação dos meias atacantes no jogo, sem contribuir com gols ou assistências, recebendo nota 5,9 pela irregularidade criativa."
-      
-      REGRAS CRÍTICAS PARA CONTEÚDO - PROIBIÇÕES ABSOLUTAS:
-      - NÃO gerar, assumir, presumir ou criar qualquer informação não explicitamente presente nos documentos
-      - NÃO fazer interpretações sobre a natureza dos lances (violentos, limpos, intensos, etc.) a menos que explicitamente descrito nos dados
-      - NÃO presumir ausência de eventos (ex: 'sem lances violentos', 'sem confusões', 'jogo limpo') - apenas reportar o que está documentado
-      - NÃO adicionar contexto emocional ou interpretativo não presente nos dados originais
-      - NÃO fazer conclusões sobre o comportamento dos jogadores além do que está explicitamente relatado
-      - LIMITAR-SE ESTRITAMENTE aos fatos documentados nos dados fornecidos
-      
-      EXEMPLOS DE CONTEÚDO VÁLIDO (ENRIQUECIMENTO ESTATÍSTICO):
-      
-      TOM EMOCIONAL/CLUBISTA:
-      - 'Wallace Yan empata para o Flamengo em um momento de total domínio rubro-negro! O gol aconteceu quando o time carioca já comandava com impressionantes 66% de posse de bola e havia disparado 11 chutes contra o gol adversário. A igualdade no placar finalmente fez jus à superioridade estatística flamenguista, que vinha pressionando desde o primeiro minuto.'
-      
-      TOM ESPECIALISTA/ANALÍTICO:
-      - 'O gol de empate de Wallace Yan aos 85 minutos reflete a conversão da superioridade estatística do Flamengo em resultado concreto. Com 66% de posse de bola, 11 chutes totais e 3 no alvo até aquele momento, o time demonstrava clara vantagem ofensiva. A igualdade consolida os números que apontavam para um domínio territorial consistente da equipe carioca.'
-      
-      TOM ESPECIALISTA AVANÇADO COM CÁLCULOS:
-      - Análise de eficiência: 'O Flamengo converteu sua superioridade numérica em gol com Wallace Yan aos 85:12. A equipe registrava 0,73 chutes por minuto nos últimos 15 minutos (11 chutes totais), enquanto o goleiro adversário fez 8 defesas contra 11 finalizações (72,7% de eficiência). A posse de bola aumentou 23% no segundo tempo, saltando de 53% para 66%.'
-      - Performance temporal: 'Nos últimos 20 minutos, a Inter cometeu 7 faltas (0,35 por minuto), concentrando 58% das infrações do jogo neste período. Alessandro Bastoni manteve 94% de passes certos mesmo com a pressão final, completando 47 de 50 tentativas. O zagueiro teve 2,3 intervenções defensivas por 10 minutos de jogo.'
-      - Análise comparativa: 'O River Plate reduziu sua eficiência ofensiva de 1,2 chutes por 10 minutos no primeiro tempo para 0,4 no segundo. Lucas Martinez Quarta recebeu cartão aos 34:56 após cometer 3 faltas em 8 minutos (0,375 por minuto). A equipe perdeu 12% de posse de bola após a advertência, caindo de 48% para 36%.'
-      - Estatísticas de goleiro: 'O goleiro do LAFC teve 85% de eficiência nas defesas (6 defesas em 7 chutes no alvo), registrando 1 intervenção a cada 12,8 minutos. Nos últimos 30 minutos, enfrentou 0,8 chutes por 10 minutos, mantendo concentração mesmo com menor volume de trabalho. Sua distribuição atingiu 78% de acerto em 23 lançamentos.'
-      
-      EXEMPLOS ADICIONAIS:
-      - Análise pós-jogo: 'O Los Angeles FC finalizou a partida com 58% de posse de bola contra 42% do Flamengo, revertendo a tendência do primeiro tempo. A equipe americana conseguiu 14 chutes totais durante os 90 minutos, sendo 6 no alvo, números que explicam a pressão final. Esta inversão estatística foi determinante para o empate conquistado nos minutos decisivos.'
-      - Performance individual: 'Alessandro Bastoni liderou as ações defensivas da Inter com 89% de passes certos e 4 desarmes bem-sucedidos. O zagueiro italiano foi responsável por neutralizar 3 das 7 investidas ofensivas do River Plate no primeiro tempo. Seus números defensivos foram fundamentais para manter o equilíbrio no marcador até o intervalo.'
-      
-      EXEMPLOS DE CONTEÚDO INVÁLIDO (NÃO FAZER):
-      - 'O jogo foi marcado por equilíbrio na disciplina, porém sem lances violentos' (presumindo ausência de violência)
-      - 'Este cenário reflete um confronto limpo' (interpretação não baseada em dados)
-      - 'Os jogadores mantiveram a calma durante toda a partida' (presumindo comportamento não documentado)
+      SEMPRE INCLUIR:
+      - Números específicos e cálculos
+      - Comparações percentuais  
+      - Taxas por minuto
+      - Correlações entre eventos
+      - Eficiências e conversões
     schema:
       title: "AnaliseEventoAoVivo"
       description: "Extrair trechos específicos dos eventos ao vivo fornecidos em português brasileiro - NENHUM CONTEÚDO GERADO PERMITIDO"
@@ -224,7 +83,12 @@ prompts:
               content:
                 type: "string"
                 description: |
-                  APENAS extrair informações reais dos eventos da partida mencionados nos documentos fornecidos que NÃO foram reportados nas últimas 3 mensagens, escrevendo SEMPRE em português brasileiro. Criar um texto descritivo de EXATAMENTE 3 frases sobre o evento, focando no enriquecimento estatístico e contextual que complementa a cobertura factual básica dos editores. Utilizar estatísticas disponíveis para contextualizar eventos novos. NÃO gerar, assumir ou criar qualquer informação não explicitamente presente nos documentos.
+                  Análise estatística avançada de EXATAMENTE 3 frases em português brasileiro. OBRIGATÓRIO incluir:
+                  - Números específicos e cálculos (taxas por minuto, percentuais, eficiências)
+                  - Comparações estatísticas entre jogadores/equipes
+                  - Correlações entre eventos e performance
+                  - Variações percentuais e impacto numérico
+                  NÃO repetir fatos básicos - FOCAR em análise estatística que complementa a cobertura editorial.
               title:
                 type: "string"
                 description: "Criar um título descritivo em português brasileiro baseado APENAS nos eventos reais e NOVOS encontrados nos documentos. Usar informações específicas dos lances, jogadores envolvidos e momentos da partida mencionados no material fonte que não foram cobertos nas últimas 3 mensagens. Exemplo: 'Gol de João Silva abre o placar para o Flamengo'"
