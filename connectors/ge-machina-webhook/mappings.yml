@@ -22,7 +22,8 @@ mappings:
               'title': $.get('snippet_data', {}).get('value', {}).get('title', ''),
               'text': $.get('snippet_data', {}).get('value', {}).get('text', ''),
               'moment': $.get('snippet_data', {}).get('value', {}).get('momento', ''),
-              'period': $.get('snippet_data', {}).get('value', {}).get('periodo', '')
+              'period': $.get('snippet_data', {}).get('value', {}).get('periodo', ''),
+              'play_type': $.get('snippet_data', {}).get('value', {}).get('play_type', '')
             }
           }
         }

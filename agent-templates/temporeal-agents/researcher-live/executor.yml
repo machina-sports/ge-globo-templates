@@ -148,6 +148,7 @@ workflow:
               'subject': c.get('subject', ''),
               'momento': c.get('momento', ''),
               'periodo': c.get('periodo', ''),
+              'play_type': c.get('play_type', ''),
               'metadata': {
                 'content-group': '$.(content-group)',
                 'content-name': '$.(content-name)',
