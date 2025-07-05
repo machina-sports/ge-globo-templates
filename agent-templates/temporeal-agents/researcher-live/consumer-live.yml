@@ -4,7 +4,7 @@ agent:
   title: "Coverage - Live Consumer"
   description: "Workflow to consume researcher live."
   context:
-    config-frequency: 3
+    config-frequency: 10
   workflows:
 
     # Workflow Event Update Live
