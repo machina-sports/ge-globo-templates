@@ -13,6 +13,16 @@ prompts:
       2. SEGUNDO: Analisar estatisticamente com emoção
       3. NÃO repetir fatos básicos que os editores já cobriram
       4. FOCAR EM: estatísticas que ARREPIAM, números que fazem o coração BATER MAIS FORTE
+      5. NUNCA criar snippets duplicados ou similares - cada snippet deve ser ÚNICO
+
+      REGRA ANTI-DUPLICATA (CRÍTICA):
+      - ANTES de criar qualquer snippet, VERIFICAR se já existe nos history-snippets:
+        * Mesmo momento (MM:SS) + mesmo jogador = DUPLICATA
+        * Mesmo evento (defesa, chute, escanteio) + mesmo momento = DUPLICATA  
+        * Subject muito similar (mesmo jogador, mesmo tipo de lance) = DUPLICATA
+        * Title com pequenas variações da mesma ação = DUPLICATA
+      - Se encontrar QUALQUER similaridade → definir "snippets: []" (array vazio)
+      - PREFERIR não gerar snippet a gerar duplicata
       
       PROCESSO OBRIGATÓRIO - SIGA ESTA ORDEM:
       
@@ -31,8 +41,10 @@ prompts:
          - Qualquer evento com timestamp NOVO
       
       3. COMPARAR com history-snippets:
-         - Se o evento JÁ foi mencionado → PULAR
+         - Se o evento JÁ foi mencionado → PULAR COMPLETAMENTE
          - Se é NOVO → CRIAR SNIPPET IMEDIATAMENTE
+         - VERIFICAR: mesmo momento (MM:SS) + mesmo jogador/situação = DUPLICATA
+         - VERIFICAR: mesmo subject/title com pequenas variações = DUPLICATA
       
       4. PRIORIDADE ABSOLUTA:
          - GOLS são PRIORIDADE MÁXIMA
@@ -47,7 +59,16 @@ prompts:
       - Nomes de jogadores + "lead" ou "score"
       - Mudanças no placar (ex: "2-0", "1-1")
       
-      EXEMPLO PRÁTICO:
+      EXEMPLO PRÁTICO DE DETECÇÃO DE DUPLICATAS:
+      Se history-snippets contém:
+      "04:29 PRIMEIRO_TEMPO Defesa espetacular de Weverton em chute de Cole Palmer"
+      
+      E você encontra no data-timeline:
+      "04:29 save_attempt Weverton makes spectacular save from Cole Palmer shot"
+      
+      → NÃO CRIAR SNIPPET - é DUPLICATA (mesmo momento + mesmo jogador + mesmo evento)
+      
+      EXEMPLO DE EVENTO NOVO:
       Se data-timeline contém:
       "90:00 score_change Inter take a comfortable 2-0 lead thanks to Alessandro Bastoni"
       
@@ -94,14 +115,15 @@ prompts:
       - CADA estatística pode ser um snippet diferente e único
       - NÃO definir no_news = true apenas porque o jogo terminou
       
-      REGRA CRÍTICA PARA no_news:
+      REGRA CRÍTICA PARA QUANDO NÃO HÁ NOVOS EVENTOS:
       
-      ✅ DEFINIR no_news = true APENAS quando:
+      ✅ RETORNAR "snippets: []" (array vazio) APENAS quando:
       - TODOS os eventos novos do data-timeline já foram cobertos no history-snippets
       - NÃO há nenhuma estatística final não analisada
       - NÃO há nenhum aspecto da partida que possa ser explorado
+      - Todas as informações encontradas são DUPLICATAS dos snippets anteriores
       
-      ❌ NUNCA definir no_news = true quando:
+      ❌ NUNCA retornar array vazio quando:
       - É pós-jogo (FIM_DE_JOGO, POS_JOGO, POS_JOGO_AO_VIVO) - sempre há conteúdo
       - Há estatísticas finais não analisadas (chutes, posse, cartões, etc.)
       - Há jogadores com performances não analisadas individualmente
@@ -109,6 +131,8 @@ prompts:
       - O jogo acabou de terminar - há MUITO conteúdo pós-jogo disponível
       
       LEMBRE-SE: Pós-jogo é o momento com MAIS oportunidades de snippets únicos!
+      
+      IMPORTANTE: Prefira retornar "snippets: []" a criar duplicatas!
       
       QUANDO PARECER QUE "TUDO JÁ FOI DITO" NO PÓS-JOGO:
       
@@ -396,7 +420,7 @@ prompts:
       properties:
         snippets:
           type: "array"
-          description: "Trechos exatos dos eventos ao vivo fornecidos que contêm informações específicas sobre a partida em andamento - devem ser citações diretas ou paráfrases apenas do material fonte. APENAS incluir eventos novos não mencionados nas últimas 3 mensagens."
+          description: "Trechos exatos dos eventos ao vivo fornecidos que contêm informações específicas sobre a partida em andamento - devem ser citações diretas ou paráfrases apenas do material fonte. APENAS incluir eventos VERDADEIRAMENTE NOVOS que não existem nos history-snippets. VERIFICAR duplicatas por momento, jogador e tipo de evento. Se tudo já foi coberto, retornar array vazio []."
           minItems: 0
           maxItems: 1
           items:
@@ -424,7 +448,7 @@ prompts:
                 description: "Criar um título descritivo em português brasileiro baseado APENAS nos eventos reais e NOVOS encontrados nos documentos. Usar informações específicas dos lances, jogadores envolvidos e momentos da partida mencionados no material fonte que não foram cobertos nas últimas 3 mensagens. Exemplo: 'Gol de João Silva abre o placar para o Flamengo'"
               subject:
                 type: "string"
-                description: "Identificar o evento específico, jogador envolvido ou momento da partida em português brasileiro, baseado APENAS no que está realmente mencionado nos documentos fornecidos e que representa uma novidade em relação às mensagens anteriores. SEMPRE incluir os nomes dos times do confronto no subject. Usar descrições exatas dos eventos como aparecem no texto fonte. Exemplo: 'Flamengo x Vasco - Gol de João Silva' ou 'Palmeiras x Corinthians - Cartão amarelo para Carlos Santos'"
+                description: "Identificar o evento específico, jogador envolvido ou momento da partida em português brasileiro, baseado APENAS no que está realmente mencionado nos documentos fornecidos e que representa uma novidade em relação aos history-snippets. SEMPRE incluir os nomes dos times do confronto no subject. VERIFICAR que este subject não é duplicata dos history-snippets (mesmo evento + mesmo jogador + mesmo momento). Usar descrições exatas dos eventos como aparecem no texto fonte. Exemplo: 'Flamengo x Vasco - Gol de João Silva' ou 'Palmeiras x Corinthians - Cartão amarelo para Carlos Santos'"
               momento:
                 type: "string"
                 description: |
