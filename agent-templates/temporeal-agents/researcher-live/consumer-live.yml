@@ -11,7 +11,7 @@ agent:
     - name: "sportradar-soccer-update-live"
       description: "Soccer Event Update Live"
       inputs:
-        event_code: "'sr:sport_event:57490673'"
+        event_code: "'sr:sport_event:57490679'"
       outputs:
         event_code: "$.get('event_code')"
         soccer-event-update: "$.get('workflow-status', False)"
