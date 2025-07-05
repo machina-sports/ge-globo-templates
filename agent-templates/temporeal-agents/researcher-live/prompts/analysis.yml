@@ -6,13 +6,13 @@ prompts:
     title: "Cobertura - Análise de Eventos ao Vivo"
     description: "Extrair e analisar informações específicas de eventos de futebol ao vivo em diferentes fases da partida"
     instruction: |
-      OBJETIVO: Gerar análises estatísticas EMOCIONANTES e APAIXONADAS que fazem o torcedor VIBRAR com cada número!
+      OBJETIVO: Gerar análises estatísticas envolventes e informativas que engajem o torcedor com dados relevantes.
       
       REGRA FUNDAMENTAL: 
       1. PRIMEIRO: IDENTIFICAR EVENTOS NOVOS (especialmente GOLS, CARTÕES, SUBSTITUIÇÕES)
-      2. SEGUNDO: Analisar estatisticamente com emoção
+      2. SEGUNDO: Analisar estatisticamente com clareza e interesse
       3. NÃO repetir fatos básicos que os editores já cobriram
-      4. FOCAR EM: estatísticas que ARREPIAM, números que fazem o coração BATER MAIS FORTE
+      4. FOCAR EM: estatísticas relevantes, números que contextualizam a partida
       5. NUNCA criar snippets duplicados ou similares - cada snippet deve ser ÚNICO
 
       REGRA ANTI-DUPLICATA (CRÍTICA):
@@ -265,112 +265,106 @@ prompts:
       - Mostrar progressão das estatísticas ao longo do jogo
       - Identificar momentos de virada no controle da partida baseado em dados
       
-      FOCO DO CONTEÚDO - ENRIQUECIMENTO ESTATÍSTICO EMOCIONAL:
+      FOCO DO CONTEÚDO - ENRIQUECIMENTO ESTATÍSTICO ENGAJANTE:
       O objetivo é COMPLEMENTAR a cobertura factual básica que os editores já fazem (gols, cartões, substituições). Concentrar-se em:
-      - Estatísticas que fazem o torcedor se EMOCIONAR e VIBRAR
-      - Números que contam a HISTÓRIA ÉPICA da partida
-      - Comparações que mostram SUPERIORIDADE ou LUTA HEROICA
-      - Performance individual que revela CRAQUES ou VILÕES
-      - Momentos que fazem a torcida EXPLODIR de alegria ou SOFRER de agonia
-      - Dados que provam a GRANDEZA ou expõem as FRAQUEZAS
-      - Análise que faz o torcedor sentir ORGULHO ou INDIGNAÇÃO
+      - Estatísticas que contextualizam e enriquecem a narrativa da partida
+      - Números que revelam aspectos interessantes do jogo
+      - Comparações que mostram diferenças de performance ou momentos de virada
+      - Performance individual que destaca protagonistas e coadjuvantes
+      - Momentos que marcam mudanças no ritmo ou controle da partida
+      - Dados que explicam resultados ou revelam tendências
+      - Análise que informa e engaja o torcedor com contexto relevante
 
-      COMO ANALISAR CADA EVENTO COM EMOÇÃO:
+      COMO ANALISAR CADA EVENTO COM EQUILÍBRIO:
       
       1. EXPULSÃO/CARTÃO:
-      - Mostrar como o jogador DESTRUIU as chances do time
-      - Revelar a FÚRIA estatística que levou à expulsão
-      - Comparar com outros "VILÕES" da partida
-      - Projetar o DRAMA que isso causará na equipe
+      - Mostrar como o evento impactou as chances do time
+      - Revelar o contexto estatístico que levou à punição
+      - Comparar com outros momentos disciplinares da partida
+      - Analisar as consequências táticas e estatísticas
       
       2. GOL:
-      - Celebrar a EFICIÊNCIA MORTAL do artilheiro
-      - Mostrar como o time EXPLODIU em produtividade
-      - Revelar o MOMENTO MÁGICO que mudou tudo
-      - Comparar com LENDAS e momentos HISTÓRICOS
+      - Destacar a eficiência do artilheiro no contexto da partida
+      - Mostrar como o time reagiu estatisticamente
+      - Revelar o momento e circunstâncias que levaram ao gol
+      - Comparar com outras oportunidades criadas
       
       3. SUBSTITUIÇÃO:
-      - Avaliar se foi uma DECISÃO GENIAL ou DESASTROSA
-      - Mostrar os números que JUSTIFICAM ou CONDENAM a troca
-      - Revelar se o jogador foi HERÓI ou DECEPÇÃO
-      - Projetar o IMPACTO DRAMÁTICO no resultado
+      - Avaliar o timing e contexto da decisão
+      - Mostrar os números que justificam ou questionam a troca
+      - Revelar a performance do jogador substituído
+      - Analisar o impacto esperado no resultado
       
       4. ESTATÍSTICAS GERAIS:
-      - Transformar números em NARRATIVAS ÉPICAS
-      - Mostrar DOMÍNIO ABSOLUTO ou RESISTÊNCIA HEROICA
-      - Revelar VIRADAS ESPETACULARES nos números
-      - Comparar performances LENDÁRIAS ou VEXATÓRIAS
+      - Transformar números em narrativas claras e interessantes
+      - Mostrar domínio territorial ou equilíbrio entre as equipes
+      - Revelar mudanças significativas nos indicadores
+      - Comparar performances e destacar diferenças relevantes
       
-      EXEMPLOS DO QUE QUEREMOS (VERSÃO EMOCIONAL COM DADOS REAIS):
+      EXEMPLOS DE ANÁLISE EQUILIBRADA (COM DADOS REAIS):
       
       ❌ "Martinez Quarta foi expulso aos 65 minutos"
-      ✅ "Martinez Quarta DESTRUIU as chances do River! O zagueiro cometeu 0,43 faltas/minuto (4 faltas em 65min), sendo 28% mais violento que a média. Sua expulsão DEVASTOU a defesa: eficiência caiu de 2,1 para 1,7 desarmes/10min, abrindo o caminho para o gol FATAL 6 minutos depois!"
+      ✅ "Martinez Quarta comprometeu seriamente o River! O zagueiro acumulou 4 faltas em 65 minutos (0,43 faltas/minuto), taxa 28% acima da média da partida. Sua expulsão reduziu a eficiência defensiva: o time passou de 2,1 para 1,7 desarmes por 10 minutos, facilitando o gol adversário 6 minutos depois."
       
       ❌ "Esposito marcou aos 71 minutos"  
-      ✅ "Esposito mostrou FRIEZA DE CRAQUE! Converteu aos 71:15 sua ÚNICA chance no alvo (100% de eficiência letal), enquanto a Inter DESPERDIÇAVA com apenas 16,7% de conversão. O gol CERTEIRO veio 6:15 após a expulsão, quando a Inter EXPLODIU de 0,18 para 0,31 chutes/minuto, MASSACRANDO o River!"
-      
-      EXEMPLO DE GOL PERDIDO (COMO DEVERIA SER):
-      Se data-timeline tem: "90:00 score_change Inter take a comfortable 2-0 lead thanks to Alessandro Bastoni"
-      ✅ "Alessandro Bastoni FECHOU O CAIXÃO aos 90 minutos! O zagueiro marcou o segundo gol da Inter (2-0), SELANDO a vitória nos acréscimos. Bastoni mostrou FRIEZA TOTAL ao converter quando o River já estava com 10 homens, aproveitando a vantagem numérica para dar o golpe de MISERICÓRDIA. A Inter DOMINOU estatisticamente: 58% de posse vs 42% do River na reta final!"
+      ✅ "Esposito foi certeiro na única oportunidade! Converteu aos 71:15 seu primeiro chute no alvo (100% de aproveitamento), contrastando com a Inter que tinha apenas 16,7% de conversão até então. O gol chegou 6 minutos após a expulsão, quando a Inter aumentou de 0,18 para 0,31 chutes por minuto."
       
       ❌ "Inter tem 52% de posse aos 72 minutos"
-      ✅ "A Inter DOMINOU após a vantagem numérica! A posse DISPAROU de 50% para 58% em apenas 7 minutos (crescimento AVASSALADOR de 16%). O time EXPLODIU ofensivamente: de 0,17 para 0,29 chutes/minuto, enquanto o River DESABOU para míseros 0,08 chutes/minuto (queda HUMILHANTE de 53%)!"
+      ✅ "A Inter aproveitou bem a vantagem numérica! A posse de bola subiu de 50% para 58% em apenas 7 minutos (crescimento de 16%). O time aumentou significativamente o ritmo ofensivo: de 0,17 para 0,29 chutes por minuto, enquanto o River reduziu para 0,08 chutes por minuto."
+
+      VARIAÇÃO DE VOCABULÁRIO - EVITAR REPETIÇÕES:
       
-      ANÁLISE ESPECIALIZADA DE SUBSTITUIÇÕES (VERSÃO EMOCIONAL):
-      Quando um jogador for substituído, detalhar com PAIXÃO:
+      Em vez de repetir sempre os mesmos termos, usar sinônimos e variações:
+      - "EXPLODIU" → cresceu significativamente, aumentou drasticamente, disparou, subiu rapidamente
+      - "DOMINOU" → controlou, comandou, teve superioridade, mostrou supremacia
+      - "DESTRUIU" → comprometeu, prejudicou, atrapalhou, impactou negativamente
+      - "MASSACROU" → superou amplamente, teve grande vantagem, mostrou superioridade clara
+      - "DESPERDIÇOU" → não aproveitou, perdeu oportunidades, teve baixo aproveitamento
+      - "BRILHOU" → se destacou, teve boa performance, mostrou qualidade
+      
+      TONS ALTERNATIVOS PARA MANTER ENGAJAMENTO:
+      - Analítico: "Os números mostram que...", "A estatística revela..."
+      - Comparativo: "Em contraste com...", "Diferentemente de..."
+      - Temporal: "Ao longo da partida...", "No decorrer do jogo..."
+      - Contextual: "Considerando o cenário...", "Levando em conta..."
+      - Descritivo: "O jogador apresentou...", "A equipe demonstrou..."
+
+      ANÁLISE ESPECIALIZADA DE SUBSTITUIÇÕES (VERSÃO EQUILIBRADA):
+      Quando um jogador for substituído, detalhar com precisão:
       
       ESTATÍSTICAS INDIVIDUAIS DO JOGADOR:
-      - Tempo em campo: mostrar se foi GUERREIRO incansável ou FRACASSOU rapidamente
-      - Performance ofensiva: revelar se foi ARTILHEIRO IMPLACÁVEL ou DESPERDIÇADOR
-      - Performance defensiva: mostrar se foi MURALHA ou PENEIRA
-      - Performance técnica: revelar MAESTRIA ou AMADORISMO nos passes
-      - Disciplina: expor se foi CAVALHEIRO ou BRIGÃO
-      - Eficiência temporal: mostrar INTENSIDADE ou PREGUIÇA
+      - Tempo em campo: mostrar se teve participação consistente ou limitada
+      - Performance ofensiva: revelar eficiência nas finalizações e criação
+      - Performance defensiva: mostrar contribuição na marcação e recuperação
+      - Performance técnica: avaliar precisão nos passes e domínio técnico
+      - Disciplina: analisar comportamento em campo e faltas cometidas
+      - Eficiência temporal: mostrar intensidade e participação por minuto
       
-      ANÁLISE COMPARATIVA E AVALIAÇÃO EMOCIONAL:
-      - Comparar com LENDAS da posição ou FRACASSOS históricos
-      - Mostrar se DOMINOU ou foi DOMINADO pelos adversários
-      - Revelar se foi DECISIVO ou INVISÍVEL nos momentos cruciais
-      - Avaliar se SALVOU ou CONDENOU o time
-      - Nota de 0 a 10 que faz o torcedor VIBRAR ou se REVOLTAR
+      ANÁLISE COMPARATIVA E AVALIAÇÃO OBJETIVA:
+      - Comparar com outros jogadores da mesma posição
+      - Mostrar se teve performance acima ou abaixo da média esperada
+      - Revelar se foi decisivo ou teve participação discreta
+      - Avaliar se contribuiu positiva ou negativamente para o resultado
+      - Nota contextualizada que reflita a performance real
       
-      EXEMPLOS DE ANÁLISE DE SUBSTITUIÇÃO EMOCIONAL:
-      - "Gabriel Barbosa DECEPCIONOU a Nação Rubro-Negra! Saiu aos 72:15 após 72 minutos de APATIA total. O camisa 9 finalizou apenas 4 vezes (0,055/min), ficou 31% ABAIXO da média dos atacantes (0,08 chutes/min). Com 50% de precisão e 78% de passes certos, mostrou números MEDIANOS para quem deveria ser o PROTAGONISTA. Nota 6,5 pela PERFORMANCE FRUSTRANTE!"
+      EXEMPLOS DE ANÁLISE DE SUBSTITUIÇÃO EQUILIBRADA:
+      - "Gabriel Barbosa teve participação discreta na partida. Saiu aos 72 minutos após finalizar 4 vezes (0,055/minuto), ficando 31% abaixo da média dos atacantes (0,08 chutes/minuto). Com 50% de precisão e 78% de passes certos, mostrou números regulares para a posição. Nota 6,5 pela performance dentro da média."
       
-      - "João Gomes foi o SENHOR DO MEIO-CAMPO! Substituído aos 65:30 após 65 minutos de DOMÍNIO ABSOLUTO. O volante COMANDOU com 89% de passes certos (42/47), fez 6 desarmes CIRÚRGICOS (0,092/min) e cometeu apenas 1 falta. SUPEROU em 23% a média dos meio-campistas, sendo o MAESTRO da partida. Nota 8,2 pela EXIBIÇÃO SOBERANA!"
+      - "João Gomes controlou bem o meio-campo. Substituído aos 65 minutos após boa atuação com 89% de passes certos (42/47), 6 desarmes eficientes (0,092/minuto) e apenas 1 falta cometida. Superou em 23% a média dos meio-campistas, sendo peça importante na partida. Nota 8,2 pela performance consistente."
       
-      - "Raphael Veiga SUMIU quando mais precisava! Saiu aos 58:12 após 58 minutos de INVISIBILIDADE total. O meia teve apenas 67% de passes certos (24/36), NÃO finalizou NENHUMA vez e perdeu 3 dribles. Ficou 45% ABAIXO da média de criação (0,07 vs 0,12 chances/min), sendo um FANTASMA ofensivo. Nota 4,8 pela ATUAÇÃO VERGONHOSA!"
-      
-      CRITÉRIOS PARA NOTAS EMOCIONAIS (0-10):
-      - 9-10: LENDA! Performance de GÊNIO, muito acima de qualquer mortal
-      - 7-8: CRAQUE! Atuação BRILHANTE, acima da média com momentos MÁGICOS
-      - 5-6: NORMAL. Performance MEDIANA, fez o básico sem BRILHAR
-      - 3-4: DECEPÇÃO! Atuação ABAIXO do esperado, com falhas EVIDENTES
-      - 0-2: DESASTRE! Performance VEXATÓRIA, muito abaixo do aceitável
-      
-      ⚠️ ALERTA CRÍTICO - NÃO PERDER EVENTOS NOVOS:
-      
-      ANTES de criar qualquer snippet sobre estatísticas gerais, disciplina, ou posse de bola:
-      1. VERIFICAR se há GOLS novos no data-timeline
-      2. VERIFICAR se há CARTÕES VERMELHOS novos
-      3. VERIFICAR se há SUBSTITUIÇÕES importantes
-      
-      SE HOUVER EVENTOS NOVOS NÃO COBERTOS:
-      - Criar snippets APENAS sobre esses eventos
-      - NÃO criar snippets genéricos
-      - FOCAR no que é NOVIDADE
-      
-      EXEMPLO DO QUE NÃO FAZER:
-      ❌ Criar snippet sobre "disciplina geral" quando há gol novo não coberto
-      ❌ Analisar posse de bola quando há expulsão nova
-      ❌ Falar de estatísticas antigas quando há substituição recente
-      
+      CRITÉRIOS PARA NOTAS OBJETIVAS (0-10):
+      - 9-10: Excepcional! Performance muito acima da média, decisiva
+      - 7-8: Boa! Atuação acima da média com momentos importantes
+      - 5-6: Regular. Performance dentro da média, cumpriu o básico
+      - 3-4: Abaixo do esperado. Atuação com falhas evidentes
+      - 0-2: Muito fraca. Performance bem abaixo do aceitável
+
       REGRAS CRÍTICAS PARA CONTEÚDO - PROIBIÇÕES ABSOLUTAS:
       - NÃO gerar, assumir, presumir ou criar qualquer informação não explicitamente presente nos documentos
       - NÃO inventar estatísticas, números, gols, assistências ou qualquer dado numérico não fornecido
       - NÃO fazer interpretações sobre a natureza dos lances (violentos, limpos, intensos, etc.) a menos que explicitamente descrito nos dados
       - NÃO presumir ausência de eventos (ex: 'sem lances violentos', 'sem confusões', 'jogo limpo') - apenas reportar o que está documentado
-      - NÃO adicionar contexto emocional ou interpretativo não presente nos dados originais
+      - NÃO usar termos exagerados sem base nos dados (ex: "SUFOCAVA", "MASSACROU", "DESTRUIU") quando não há evidência clara
       - NÃO fazer conclusões sobre o comportamento dos jogadores além do que está explicitamente relatado
       - NÃO somar ou calcular estatísticas de jogadores que não estão explicitamente fornecidas
       - NÃO criar médias, percentuais ou comparações com base em dados não fornecidos
@@ -379,6 +373,7 @@ prompts:
       - NÃO presumir o contexto da competição (eliminatória, fase de grupos, etc.) sem dados concretos
       - LIMITAR-SE ESTRITAMENTE aos fatos documentados nos dados fornecidos
       - SEMPRE verificar se um dado numérico específico existe nos documentos antes de mencioná-lo
+      - EVITAR repetir os mesmos jargões e expressões - usar vocabulário variado
       
       EXPLORAÇÃO OBRIGATÓRIA DOS DADOS FORNECIDOS:
       - SEMPRE verificar TODOS os campos de data-team-stats, data-player-stats, data-events, data-timeline
@@ -388,29 +383,29 @@ prompts:
       - VERIFICAR se existem dados de comparação temporal (antes/depois de eventos)
       - CONFIRMAR que cada número mencionado tem fonte explícita nos documentos
       
-      SEMPRE INCLUIR COM EMOÇÃO (APENAS DADOS REAIS):
-      - Números específicos que fazem o torcedor VIBRAR - mas que EXISTEM nos dados
-      - Comparações que mostram SUPERIORIDADE ou FRACASSO - baseadas em dados reais
-      - Taxas por minuto que revelam INTENSIDADE ou PREGUIÇA - calculadas dos dados fornecidos
-      - Correlações que contam HISTÓRIAS ÉPICAS - conectando dados reais disponíveis
-      - Eficiências que provam CLASSE ou expõem AMADORISMO - extraídas dos dados documentados
+      SEMPRE INCLUIR COM PRECISÃO (APENAS DADOS REAIS):
+      - Números específicos que contextualizam a partida - mas que EXISTEM nos dados
+      - Comparações que mostram diferenças de performance - baseadas em dados reais
+      - Taxas por minuto que revelam intensidade ou ritmo - calculadas dos dados fornecidos
+      - Correlações que contam a história da partida - conectando dados reais disponíveis
+      - Eficiências que mostram qualidade técnica - extraídas dos dados documentados
 
       EXEMPLOS DE ANÁLISES PÓS-JOGO VARIADAS:
       
       🎯 EFICIÊNCIA OFENSIVA:
-      "A Inter foi CIRÚRGICA nas finalizações! Converteu 2 gols em apenas 8 chutes no alvo (25% de eficiência LETAL), enquanto o River DESPERDIÇOU 12 chances claras sem balançar as redes. A diferença na precisão foi BRUTAL: Inter 62,5% de chutes no alvo vs River 41,7% - uma SUPERIORIDADE técnica que definiu o resultado!"
+      "A Inter mostrou maior precisão nas finalizações! Converteu 2 gols em 8 chutes no alvo (25% de eficiência), enquanto o River teve 12 tentativas sem sucesso. A diferença na precisão foi clara: Inter 62,5% de chutes no alvo vs River 41,7% - uma superioridade técnica que definiu o resultado."
       
       🛡️ BATALHA DEFENSIVA:
-      "O goleiro da Inter foi um MURO INTRANSPONÍVEL! Fez 8 defesas decisivas (72,7% de aproveitamento), enquanto o River conseguiu apenas 3 defesas em 8 chutes sofridos. A diferença entre os arqueiros foi GRITANTE: um HERÓI absoluto contra um que SUCUMBIU à pressão interista!"
+      "O goleiro da Inter foi fundamental na vitória! Fez 8 defesas importantes (72,7% de aproveitamento), enquanto o River conseguiu apenas 3 defesas em 8 chutes sofridos. A diferença entre os arqueiros foi decisiva para o resultado final."
       
       🔥 DISCIPLINA:
-      "O River PERDEU A CABEÇA na reta final! Cometeu 18 faltas vs 12 da Inter (50% mais violento), culminando na expulsão FATAL aos 72 minutos. A indisciplina CUSTOU CARO: após o cartão vermelho, o River teve apenas 0,08 chutes/minuto, uma QUEDA LIVRE de 67% na produção ofensiva!"
+      "O River teve mais problemas disciplinares na reta final! Cometeu 18 faltas vs 12 da Inter (50% a mais), culminando na expulsão aos 72 minutos. A indisciplina impactou o desempenho: após o cartão vermelho, o River reduziu para 0,08 chutes/minuto, uma queda de 67% na produção ofensiva."
       
-      ⏱️ VIRADA TEMPORAL:
-      "A Inter EXPLODIU no segundo tempo! Passou de 47% para 59% de posse de bola, um CRESCIMENTO AVASSALADOR de 25,5%. O primeiro tempo foi equilibrado (1-0), mas a segunda etapa foi um MASSACRE estatístico: Inter 6 chutes vs River 2, mostrando quem DOMINA quando a pressão aumenta!"
+      ⏱️ CONTROLE TEMPORAL:
+      "A Inter cresceu no segundo tempo! Passou de 47% para 59% de posse de bola, um crescimento de 25,5%. O primeiro tempo foi equilibrado (1-0), mas a segunda etapa mostrou maior domínio: Inter 6 chutes vs River 2, evidenciando quem controlou melhor a pressão."
       
-      🎭 MVP DA PARTIDA:
-      "Alessandro Bastoni foi o SENHOR DA PARTIDA! O zagueiro teve 94% de passes certos (34/36), fez 3 desarmes CIRÚRGICOS, e ainda marcou o gol que SELOU a vitória. Comparado aos outros defensores, foi 31% mais eficiente nos passes e 100% mais decisivo - um GIGANTE em campo!"
+      🎭 DESTAQUE DA PARTIDA:
+      "Alessandro Bastoni teve atuação completa! O zagueiro manteve 94% de passes certos (34/36), fez 3 desarmes eficientes, e ainda marcou o gol da vitória. Comparado aos outros defensores, foi 31% mais eficiente nos passes - uma performance de destaque."
     schema:
       title: "AnaliseEventoAoVivo"
       description: "Extrair trechos específicos dos eventos ao vivo fornecidos em português brasileiro - NENHUM CONTEÚDO GERADO PERMITIDO"
@@ -436,13 +431,14 @@ prompts:
               content:
                 type: "string"
                 description: |
-                  Análise estatística EMOCIONANTE de EXATAMENTE 3 frases em português brasileiro. OBRIGATÓRIO incluir:
-                  - Números específicos que fazem o torcedor VIBRAR (taxas por minuto, percentuais IMPRESSIONANTES) - MAS QUE EXISTEM NOS DADOS
-                  - Comparações estatísticas que mostram DOMÍNIO ou FRACASSO - BASEADAS EM DADOS REAIS
-                  - Correlações entre eventos que contam HISTÓRIAS ÉPICAS - CONECTANDO DADOS DISPONÍVEIS
-                  - Variações percentuais que revelam VIRADAS DRAMÁTICAS - CALCULADAS DOS DADOS FORNECIDOS
-                  TOM EMOCIONAL: usar palavras que fazem o torcedor se EMOCIONAR - EXPLODIR, DOMINAR, MASSACRAR, BRILHAR, DECEPCIONAR, DESTRUIR.
-                  VALIDAÇÃO OBRIGATÓRIA: CADA número mencionado DEVE existir nos documentos data-team-stats, data-player-stats, data-events ou data-timeline - mas NÃO citar as fontes no texto final para manter o tom emocional.
+                  Análise estatística envolvente de EXATAMENTE 3 frases em português brasileiro. OBRIGATÓRIO incluir:
+                  - Números específicos que contextualizam a partida (taxas por minuto, percentuais relevantes) - MAS QUE EXISTEM NOS DADOS
+                  - Comparações estatísticas que mostram diferenças de performance - BASEADAS EM DADOS REAIS
+                  - Correlações entre eventos que contam a história da partida - CONECTANDO DADOS DISPONÍVEIS
+                  - Variações percentuais que revelam mudanças significativas - CALCULADAS DOS DADOS FORNECIDOS
+                  TOM EQUILIBRADO: usar linguagem envolvente mas precisa - destacar, mostrar superioridade, revelar diferenças, evidenciar qualidade.
+                  VALIDAÇÃO OBRIGATÓRIA: CADA número mencionado DEVE existir nos documentos data-team-stats, data-player-stats, data-events ou data-timeline - mas NÃO citar as fontes no texto final para manter fluidez.
+                  EVITAR REPETIÇÕES: variar vocabulário, não repetir jargões como "EXPLODIU", "MASSACROU", "DESTRUIU" - usar sinônimos e termos mais equilibrados.
               title:
                 type: "string"
                 description: "Criar um título descritivo em português brasileiro baseado APENAS nos eventos reais e NOVOS encontrados nos documentos. Usar informações específicas dos lances, jogadores envolvidos e momentos da partida mencionados no material fonte que não foram cobertos nas últimas 3 mensagens. Exemplo: 'Gol de João Silva abre o placar para o Flamengo'"
