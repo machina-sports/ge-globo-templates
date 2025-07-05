@@ -100,6 +100,7 @@ workflow:
     # load-snippets-by-code
     - type: document
       name: load-snippets-by-code
+      condition: "$.get('event_exists') is True"
       config:
         action: "search"
         search-limit: 100

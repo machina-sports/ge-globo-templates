@@ -4,14 +4,14 @@ agent:
   title: "Coverage - Live Consumer"
   description: "Workflow to consume researcher live."
   context:
-    config-frequency: 1
-  inputs:
-    event_code: "$.get('event_code') or None"
+    config-frequency: 3
   workflows:
 
     # Workflow Event Update Live
     - name: "sportradar-soccer-update-live"
       description: "Soccer Event Update Live"
+      inputs:
+        event_code: "'sr:sport_event:57490673'"
       outputs:
         event_code: "$.get('event_code')"
         soccer-event-update: "$.get('workflow-status', False)"
@@ -31,3 +31,10 @@ agent:
         event_code: "$.get('event_code')"
       outputs:
         researcher-executor-status: "$.get('workflow-status', False)"
+
+    - name: "send-snippet"
+      description: "Send Snippet"
+      inputs:
+        event_code: "$.get('event_code')"
+      outputs:
+        snippet-sent: "$.get('workflow-status', False)"

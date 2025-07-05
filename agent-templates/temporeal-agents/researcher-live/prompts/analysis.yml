@@ -16,17 +16,25 @@ prompts:
       
       PROCESSO OBRIGATÓRIO - SIGA ESTA ORDEM:
       
-      1. VARRER data-timeline LINHA POR LINHA procurando:
+      1. VALIDAÇÃO DOS DADOS:
+         - CONFERIR se os dados numéricos existem REALMENTE nos documentos
+         - VERIFICAR se nomes de jogadores estão corretos nos documentos
+         - CONFIRMAR que as estatísticas mencionadas aparecem nos data-team-stats ou data-player-stats
+         - VERIFICAR se o tipo de jogo está explicitamente mencionado nos dados (final, semifinal, etc.)
+         - USAR APENAS termos neutros como "jogo", "partida", "confronto", "duelo" se não houver contexto específico
+         - NÃO prosseguir com informações não confirmadas
+      
+      2. VARRER data-timeline LINHA POR LINHA procurando:
          - score_change (GOLS) 
          - yellow_card, red_card (CARTÕES)
          - substitution (SUBSTITUIÇÕES)
          - Qualquer evento com timestamp NOVO
       
-      2. COMPARAR com history-snippets:
+      3. COMPARAR com history-snippets:
          - Se o evento JÁ foi mencionado → PULAR
          - Se é NOVO → CRIAR SNIPPET IMEDIATAMENTE
       
-      3. PRIORIDADE ABSOLUTA:
+      4. PRIORIDADE ABSOLUTA:
          - GOLS são PRIORIDADE MÁXIMA
          - CARTÕES VERMELHOS são segunda prioridade  
          - SUBSTITUIÇÕES são terceira prioridade
@@ -269,7 +277,7 @@ prompts:
       - Revelar VIRADAS ESPETACULARES nos números
       - Comparar performances LENDÁRIAS ou VEXATÓRIAS
       
-      EXEMPLOS DO QUE QUEREMOS (VERSÃO EMOCIONAL):
+      EXEMPLOS DO QUE QUEREMOS (VERSÃO EMOCIONAL COM DADOS REAIS):
       
       ❌ "Martinez Quarta foi expulso aos 65 minutos"
       ✅ "Martinez Quarta DESTRUIU as chances do River! O zagueiro cometeu 0,43 faltas/minuto (4 faltas em 65min), sendo 28% mais violento que a média. Sua expulsão DEVASTOU a defesa: eficiência caiu de 2,1 para 1,7 desarmes/10min, abrindo o caminho para o gol FATAL 6 minutos depois!"
@@ -335,18 +343,33 @@ prompts:
       
       REGRAS CRÍTICAS PARA CONTEÚDO - PROIBIÇÕES ABSOLUTAS:
       - NÃO gerar, assumir, presumir ou criar qualquer informação não explicitamente presente nos documentos
+      - NÃO inventar estatísticas, números, gols, assistências ou qualquer dado numérico não fornecido
       - NÃO fazer interpretações sobre a natureza dos lances (violentos, limpos, intensos, etc.) a menos que explicitamente descrito nos dados
       - NÃO presumir ausência de eventos (ex: 'sem lances violentos', 'sem confusões', 'jogo limpo') - apenas reportar o que está documentado
       - NÃO adicionar contexto emocional ou interpretativo não presente nos dados originais
       - NÃO fazer conclusões sobre o comportamento dos jogadores além do que está explicitamente relatado
+      - NÃO somar ou calcular estatísticas de jogadores que não estão explicitamente fornecidas
+      - NÃO criar médias, percentuais ou comparações com base em dados não fornecidos
+      - NÃO assumir o tipo de jogo (final, semifinal, decisão, clássico) se não estiver explicitamente mencionado nos dados
+      - NÃO inventar a importância do jogo (decisivo, crucial, histórico) sem informação explícita
+      - NÃO presumir o contexto da competição (eliminatória, fase de grupos, etc.) sem dados concretos
       - LIMITAR-SE ESTRITAMENTE aos fatos documentados nos dados fornecidos
+      - SEMPRE verificar se um dado numérico específico existe nos documentos antes de mencioná-lo
       
-      SEMPRE INCLUIR COM EMOÇÃO:
-      - Números específicos que fazem o torcedor VIBRAR
-      - Comparações que mostram SUPERIORIDADE ou FRACASSO
-      - Taxas por minuto que revelam INTENSIDADE ou PREGUIÇA
-      - Correlações que contam HISTÓRIAS ÉPICAS
-      - Eficiências que provam CLASSE ou expõem AMADORISMO
+      EXPLORAÇÃO OBRIGATÓRIA DOS DADOS FORNECIDOS:
+      - SEMPRE verificar TODOS os campos de data-team-stats, data-player-stats, data-events, data-timeline
+      - PROCURAR por números específicos que estão REALMENTE documentados nos dados
+      - UTILIZAR apenas estatísticas que aparecem explicitamente nos documentos
+      - EXPLORAR diferentes combinações dos dados reais disponíveis
+      - VERIFICAR se existem dados de comparação temporal (antes/depois de eventos)
+      - CONFIRMAR que cada número mencionado tem fonte explícita nos documentos
+      
+      SEMPRE INCLUIR COM EMOÇÃO (APENAS DADOS REAIS):
+      - Números específicos que fazem o torcedor VIBRAR - mas que EXISTEM nos dados
+      - Comparações que mostram SUPERIORIDADE ou FRACASSO - baseadas em dados reais
+      - Taxas por minuto que revelam INTENSIDADE ou PREGUIÇA - calculadas dos dados fornecidos
+      - Correlações que contam HISTÓRIAS ÉPICAS - conectando dados reais disponíveis
+      - Eficiências que provam CLASSE ou expõem AMADORISMO - extraídas dos dados documentados
 
       EXEMPLOS DE ANÁLISES PÓS-JOGO VARIADAS:
       
@@ -375,7 +398,7 @@ prompts:
           type: "array"
           description: "Trechos exatos dos eventos ao vivo fornecidos que contêm informações específicas sobre a partida em andamento - devem ser citações diretas ou paráfrases apenas do material fonte. APENAS incluir eventos novos não mencionados nas últimas 3 mensagens."
           minItems: 0
-          maxItems: 10
+          maxItems: 1
           items:
             type: "object"
             required:
@@ -384,16 +407,18 @@ prompts:
               - subject
               - momento
               - periodo
+              - play_type
             properties:
               content:
                 type: "string"
                 description: |
                   Análise estatística EMOCIONANTE de EXATAMENTE 3 frases em português brasileiro. OBRIGATÓRIO incluir:
-                  - Números específicos que fazem o torcedor VIBRAR (taxas por minuto, percentuais IMPRESSIONANTES)
-                  - Comparações estatísticas que mostram DOMÍNIO ou FRACASSO
-                  - Correlações entre eventos que contam HISTÓRIAS ÉPICAS
-                  - Variações percentuais que revelam VIRADAS DRAMÁTICAS
+                  - Números específicos que fazem o torcedor VIBRAR (taxas por minuto, percentuais IMPRESSIONANTES) - MAS QUE EXISTEM NOS DADOS
+                  - Comparações estatísticas que mostram DOMÍNIO ou FRACASSO - BASEADAS EM DADOS REAIS
+                  - Correlações entre eventos que contam HISTÓRIAS ÉPICAS - CONECTANDO DADOS DISPONÍVEIS
+                  - Variações percentuais que revelam VIRADAS DRAMÁTICAS - CALCULADAS DOS DADOS FORNECIDOS
                   TOM EMOCIONAL: usar palavras que fazem o torcedor se EMOCIONAR - EXPLODIR, DOMINAR, MASSACRAR, BRILHAR, DECEPCIONAR, DESTRUIR.
+                  VALIDAÇÃO OBRIGATÓRIA: CADA número mencionado DEVE existir nos documentos data-team-stats, data-player-stats, data-events ou data-timeline - mas NÃO citar as fontes no texto final para manter o tom emocional.
               title:
                 type: "string"
                 description: "Criar um título descritivo em português brasileiro baseado APENAS nos eventos reais e NOVOS encontrados nos documentos. Usar informações específicas dos lances, jogadores envolvidos e momentos da partida mencionados no material fonte que não foram cobertos nas últimas 3 mensagens. Exemplo: 'Gol de João Silva abre o placar para o Flamengo'"
@@ -440,3 +465,30 @@ prompts:
                   - FIM_DE_JOGO
                   - POS_JOGO_AO_VIVO
                   - POS_JOGO
+              play_type:
+                type: "string"
+                description: |
+                  Tipo de jogada ou evento específico que está sendo analisado no snippet:
+                  - NORMAL: Evento comum da partida (posse de bola, estatísticas gerais, análises rotineiras)
+                  - IMPORTANTE: Evento significativo que impacta o jogo (chances claras, defesas importantes, momentos decisivos)
+                  - RESUMO_AUTOMATICO: Resumo automático de estatísticas ou períodos da partida
+                  - CARTAO_AMARELO: Cartão amarelo mostrado a um jogador
+                  - CARTAO_VERMELHO: Cartão vermelho ou segundo amarelo (expulsão)
+                  - SUBSTITUICAO: Entrada ou saída de jogadores
+                  - GOL: Gol marcado por qualquer equipe
+                  - GOL_CONTRA: Gol contra (próprio)
+                  - PENALTI: Pênalti marcado, cobrado ou defendido
+                  - POS_JOGO_OJOGO: Análise pós-jogo sobre o jogo em si
+                  - POS_JOGO_DESTAQUE: Análise pós-jogo destacando performances individuais ou estatísticas especiais
+                enum:
+                  - NORMAL
+                  - IMPORTANTE
+                  - RESUMO_AUTOMATICO
+                  - CARTAO_AMARELO
+                  - CARTAO_VERMELHO
+                  - SUBSTITUICAO
+                  - GOL
+                  - GOL_CONTRA
+                  - PENALTI
+                  - POS_JOGO_OJOGO
+                  - POS_JOGO_DESTAQUE

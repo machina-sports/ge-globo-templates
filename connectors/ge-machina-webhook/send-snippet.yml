@@ -58,7 +58,7 @@ workflow:
         body: "$.get('webhook_payload')"
       outputs:
         webhook_response: "$"
-        webhook_success: "$.get('status', False)"
+        webhook_success: "$.get('status', 'false') == 'success'"
         webhook_status_code: "$.get('status_code', 0)"
         webhook_message: "$.get('message', '')"
 
@@ -75,9 +75,5 @@ workflow:
           {
             **$.get('snippet_value', {}),
             "sent": True,
-            "sent_at": "$.get('current_timestamp')",
             "webhook_response": $.get('webhook_response', {})
           }
-      outputs:
-        update_success: "$.get('success', False)"
-        updated_document: "$"
