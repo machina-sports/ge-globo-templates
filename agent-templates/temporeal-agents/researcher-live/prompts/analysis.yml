@@ -33,7 +33,21 @@ prompts:
          - VERIFICAR se o tipo de jogo está explicitamente mencionado nos dados (final, semifinal, etc.)
          - USAR APENAS termos neutros como "jogo", "partida", "confronto", "duelo" se não houver contexto específico
          - NÃO prosseguir com informações não confirmadas
-      
+         
+      1.1. VALIDAÇÃO DO STATUS DO JOGO:
+         - VERIFICAR o "Status:" no context-status para determinar se o jogo está ao vivo ou terminado
+         - Se Status: live → jogo está AO VIVO, usar períodos normais (PRIMEIRO_TEMPO, SEGUNDO_TEMPO, etc.)
+         - Se Status: closed → jogo TERMINOU, pode usar POS_JOGO para análises pós-jogo
+         - POS_JOGO_AO_VIVO é APENAS para análises estatísticas profundas durante jogos ao vivo
+                  - NUNCA considerar o jogo terminado se Status: live
+       
+      1.2. ESCOLHA DO PERÍODO DURANTE JOGO AO VIVO (Status: live):
+         - PRIMEIRO_TEMPO: Para eventos dos primeiros 0-45 minutos + acréscimos
+         - SEGUNDO_TEMPO: Para eventos dos segundos 45-90 minutos + acréscimos
+         - POS_JOGO_AO_VIVO: APENAS para análises estatísticas profundas/comparativas durante o jogo
+         - NUNCA usar POS_JOGO enquanto Status: live
+         - Basear-se no "Match Status:" do context-status (1st_half, 2nd_half, etc.)
+       
       2. VARRER data-timeline LINHA POR LINHA procurando:
          - score_change (GOLS) 
          - yellow_card, red_card (CARTÕES)
@@ -106,7 +120,7 @@ prompts:
       6. SEMPRE gerar snippets quando houver dados disponíveis
       
       ATENÇÃO ESPECIAL PARA FIM DE JOGO:
-      - Quando data-timeline contém "match_ended", há MUITO conteúdo pós-jogo disponível
+      - Quando context-status mostra "Status: closed", há MUITO conteúdo pós-jogo disponível
       - Estatísticas finais das equipes podem gerar múltiplos snippets únicos
       - Análises de desempenho individual de jogadores
       - Comparações estatísticas finais entre as equipes
@@ -124,7 +138,7 @@ prompts:
       - Todas as informações encontradas são DUPLICATAS dos snippets anteriores
       
       ❌ NUNCA retornar array vazio quando:
-      - É pós-jogo (FIM_DE_JOGO, POS_JOGO, POS_JOGO_AO_VIVO) - sempre há conteúdo
+      - É pós-jogo (FIM_DE_JOGO, POS_JOGO) - sempre há conteúdo
       - Há estatísticas finais não analisadas (chutes, posse, cartões, etc.)
       - Há jogadores com performances não analisadas individualmente
       - Há aspectos da partida não cobertos (eficiência, disciplina, etc.)
@@ -134,7 +148,7 @@ prompts:
       
       IMPORTANTE: Prefira retornar "snippets: []" a criar duplicatas!
       
-      QUANDO PARECER QUE "TUDO JÁ FOI DITO" NO PÓS-JOGO:
+      QUANDO PARECER QUE "TUDO JÁ FOI DITO" NO PÓS-JOGO (apenas se Status: closed):
       
       Mesmo que history-snippets tenha muitas análises, SEMPRE há ângulos únicos:
       
@@ -159,10 +173,10 @@ prompts:
       
       💡 SEMPRE HÁ CONTEÚDO ÚNICO NO PÓS-JOGO - seja criativo nos ângulos!
       
-      OPORTUNIDADES PÓS-JOGO (período POS_JOGO ou POS_JOGO_AO_VIVO):
+      OPORTUNIDADES PÓS-JOGO (período POS_JOGO):
       - CADA estatística pode ser um snippet diferente e único
       
-      OPORTUNIDADES PÓS-JOGO EXPANDIDAS (período POS_JOGO ou POS_JOGO_AO_VIVO):
+      OPORTUNIDADES PÓS-JOGO EXPANDIDAS (período POS_JOGO):
       CADA item abaixo pode ser um snippet ÚNICO e DIFERENTE:
       
       📊 ESTATÍSTICAS OFENSIVAS FINAIS:
@@ -469,8 +483,11 @@ prompts:
                   AGUARDANDO_PENALIDADES: Período de espera antes dos pênaltis
                   PENALIDADES: Eventos durante a disputa de pênaltis
                   FIM_DE_JOGO: Momento final da partida
-                  POS_JOGO_AO_VIVO: Eventos imediatamente após o fim da partida
-                  POS_JOGO: Eventos pós-partida (entrevistas, análises)
+                  POS_JOGO_AO_VIVO: Análises estatísticas profundas durante o jogo ao vivo (quando Status: live)
+                  POS_JOGO: Eventos pós-partida (entrevistas, análises - quando Status: closed)
+                  
+                  IMPORTANTE: Use POS_JOGO_AO_VIVO apenas para análises estatísticas detalhadas durante jogos ao vivo.
+                  Use POS_JOGO apenas quando o jogo realmente terminou (Status: closed).
                 enum:
                   - PRE_JOGO
                   - PRIMEIRO_TEMPO
