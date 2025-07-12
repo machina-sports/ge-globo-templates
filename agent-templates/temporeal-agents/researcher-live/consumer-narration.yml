@@ -29,12 +29,12 @@ agent:
       outputs:
         event-execution: "$.get('workflow-status', False)"
 
-    # - name: send-snippet
-    #   description: "Send Snippet"
-    #   inputs:
-    #     event_code: "$.get('event_code')"
-    #   outputs:
-    #     snippet-sent: "$.get('workflow-status', False)"
+    - name: send-snippet
+      description: "Send Snippet"
+      inputs:
+        event_code: "$.get('event_code')"
+      outputs:
+        snippet-sent: "$.get('workflow-status', False)"
 
     - name: coverage-live-narration-use-event
       description: "Use Event - Checkout"
