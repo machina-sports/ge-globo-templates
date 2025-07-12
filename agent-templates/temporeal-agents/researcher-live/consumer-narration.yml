@@ -4,7 +4,7 @@ agent:
   title: "Coverage - Live Narration"
   description: "Workflow to consume researcher live narration."
   context:
-    config-frequency: 6
+    config-frequency: 1
   context-variables:
     event_code: "$.get('event_code')"
   workflows:
