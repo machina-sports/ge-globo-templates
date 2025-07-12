@@ -40,8 +40,7 @@ agent:
         version_control_updated: |
           {
             'processing': False,
-            'update-event-narration': 'processed',
-            'update-event-narration-date': datetime.utcnow().isoformat()
+            'update-event-narration': 'processed'
           }
       outputs:
         event-checkout: "$.get('workflow-status', False)"

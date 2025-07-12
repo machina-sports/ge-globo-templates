@@ -85,7 +85,8 @@ workflow:
             **$.get('event_value', {}),
             'version_control': {
               **$.get('version_control', {}),
-              **$.get('version_control_updated', {})
+              **$.get('version_control_updated', {}),
+              'update-event-narration': datetime.utcnow()
             }
           }
       metadata:
