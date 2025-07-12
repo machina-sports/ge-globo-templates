@@ -53,7 +53,7 @@ workflow:
         search-sorters: ["value.version_control.update-event-narration-date", 1]
       filters:
         value.sport_event_status.status: "{'$in': ['live']}"
-        value.version_control.update-event-narration-date: "{'$lt': datetime.utcnow() - timedelta(minutes=5)}"
+        value.version_control.update-event-narration-date: "{'$or': [{'$lt': datetime.utcnow() - timedelta(minutes=5)}, {'$exists': False}]}"
       inputs:
         name: "{'$in': ['soccer-game']}"
       outputs:
