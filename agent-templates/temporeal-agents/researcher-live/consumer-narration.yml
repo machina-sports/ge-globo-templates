@@ -5,11 +5,14 @@ agent:
   description: "Workflow to consume researcher live narration."
   context:
     config-frequency: 6
+  inputs:
+    event_code: "$.get('event_code')"
   workflows:
 
     - name: coverage-live-narration-use-event
       description: "Use Event - Checkin"
       inputs:
+        event_code: "$.get('event_code')"
         version_control_updated: |
           {
             'processing': True,
