@@ -10,15 +10,40 @@ workflow:
       basicAuth: "$TEMP_CONTEXT_VARIABLE_GE_MACHINA_WEBHOOK_API_KEY"
   inputs:
     event_code: "$.get('event_code')"
+    snippet_id: "$.get('snippet_id')"
   outputs:
     workflow-status: "'executed'"
     snippet-sent: "$.get('webhook_success', False)"
-    snippet-id: "$.get('snippet_id')"
+    snippet_id: "$.get('snippet_id')"
   tasks:
+
+    # load-snippet-by-id
+    - type: document
+      name: load-snippet-by-id
+      description: "Load snippet by ID if provided."
+      condition: "$.get('snippet_id') is not None"
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+      filters:
+        document_id: "$.get('snippet_id')"
+      inputs:
+        name: "{'$in': ['content-snippet']}"
+      outputs:
+        snippet_found: "len($.get('documents', [])) > 0"
+        snippet_data: "$.get('documents', [])[0] if $.get('documents') else None"
+        snippet_id: "$.get('documents', [])[0].get('_id') if $.get('documents') else None"
+        snippet_metadata: "$.get('documents', [])[0].get('metadata', {}) if $.get('documents') else None"
+        snippet_value: "$.get('documents', [])[0].get('value', {}) if $.get('documents') else None"
+        snippet_created: "$.get('documents', [])[0].get('created') if $.get('documents') else None"
+        snippet_updated: "$.get('documents', [])[0].get('updated') if $.get('documents') else None"
 
     # load-latest-snippet-by-event-code
     - type: document
       name: load-latest-snippet-by-event-code
+      description: "Fallback: Search for the latest content-snippet by event_code."
+      condition: "$.get('snippet_found') is not True"
       config:
         action: "search"
         search-limit: 1
