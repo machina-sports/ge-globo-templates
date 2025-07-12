@@ -1,0 +1,17 @@
+agent:
+
+  name: coverage-longterm-consumer
+  title: "Coverage - Long-Term"
+  description: "Workflow to consume researcher long-term."
+  context:
+    config-frequency: 10
+  inputs:
+    event_code: "$.get('event_code') or None"
+  workflows:
+
+    # Workflow Event Update Long-Term
+    - name: "sportradar-soccer-update-longterm"
+      description: "Soccer Event Update Long-Term"
+      outputs:
+        soccer-event-update: "$.get('workflow-status', False)"
+        

@@ -1,0 +1,28 @@
+agent:
+
+  name: coverage-live-narration 
+  title: "Coverage - Live Narration"
+  description: "Workflow to consume researcher live narration."
+  context:
+    config-frequency: 6
+  workflows:
+
+    - name: sportradar-soccer-update-live
+      description: "Soccer Event Update Live"
+      outputs:
+        event_code: "$.get('event_code')"
+        soccer-event-update: "$.get('workflow-status', False)"
+        
+    - name: coverage-live-narration-executor
+      description: "Coverage Researcher Live Executor"
+      inputs:
+        event_code: "$.get('event_code')"
+      outputs:
+        researcher-executor-status: "$.get('workflow-status', False)"
+
+    - name: send-snippet
+      description: "Send Snippet"
+      inputs:
+        event_code: "$.get('event_code')"
+      outputs:
+        snippet-sent: "$.get('workflow-status', False)"

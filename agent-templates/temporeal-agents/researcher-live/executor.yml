@@ -1,6 +1,6 @@
 workflow:
 
-  name: coverage-researcher-live-executor
+  name: coverage-live-narration-executor
   title: "Coverage - Researcher Live Executor"
   description: "Workflow to execute researcher live."
   context-variables:
