@@ -52,7 +52,8 @@ workflow:
         search-vector: false
         search-sorters: ["value.version_control.updated", 1]
       filters:
-        updated: "{'$lt': datetime.utcnow() - timedelta(minutes=1)}"
+        value.sport_event_status.status: "{'$in': ['live']}"
+        value.version_control.update-event-narration-date: "{'$lt': datetime.utcnow() - timedelta(minutes=1)}"
       inputs:
         name: "{'$in': ['soccer-game']}"
       outputs:
@@ -86,7 +87,7 @@ workflow:
             'version_control': {
               **$.get('version_control', {}),
               **$.get('version_control_updated', {}),
-              'update-event-narration': datetime.utcnow()
+              'update-event-narration-date': datetime.utcnow()
             }
           }
       metadata:
