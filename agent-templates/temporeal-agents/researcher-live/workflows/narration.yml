@@ -150,9 +150,6 @@ workflow:
               'periodo': c.get('periodo', ''),
               'play_type': c.get('play_type', ''),
               'metadata': {
-                'content-group': '$.(content-group)',
-                'content-name': '$.(content-name)',
-                'content-topic': '$.(content-topic)',
                 'event_code': '$.(event_code)'
               }
             }

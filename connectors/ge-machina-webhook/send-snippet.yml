@@ -31,6 +31,7 @@ workflow:
       inputs:
         name: "{'$in': ['content-snippet']}"
       outputs:
+        event_code: "$.get('documents', [])[0].get('metadata', {}).get('event_code') if $.get('documents') else None"
         snippet_found: "len($.get('documents', [])) > 0"
         snippet_data: "$.get('documents', [])[0] if $.get('documents') else None"
         snippet_id: "$.get('documents', [])[0].get('_id') if $.get('documents') else None"
@@ -102,3 +103,5 @@ workflow:
             "sent": True,
             "webhook_response": $.get('webhook_response', {})
           }
+      metadata:
+        event_code: "$.get('event_code')"
