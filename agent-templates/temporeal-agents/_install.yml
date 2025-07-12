@@ -88,9 +88,6 @@ datasets:
     
   # researcher-live
 
-  - type: "workflow"
-    path: "researcher-live/executor.yml"
-
   - type: "prompts"
     path: "researcher-live/prompts/analysis.yml"
 
@@ -108,6 +105,12 @@ datasets:
 
   - type: "agent"
     path: "researcher-live/consumer-pre.yml"
+
+  - type: "workflow"
+    path: "researcher-live/workflows/narration.yml"
+
+  - type: "workflow"
+    path: "researcher-live/workflows/use-event.yml"
 
   # researcher-stats
 

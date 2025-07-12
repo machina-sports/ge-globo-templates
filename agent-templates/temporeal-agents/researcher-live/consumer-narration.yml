@@ -7,22 +7,41 @@ agent:
     config-frequency: 6
   workflows:
 
-    - name: sportradar-soccer-update-live
-      description: "Soccer Event Update Live"
+    - name: coverage-live-narration-use-event
+      description: "Use Event - Checkin"
+      inputs:
+        version_control_updated: |
+          {
+            'processing': True,
+            'update-event-narration': 'processing'
+          }
       outputs:
         event_code: "$.get('event_code')"
-        soccer-event-update: "$.get('workflow-status', False)"
+        event-checkin: "$.get('workflow-status', False)"
         
     - name: coverage-live-narration-executor
-      description: "Coverage Researcher Live Executor"
+      description: "Event Execution"
       inputs:
         event_code: "$.get('event_code')"
       outputs:
-        researcher-executor-status: "$.get('workflow-status', False)"
+        event-execution: "$.get('workflow-status', False)"
 
-    - name: send-snippet
-      description: "Send Snippet"
+    # - name: send-snippet
+    #   description: "Send Snippet"
+    #   inputs:
+    #     event_code: "$.get('event_code')"
+    #   outputs:
+    #     snippet-sent: "$.get('workflow-status', False)"
+
+    - name: coverage-live-narration-use-event
+      description: "Use Event - Checkout"
       inputs:
         event_code: "$.get('event_code')"
+        version_control_updated: |
+          {
+            'processing': False,
+            'update-event-narration': 'processed',
+            'update-event-narration-date': datetime.utcnow().isoformat()
+          }
       outputs:
-        snippet-sent: "$.get('workflow-status', False)"
+        event-checkout: "$.get('workflow-status', False)"

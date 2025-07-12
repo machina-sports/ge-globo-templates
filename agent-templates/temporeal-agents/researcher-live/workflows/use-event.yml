@@ -1,0 +1,93 @@
+workflow:
+
+  name: coverage-live-narration-use-event
+  title: "Coverage - Live Narration Use Event"
+  description: "Workflow to use a soccer game from SportRadar API by event code."
+  context-variables:
+    debugger:
+      enabled: true
+    machina-ai:
+      api_key: "$TEMP_CONTEXT_VARIABLE_SDK_OPENAI_API_KEY"
+    sportradar-soccer:
+      api_key: "$TEMP_CONTEXT_VARIABLE_SPORTRADAR_SOCCER_V4_API_KEY"
+  inputs:
+    event_code: "$.get('event_code')"
+    version_control_updated: "$.get('version_control_updated')"
+  outputs:
+    event_data: "$.get('event_data')"
+    event_code: "$.get('event_code')"
+    workflow-status: "$.get('event_exists') is not True and 'skipped' or 'executed'"
+  tasks:
+
+    # 0 load-event-by-code
+    - type: "document"
+      name: "load-event-by-code"
+      description: "Search event (sportradar) by code."
+      condition: "$.get('event_code') is not None"
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["value.start_time", 1]
+      filters:
+        metadata.event_code: "$.get('event_code')"
+      inputs:
+        name: "{'$in': ['soccer-game']}"
+      outputs:
+        event_exists: "len($.get('documents', [])) > 0"
+        event_metadata: "$.get('documents', [])[0].get('metadata', {}) if $.get('documents') else None"
+        event_value: "$.get('documents', [])[0].get('value', {}) if $.get('documents') else None"
+
+    # 1 load-event-by-condition
+    - type: "document"
+      name: "load-event-by-condition"
+      description: "Search for schedule events (sportradar)."
+      condition: |
+        (
+          $.get('event_exists') is not True
+        )
+      config:
+        action: "search"
+        search-limit: 1
+        search-vector: false
+        search-sorters: ["value.version_control.updated", 1]
+      filters:
+        updated: "{'$lt': datetime.utcnow() - timedelta(minutes=1)}"
+      inputs:
+        name: "{'$in': ['soccer-game']}"
+      outputs:
+        event_exists: "len($.get('documents', [])) > 0"
+        event_code: "$.get('documents', [])[0].get('metadata', {}).get('event_code') if $.get('documents') else None"
+        event_metadata: "$.get('documents', [])[0].get('metadata', {}) if $.get('documents') else None"
+        event_value: "$.get('documents', [])[0].get('value', {}) if $.get('documents') else None"
+
+    # 2 mapping-soccer-version-control
+    - type: "mapping"
+      name: "mapping-soccer-version-control"
+      description: "Transform the sportradar soccer data"
+      inputs:
+        item: "$.get('event_value', [])"
+      outputs:
+        version_control: "$.get('version_control')"
+
+    # 3 version-control-update
+    - type: "document"
+      name: "version-control-update"
+      description: "Update the events document version control."
+      condition: "$.get('event_exists') is True"
+      config:
+        action: "update"
+        embed-vector: false
+        force-update: true
+      documents:
+        soccer-game: |
+          {
+            **$.get('event_value', {}),
+            'version_control': {
+              **$.get('version_control', {}),
+              **$.get('version_control_updated', {})
+            }
+          }
+      metadata:
+        event_code: "$.get('event_code')"
+        integration_code: "$.get('event_metadata', {}).get('integration_code')"
