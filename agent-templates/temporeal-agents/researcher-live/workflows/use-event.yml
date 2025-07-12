@@ -50,7 +50,7 @@ workflow:
         action: "search"
         search-limit: 1
         search-vector: false
-        search-sorters: ["value.version_control.updated", 1]
+        search-sorters: ["value.version_control.update-event-narration-date", 1]
       filters:
         value.sport_event_status.status: "{'$in': ['live']}"
       inputs:
