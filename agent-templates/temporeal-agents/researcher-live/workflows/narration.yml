@@ -15,7 +15,7 @@ workflow:
   inputs:
     event_code: "$.get('event_code')"
   outputs:
-    workflow-status: "'executed'"
+    workflow-status: "$.get('event_exists') is not True and 'skipped' or 'executed'"
   tasks:
 
     # sportradar-live-requests (have-content-to-process)

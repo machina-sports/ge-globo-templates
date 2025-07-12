@@ -39,7 +39,7 @@ prompts:
          - Se Status: live → jogo está AO VIVO, usar períodos normais (PRIMEIRO_TEMPO, SEGUNDO_TEMPO, etc.)
          - Se Status: closed → jogo TERMINOU, pode usar POS_JOGO para análises pós-jogo
          - POS_JOGO_AO_VIVO é APENAS para análises estatísticas profundas durante jogos ao vivo
-                  - NUNCA considerar o jogo terminado se Status: live
+          - NUNCA considerar o jogo terminado se Status: live
        
       1.2. ESCOLHA DO PERÍODO DURANTE JOGO AO VIVO (Status: live):
          - PRIMEIRO_TEMPO: Para eventos dos primeiros 0-45 minutos + acréscimos
@@ -54,13 +54,7 @@ prompts:
          - substitution (SUBSTITUIÇÕES)
          - Qualquer evento com timestamp NOVO
       
-      3. COMPARAR com history-snippets:
-         - Se o evento JÁ foi mencionado → PULAR COMPLETAMENTE
-         - Se é NOVO → CRIAR SNIPPET IMEDIATAMENTE
-         - VERIFICAR: mesmo momento (MM:SS) + mesmo jogador/situação = DUPLICATA
-         - VERIFICAR: mesmo subject/title com pequenas variações = DUPLICATA
-      
-      4. PRIORIDADE ABSOLUTA:
+      3. PRIORIDADE ABSOLUTA:
          - GOLS são PRIORIDADE MÁXIMA
          - CARTÕES VERMELHOS são segunda prioridade  
          - SUBSTITUIÇÕES são terceira prioridade
@@ -72,24 +66,6 @@ prompts:
       - "goal" (gol marcado)
       - Nomes de jogadores + "lead" ou "score"
       - Mudanças no placar (ex: "2-0", "1-1")
-      
-      EXEMPLO PRÁTICO DE DETECÇÃO DE DUPLICATAS:
-      Se history-snippets contém:
-      "04:29 PRIMEIRO_TEMPO Defesa espetacular de Weverton em chute de Cole Palmer"
-      
-      E você encontra no data-timeline:
-      "04:29 save_attempt Weverton makes spectacular save from Cole Palmer shot"
-      
-      → NÃO CRIAR SNIPPET - é DUPLICATA (mesmo momento + mesmo jogador + mesmo evento)
-      
-      EXEMPLO DE EVENTO NOVO:
-      Se data-timeline contém:
-      "90:00 score_change Inter take a comfortable 2-0 lead thanks to Alessandro Bastoni"
-      
-      E history-snippets NÃO menciona "Alessandro Bastoni" ou "2-0" ou "90 minutos":
-      → CRIAR SNIPPET IMEDIATAMENTE sobre o gol do Bastoni
-      
-      NÃO CRIAR snippets genéricos sobre posse de bola ou disciplina se há GOLS não cobertos!
       
       COMO USAR OS DADOS FORNECIDOS:
       
