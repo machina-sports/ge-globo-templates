@@ -6,406 +6,127 @@ prompts:
     title: "Cobertura - Análise de Eventos ao Vivo"
     description: "Extrair e analisar informações específicas de eventos de futebol ao vivo em diferentes fases da partida"
     instruction: |
-      OBJETIVO: Gerar análises estatísticas envolventes e informativas que engajem o torcedor com dados relevantes.
+      OBJETIVO: Gerar análises estatísticas envolventes que engajem o torcedor com dados relevantes.
       
-      REGRA FUNDAMENTAL: 
-      1. PRIMEIRO: IDENTIFICAR EVENTOS NOVOS (especialmente GOLS, CARTÕES, SUBSTITUIÇÕES)
-      2. SEGUNDO: Analisar estatisticamente com clareza e interesse
-      3. NÃO repetir fatos básicos que os editores já cobriram
+      REGRAS FUNDAMENTAIS: 
+      1. IDENTIFICAR EVENTOS NOVOS (especialmente GOLS, CARTÕES, SUBSTITUIÇÕES)
+      2. Analisar estatisticamente com clareza e interesse
+      3. NÃO repetir fatos básicos já cobertos pelos editores
       4. FOCAR EM: estatísticas relevantes, números que contextualizam a partida
-      5. NUNCA criar snippets duplicados ou similares - cada snippet deve ser ÚNICO
+      5. NUNCA criar snippets duplicados - cada snippet deve ser ÚNICO
 
       REGRA ANTI-DUPLICATA (CRÍTICA):
-      - ANTES de criar qualquer snippet, VERIFICAR se já existe nos history-snippets:
+      - VERIFICAR se já existe nos history-snippets:
         * Mesmo momento (MM:SS) + mesmo jogador = DUPLICATA
-        * Mesmo evento (defesa, chute, escanteio) + mesmo momento = DUPLICATA  
-        * Subject muito similar (mesmo jogador, mesmo tipo de lance) = DUPLICATA
-        * Title com pequenas variações da mesma ação = DUPLICATA
-      - Se encontrar QUALQUER similaridade → definir "snippets: []" (array vazio)
+        * Mesmo evento + mesmo momento = DUPLICATA  
+        * Subject muito similar = DUPLICATA
+      - Se encontrar similaridade → definir "snippets: []" (array vazio)
       - PREFERIR não gerar snippet a gerar duplicata
       
-      PROCESSO OBRIGATÓRIO - SIGA ESTA ORDEM:
+      PROCESSO OBRIGATÓRIO:
       
       1. VALIDAÇÃO DOS DADOS:
-         - CONFERIR se os dados numéricos existem REALMENTE nos documentos
-         - VERIFICAR se nomes de jogadores estão corretos nos documentos
-         - CONFIRMAR que as estatísticas mencionadas aparecem nos data-team-stats ou data-player-stats
-         - VERIFICAR se o tipo de jogo está explicitamente mencionado nos dados (final, semifinal, etc.)
-         - USAR APENAS termos neutros como "jogo", "partida", "confronto", "duelo" se não houver contexto específico
+         - CONFERIR se os dados numéricos existem nos documentos
+         - VERIFICAR se nomes de jogadores estão corretos
+         - CONFIRMAR estatísticas em data-team-stats ou data-player-stats
+         - USAR apenas termos neutros como "jogo", "partida" se não houver contexto específico
          - NÃO prosseguir com informações não confirmadas
          
-      1.1. VALIDAÇÃO DO STATUS DO JOGO:
-         - VERIFICAR o "Status:" no context-status para determinar se o jogo está ao vivo ou terminado
-         - Se Status: live → jogo está AO VIVO, usar períodos normais (PRIMEIRO_TEMPO, SEGUNDO_TEMPO, etc.)
-         - Se Status: closed → jogo TERMINOU, pode usar POS_JOGO para análises pós-jogo
-         - POS_JOGO_AO_VIVO é APENAS para análises estatísticas profundas durante jogos ao vivo
-          - NUNCA considerar o jogo terminado se Status: live
+      1.1. VALIDAÇÃO DO STATUS:
+         - VERIFICAR "Status:" no context-status
+         - Se Status: live → jogo AO VIVO (períodos: PRIMEIRO_TEMPO, SEGUNDO_TEMPO)
+         - Se Status: closed → jogo TERMINOU (pode usar POS_JOGO)
+         - POS_JOGO_AO_VIVO apenas para análises estatísticas profundas durante jogos ao vivo
        
-      1.2. ESCOLHA DO PERÍODO DURANTE JOGO AO VIVO (Status: live):
-         - PRIMEIRO_TEMPO: Para eventos dos primeiros 0-45 minutos + acréscimos
-         - SEGUNDO_TEMPO: Para eventos dos segundos 45-90 minutos + acréscimos
-         - POS_JOGO_AO_VIVO: APENAS para análises estatísticas profundas/comparativas durante o jogo
-         - NUNCA usar POS_JOGO enquanto Status: live
-         - Basear-se no "Match Status:" do context-status (1st_half, 2nd_half, etc.)
-       
-      2. VARRER data-timeline LINHA POR LINHA procurando:
+      2. VARRER data-timeline procurando:
          - score_change (GOLS) 
          - yellow_card, red_card (CARTÕES)
          - substitution (SUBSTITUIÇÕES)
-         - Qualquer evento com timestamp NOVO
+         - Eventos com timestamp NOVO
       
-      3. PRIORIDADE ABSOLUTA:
+      3. PRIORIDADE:
          - GOLS são PRIORIDADE MÁXIMA
          - CARTÕES VERMELHOS são segunda prioridade  
          - SUBSTITUIÇÕES são terceira prioridade
          - Outras estatísticas só se não houver eventos novos
       
-      IDENTIFICAÇÃO DE GOLS NO DATA-TIMELINE:
-      Procurar por linhas que contenham:
-      - "score_change" (mudança de placar)
-      - "goal" (gol marcado)
-      - Nomes de jogadores + "lead" ou "score"
-      - Mudanças no placar (ex: "2-0", "1-1")
+      COMO USAR OS DADOS:
       
-      COMO USAR OS DADOS FORNECIDOS:
-      
-      1. HISTORY-SNIPPETS (Evitar Repetição):
-      - Contém os últimos snippets já gerados para este evento
-      - USAR APENAS para verificar o que JÁ foi reportado
-      - NÃO repetir informações que já aparecem nestes snippets
-      
-      2. CONTEXT (Contextualização - NÃO extrair como novidade):
-      - context-match-summary: Informações básicas do jogo (times, data, estádio)
-      - context-lineups: Escalações dos times (usar apenas como contexto)
-      - context-status: Status atual da partida (placar, tempo)
-      - USAR para contextualizar eventos, mas NÃO como fonte de novos snippets
-      
-      3. DATA (Dados novos para análise - FONTE DOS SNIPPETS):
-      - data-timeline: PRIMEIRA PRIORIDADE - cronologia de eventos da partida
-      - data-events: Lista de eventos mapeados
-      - data-team-stats: Estatísticas das equipes
-      - data-player-stats: Estatísticas individuais dos jogadores
-      - ANALISAR estes dados para encontrar NOVOS eventos não cobertos no history-snippets
-      
-      PROCESSO DE ANÁLISE:
-      1. Verificar history-snippets para saber o que JÁ foi reportado
-      2. Usar context para entender o cenário da partida
-      3. Analisar data-timeline, data-events, data-team-stats, data-player-stats
-      4. Identificar eventos NOVOS que não estão no history-snippets
-      5. Criar snippets para eventos verdadeiramente novos
-      6. SEMPRE gerar snippets quando houver dados disponíveis
+      1. HISTORY-SNIPPETS: Verificar o que JÁ foi reportado - NÃO repetir
+      2. CONTEXT: Contextualização - NÃO extrair como novidade
+      3. DATA: Fonte dos snippets - analisar para encontrar NOVOS eventos
       
       ATENÇÃO ESPECIAL PARA FIM DE JOGO:
-      - Quando context-status mostra "Status: closed", há MUITO conteúdo pós-jogo disponível
-      - Estatísticas finais das equipes podem gerar múltiplos snippets únicos
-      - Análises de desempenho individual de jogadores
-      - Comparações estatísticas finais entre as equipes
-      - Momentos decisivos da partida
-      - Análise de posse de bola, chutes, cartões, etc.
-      - CADA estatística pode ser um snippet diferente e único
-      - NÃO definir no_news = true apenas porque o jogo terminou
+      - Quando Status: closed, há MUITO conteúdo pós-jogo disponível
+      - Estatísticas finais podem gerar múltiplos snippets únicos
+      - Análises de desempenho individual, comparações estatísticas
+      - CADA estatística pode ser um snippet diferente
+      - NÃO definir snippets: [] apenas porque o jogo terminou
       
-      REGRA CRÍTICA PARA QUANDO NÃO HÁ NOVOS EVENTOS:
-      
-      ✅ RETORNAR "snippets: []" (array vazio) APENAS quando:
-      - TODOS os eventos novos do data-timeline já foram cobertos no history-snippets
-      - NÃO há nenhuma estatística final não analisada
-      - NÃO há nenhum aspecto da partida que possa ser explorado
-      - Todas as informações encontradas são DUPLICATAS dos snippets anteriores
-      
-      ❌ NUNCA retornar array vazio quando:
-      - É pós-jogo (FIM_DE_JOGO, POS_JOGO) - sempre há conteúdo
-      - Há estatísticas finais não analisadas (chutes, posse, cartões, etc.)
-      - Há jogadores com performances não analisadas individualmente
-      - Há aspectos da partida não cobertos (eficiência, disciplina, etc.)
-      - O jogo acabou de terminar - há MUITO conteúdo pós-jogo disponível
-      
-      LEMBRE-SE: Pós-jogo é o momento com MAIS oportunidades de snippets únicos!
-      
-      IMPORTANTE: Prefira retornar "snippets: []" a criar duplicatas!
-      
-      QUANDO PARECER QUE "TUDO JÁ FOI DITO" NO PÓS-JOGO (apenas se Status: closed):
-      
-      Mesmo que history-snippets tenha muitas análises, SEMPRE há ângulos únicos:
-      
-      🔍 PROCURE POR ASPECTOS NÃO COBERTOS:
-      - Se já falou de posse geral → fale de posse por período (1°T vs 2°T)
-      - Se já falou de gols → fale da eficiência dos goleiros
-      - Se já falou de cartões → fale do timing dos cartões (quando aconteceram)
-      - Se já falou de chutes → fale da precisão e zonas de finalização
-      - Se já falou de um jogador → fale de outro jogador importante
-      
-      📊 DIFERENTES ÂNGULOS DA MESMA ESTATÍSTICA:
-      - Posse de bola: geral → por tempo → por zona do campo
-      - Chutes: total → precisão → eficiência → timing
-      - Faltas: quantidade → contexto → impacto no jogo
-      - Passes: quantidade → precisão → passes decisivos
-      
-      🎭 PERSONALIZE AS ANÁLISES:
-      - Se já analisou o time → analise jogadores individuais
-      - Se já falou do ataque → fale da defesa
-      - Se já cobriu estatísticas → fale de momentos decisivos
-      - Se já falou do resultado → fale do processo
+      OPORTUNIDADES PÓS-JOGO:
+      📊 ESTATÍSTICAS FINAIS:
+      - Eficiência de finalização (chutes no alvo vs total)
+      - Performance individual dos jogadores
+      - Batalha defensiva (desarmes, interceptações)
+      - Disciplina (cartões e contexto)
+      - Análise temporal (1°T vs 2°T)
+      - Impacto das substituições
       
       💡 SEMPRE HÁ CONTEÚDO ÚNICO NO PÓS-JOGO - seja criativo nos ângulos!
       
-      OPORTUNIDADES PÓS-JOGO (período POS_JOGO):
-      - CADA estatística pode ser um snippet diferente e único
+      ESTATÍSTICAS DETALHADAS:
       
-      OPORTUNIDADES PÓS-JOGO EXPANDIDAS (período POS_JOGO):
-      CADA item abaixo pode ser um snippet ÚNICO e DIFERENTE:
+      EQUIPE (data-team-stats):
+      - Posse de bola, chutes (total/no gol/fora)
+      - Faltas, cartões, escanteios, impedimentos
       
-      📊 ESTATÍSTICAS OFENSIVAS FINAIS:
-      - Eficiência de finalização por equipe (chutes no alvo vs total)
-      - Análise de precisão: percentual de chutes certeiros
-      - Produtividade ofensiva: chutes por minuto de cada time
-      - Zonas de finalização: de onde vieram os chutes
-      - Tempo médio entre chutes de cada equipe
-      
-      🎯 ANÁLISE INDIVIDUAL DOS ARTILHEIROS:
-      - Performance completa de cada goleador (chutes, precisão, tempo)
-      - Comparação entre os atacantes das duas equipes
-      - Eficiência dos meio-campistas ofensivos
-      - Jogadores que mais criaram chances
-      - Análise dos jogadores que desperdiçaram oportunidades
-      
-      🛡️ BATALHA DEFENSIVA:
-      - Desarmes por equipe e eficiência defensiva
-      - Interceptações e cortes por time
-      - Performance dos goleiros (defesas, tipo de chutes defendidos)
-      - Solidez defensiva: gols sofridos vs chutes no alvo
-      - Falhas defensivas que resultaram em gols
-      
-      ⚡ INTENSIDADE E RITMO:
-      - Faltas por minuto de cada equipe
-      - Momentos de maior intensidade (mais faltas/cartões)
-      - Períodos de domínio territorial
-      - Variação do ritmo ao longo dos 90 minutos
-      - Impacto das substituições no ritmo de jogo
-      
-      🔥 DISCIPLINA E TEMPERAMENTO:
-      - Cartões por equipe e contexto (quando foram mostrados)
-      - Jogadores mais "brigões" (faltas cometidas)
-      - Momentos de tensão (concentração de cartões)
-      - Impacto disciplinar: como cartões mudaram o jogo
-      - Comparação de fair play entre as equipes
-      
-      🎭 PROTAGONISTAS E COADJUVANTES:
-      - MVP da partida baseado em estatísticas
-      - Jogador que mais decepcionou (estatisticamente)
-      - Revelações da partida (performance acima da média)
-      - Veteranos vs jovens: quem se destacou
-      - Capitães: liderança em campo (estatísticas)
-      
-      ⏱️ ANÁLISE TEMPORAL:
-      - Primeiro tempo vs segundo tempo (estatísticas comparativas)
-      - Momentos decisivos: quando o jogo mudou
-      - Acréscimos: o que aconteceu nos minutos extras
-      - Períodos de pressão: quando cada time atacou mais
-      - Viradas estatísticas ao longo da partida
-      
-      🏆 CONTEXTO HISTÓRICO:
-      - Comparação com outros jogos recentes das equipes
-      - Recordes quebrados ou igualados
-      - Sequências mantidas ou interrompidas
-      - Estatísticas raras ou curiosas da partida
-      - Marcos individuais alcançados pelos jogadores
-      
-      💪 IMPACTO DAS SUBSTITUIÇÕES:
-      - Análise detalhada de cada troca (quem saiu vs quem entrou)
-      - Impacto estatístico das substituições
-      - Timing das trocas: cedo, tarde, ou na hora certa
-      - Jogadores que mudaram o jogo entrando do banco
-      - Substituições defensivas vs ofensivas e seus resultados
-      
-      🎨 ASPECTOS TÉCNICOS:
-      - Passes certos vs errados por equipe
-      - Dribles bem-sucedidos e tentativas
-      - Cruzamentos: tentativas vs conversões
-      - Escanteios: aproveitamento e desperdício
-      - Impedimentos: disciplina tática
-      
-      IMPORTANTE: Não repetir análises similares - cada snippet deve abordar um aspecto ÚNICO da partida!
-      
-      UTILIZAR ESTATÍSTICAS DETALHADAS para contextualizar eventos novos:
-      
-      ESTATÍSTICAS DE EQUIPE (data-team-stats):
-      - Posse de bola (ball_possession): Comparar percentuais entre os times
-      - Chutes totais (shots_total) vs chutes no gol (shots_on_target) vs chutes para fora (shots_off_target)
-      - Faltas cometidas (fouls) e cobranças de falta (free_kicks)
-      - Cartões amarelos (yellow_cards) e vermelhos (red_cards + yellow_red_cards)
-      - Escanteios (corners) e impedimentos (offsides)
-      
-      ESTATÍSTICAS DE JOGADORES (data-player-stats):
-      - Gols marcados (goals_scored) e assistências (assists)
-      - Performance individual: chutes, chutes no gol, chutes para fora
-      - Disciplina: cartões amarelos e vermelhos por jogador
-      - Substituições: jogadores que entraram (substituted_in) e saíram (substituted_out)
-      - Cobranças de escanteio (corner_kicks) e impedimentos por jogador
+      JOGADORES (data-player-stats):
+      - Gols, assistências, chutes por jogador
+      - Disciplina individual, substituições
       
       ANÁLISE COMPARATIVA:
-      - Comparar estatísticas atuais com dados do history-snippets
-      - Identificar mudanças significativas na posse de bola, chutes, cartões
-      - Destacar evoluções no desempenho de jogadores específicos
-      - Relacionar eventos novos com o contexto estatístico
-      - Mostrar como eventos impactam o equilíbrio da partida
+      - Comparar com history-snippets
+      - Identificar mudanças significativas
+      - Relacionar eventos com contexto estatístico
       
-      CONTEXTUALIZAÇÃO TEMPORAL:
-      - Relacionar estatísticas com o período da partida (primeiro tempo, segundo tempo, prorrogação)
-      - Mostrar progressão das estatísticas ao longo do jogo
-      - Identificar momentos de virada no controle da partida baseado em dados
-      
-      FOCO DO CONTEÚDO - ENRIQUECIMENTO ESTATÍSTICO ENGAJANTE:
-      O objetivo é COMPLEMENTAR a cobertura factual básica que os editores já fazem (gols, cartões, substituições). Concentrar-se em:
-      - Estatísticas que contextualizam e enriquecem a narrativa da partida
-      - Números que revelam aspectos interessantes do jogo
-      - Comparações que mostram diferenças de performance ou momentos de virada
-      - Performance individual que destaca protagonistas e coadjuvantes
-      - Momentos que marcam mudanças no ritmo ou controle da partida
-      - Dados que explicam resultados ou revelam tendências
-      - Análise que informa e engaja o torcedor com contexto relevante
-
-      COMO ANALISAR CADA EVENTO COM EQUILÍBRIO:
-      
-      1. EXPULSÃO/CARTÃO:
-      - Mostrar como o evento impactou as chances do time
-      - Revelar o contexto estatístico que levou à punição
-      - Comparar com outros momentos disciplinares da partida
-      - Analisar as consequências táticas e estatísticas
-      
-      2. GOL:
-      - Destacar a eficiência do artilheiro no contexto da partida
-      - Mostrar como o time reagiu estatisticamente
-      - Revelar o momento e circunstâncias que levaram ao gol
-      - Comparar com outras oportunidades criadas
-      
-      3. SUBSTITUIÇÃO:
-      - Avaliar o timing e contexto da decisão
-      - Mostrar os números que justificam ou questionam a troca
-      - Revelar a performance do jogador substituído
-      - Analisar o impacto esperado no resultado
-      
-      4. ESTATÍSTICAS GERAIS:
-      - Transformar números em narrativas claras e interessantes
-      - Mostrar domínio territorial ou equilíbrio entre as equipes
-      - Revelar mudanças significativas nos indicadores
-      - Comparar performances e destacar diferenças relevantes
-      
-      EXEMPLOS DE ANÁLISE EQUILIBRADA (COM DADOS REAIS):
+      EXEMPLOS DE ANÁLISE EQUILIBRADA:
       
       ❌ "Martinez Quarta foi expulso aos 65 minutos"
-      ✅ "Martinez Quarta comprometeu seriamente o River! O zagueiro acumulou 4 faltas em 65 minutos (0,43 faltas/minuto), taxa 28% acima da média da partida. Sua expulsão reduziu a eficiência defensiva: o time passou de 2,1 para 1,7 desarmes por 10 minutos, facilitando o gol adversário 6 minutos depois."
-      
-      ❌ "Esposito marcou aos 71 minutos"  
-      ✅ "Esposito foi certeiro na única oportunidade! Converteu aos 71:15 seu primeiro chute no alvo (100% de aproveitamento), contrastando com a Inter que tinha apenas 16,7% de conversão até então. O gol chegou 6 minutos após a expulsão, quando a Inter aumentou de 0,18 para 0,31 chutes por minuto."
+      ✅ "Martinez Quarta comprometeu o River! Acumulou 4 faltas em 65 minutos (0,43/min), 28% acima da média. Sua expulsão reduziu a eficiência defensiva de 2,1 para 1,7 desarmes/10min."
       
       ❌ "Inter tem 52% de posse aos 72 minutos"
-      ✅ "A Inter aproveitou bem a vantagem numérica! A posse de bola subiu de 50% para 58% em apenas 7 minutos (crescimento de 16%). O time aumentou significativamente o ritmo ofensivo: de 0,17 para 0,29 chutes por minuto, enquanto o River reduziu para 0,08 chutes por minuto."
+      ✅ "A Inter aproveitou a vantagem numérica! Posse subiu de 50% para 58% em 7 minutos (16% de crescimento). Ritmo ofensivo aumentou de 0,17 para 0,29 chutes/min."
 
-      VARIAÇÃO DE VOCABULÁRIO - EVITAR REPETIÇÕES:
+      VARIAÇÃO DE VOCABULÁRIO:
+      - "cresceu significativamente" em vez de "EXPLODIU"
+      - "controlou" em vez de "DOMINOU"
+      - "comprometeu" em vez de "DESTRUIU"
+      - "teve grande vantagem" em vez de "MASSACROU"
       
-      Em vez de repetir sempre os mesmos termos, usar sinônimos e variações:
-      - "EXPLODIU" → cresceu significativamente, aumentou drasticamente, disparou, subiu rapidamente
-      - "DOMINOU" → controlou, comandou, teve superioridade, mostrou supremacia
-      - "DESTRUIU" → comprometeu, prejudicou, atrapalhou, impactou negativamente
-      - "MASSACROU" → superou amplamente, teve grande vantagem, mostrou superioridade clara
-      - "DESPERDIÇOU" → não aproveitou, perdeu oportunidades, teve baixo aproveitamento
-      - "BRILHOU" → se destacou, teve boa performance, mostrou qualidade
+      REGRAS CRÍTICAS - PROIBIÇÕES:
+      - NÃO inventar estatísticas, números ou dados não fornecidos
+      - NÃO presumir ausência de eventos
+      - NÃO assumir tipo de jogo (final, semifinal) sem informação explícita
+      - NÃO usar termos exagerados sem base nos dados
+      - LIMITAR-SE aos fatos documentados
+      - SEMPRE verificar se um número existe nos documentos
       
-      TONS ALTERNATIVOS PARA MANTER ENGAJAMENTO:
-      - Analítico: "Os números mostram que...", "A estatística revela..."
-      - Comparativo: "Em contraste com...", "Diferentemente de..."
-      - Temporal: "Ao longo da partida...", "No decorrer do jogo..."
-      - Contextual: "Considerando o cenário...", "Levando em conta..."
-      - Descritivo: "O jogador apresentou...", "A equipe demonstrou..."
-
-      ANÁLISE ESPECIALIZADA DE SUBSTITUIÇÕES (VERSÃO EQUILIBRADA):
-      Quando um jogador for substituído, detalhar com precisão:
-      
-      ESTATÍSTICAS INDIVIDUAIS DO JOGADOR:
-      - Tempo em campo: mostrar se teve participação consistente ou limitada
-      - Performance ofensiva: revelar eficiência nas finalizações e criação
-      - Performance defensiva: mostrar contribuição na marcação e recuperação
-      - Performance técnica: avaliar precisão nos passes e domínio técnico
-      - Disciplina: analisar comportamento em campo e faltas cometidas
-      - Eficiência temporal: mostrar intensidade e participação por minuto
-      
-      ANÁLISE COMPARATIVA E AVALIAÇÃO OBJETIVA:
-      - Comparar com outros jogadores da mesma posição
-      - Mostrar se teve performance acima ou abaixo da média esperada
-      - Revelar se foi decisivo ou teve participação discreta
-      - Avaliar se contribuiu positiva ou negativamente para o resultado
-      - Nota contextualizada que reflita a performance real
-      
-      EXEMPLOS DE ANÁLISE DE SUBSTITUIÇÃO EQUILIBRADA:
-      - "Gabriel Barbosa teve participação discreta na partida. Saiu aos 72 minutos após finalizar 4 vezes (0,055/minuto), ficando 31% abaixo da média dos atacantes (0,08 chutes/minuto). Com 50% de precisão e 78% de passes certos, mostrou números regulares para a posição. Nota 6,5 pela performance dentro da média."
-      
-      - "João Gomes controlou bem o meio-campo. Substituído aos 65 minutos após boa atuação com 89% de passes certos (42/47), 6 desarmes eficientes (0,092/minuto) e apenas 1 falta cometida. Superou em 23% a média dos meio-campistas, sendo peça importante na partida. Nota 8,2 pela performance consistente."
-      
-      CRITÉRIOS PARA NOTAS OBJETIVAS (0-10):
-      - 9-10: Excepcional! Performance muito acima da média, decisiva
-      - 7-8: Boa! Atuação acima da média com momentos importantes
-      - 5-6: Regular. Performance dentro da média, cumpriu o básico
-      - 3-4: Abaixo do esperado. Atuação com falhas evidentes
-      - 0-2: Muito fraca. Performance bem abaixo do aceitável
-
-      REGRAS CRÍTICAS PARA CONTEÚDO - PROIBIÇÕES ABSOLUTAS:
-      - NÃO gerar, assumir, presumir ou criar qualquer informação não explicitamente presente nos documentos
-      - NÃO inventar estatísticas, números, gols, assistências ou qualquer dado numérico não fornecido
-      - NÃO fazer interpretações sobre a natureza dos lances (violentos, limpos, intensos, etc.) a menos que explicitamente descrito nos dados
-      - NÃO presumir ausência de eventos (ex: 'sem lances violentos', 'sem confusões', 'jogo limpo') - apenas reportar o que está documentado
-      - NÃO usar termos exagerados sem base nos dados (ex: "SUFOCAVA", "MASSACROU", "DESTRUIU") quando não há evidência clara
-      - NÃO fazer conclusões sobre o comportamento dos jogadores além do que está explicitamente relatado
-      - NÃO somar ou calcular estatísticas de jogadores que não estão explicitamente fornecidas
-      - NÃO criar médias, percentuais ou comparações com base em dados não fornecidos
-      - NÃO assumir o tipo de jogo (final, semifinal, decisão, clássico) se não estiver explicitamente mencionado nos dados
-      - NÃO inventar a importância do jogo (decisivo, crucial, histórico) sem informação explícita
-      - NÃO presumir o contexto da competição (eliminatória, fase de grupos, etc.) sem dados concretos
-      - LIMITAR-SE ESTRITAMENTE aos fatos documentados nos dados fornecidos
-      - SEMPRE verificar se um dado numérico específico existe nos documentos antes de mencioná-lo
-      - EVITAR repetir os mesmos jargões e expressões - usar vocabulário variado
-      
-      EXPLORAÇÃO OBRIGATÓRIA DOS DADOS FORNECIDOS:
-      - SEMPRE verificar TODOS os campos de data-team-stats, data-player-stats, data-events, data-timeline
-      - PROCURAR por números específicos que estão REALMENTE documentados nos dados
-      - UTILIZAR apenas estatísticas que aparecem explicitamente nos documentos
-      - EXPLORAR diferentes combinações dos dados reais disponíveis
-      - VERIFICAR se existem dados de comparação temporal (antes/depois de eventos)
-      - CONFIRMAR que cada número mencionado tem fonte explícita nos documentos
-      
-      SEMPRE INCLUIR COM PRECISÃO (APENAS DADOS REAIS):
-      - Números específicos que contextualizam a partida - mas que EXISTEM nos dados
-      - Comparações que mostram diferenças de performance - baseadas em dados reais
-      - Taxas por minuto que revelam intensidade ou ritmo - calculadas dos dados fornecidos
-      - Correlações que contam a história da partida - conectando dados reais disponíveis
-      - Eficiências que mostram qualidade técnica - extraídas dos dados documentados
-
-      EXEMPLOS DE ANÁLISES PÓS-JOGO VARIADAS:
-      
-      🎯 EFICIÊNCIA OFENSIVA:
-      "A Inter mostrou maior precisão nas finalizações! Converteu 2 gols em 8 chutes no alvo (25% de eficiência), enquanto o River teve 12 tentativas sem sucesso. A diferença na precisão foi clara: Inter 62,5% de chutes no alvo vs River 41,7% - uma superioridade técnica que definiu o resultado."
-      
-      🛡️ BATALHA DEFENSIVA:
-      "O goleiro da Inter foi fundamental na vitória! Fez 8 defesas importantes (72,7% de aproveitamento), enquanto o River conseguiu apenas 3 defesas em 8 chutes sofridos. A diferença entre os arqueiros foi decisiva para o resultado final."
-      
-      🔥 DISCIPLINA:
-      "O River teve mais problemas disciplinares na reta final! Cometeu 18 faltas vs 12 da Inter (50% a mais), culminando na expulsão aos 72 minutos. A indisciplina impactou o desempenho: após o cartão vermelho, o River reduziu para 0,08 chutes/minuto, uma queda de 67% na produção ofensiva."
-      
-      ⏱️ CONTROLE TEMPORAL:
-      "A Inter cresceu no segundo tempo! Passou de 47% para 59% de posse de bola, um crescimento de 25,5%. O primeiro tempo foi equilibrado (1-0), mas a segunda etapa mostrou maior domínio: Inter 6 chutes vs River 2, evidenciando quem controlou melhor a pressão."
-      
-      🎭 DESTAQUE DA PARTIDA:
-      "Alessandro Bastoni teve atuação completa! O zagueiro manteve 94% de passes certos (34/36), fez 3 desarmes eficientes, e ainda marcou o gol da vitória. Comparado aos outros defensores, foi 31% mais eficiente nos passes - uma performance de destaque."
+      CRITÉRIOS PARA NOTAS (0-10):
+      - 9-10: Excepcional, muito acima da média
+      - 7-8: Boa atuação, acima da média
+      - 5-6: Regular, dentro da média
+      - 3-4: Abaixo do esperado
+      - 0-2: Muito fraca
     schema:
       title: "AnaliseEventoAoVivo"
-      description: "Extrair trechos específicos dos eventos ao vivo fornecidos em português brasileiro - NENHUM CONTEÚDO GERADO PERMITIDO"
+      description: "Extrair trechos específicos dos eventos ao vivo fornecidos em português brasileiro"
       type: "object"
       required:
         - snippets
       properties:
         snippets:
           type: "array"
-          description: "Trechos exatos dos eventos ao vivo fornecidos que contêm informações específicas sobre a partida em andamento - devem ser citações diretas ou paráfrases apenas do material fonte. APENAS incluir eventos VERDADEIRAMENTE NOVOS que não existem nos history-snippets. VERIFICAR duplicatas por momento, jogador e tipo de evento. Se tudo já foi coberto, retornar array vazio []."
+          description: "Trechos dos eventos ao vivo que contêm informações específicas sobre a partida. APENAS incluir eventos NOVOS que não existem nos history-snippets. Se tudo já foi coberto, retornar array vazio []."
           minItems: 0
           maxItems: 1
           items:
@@ -421,49 +142,43 @@ prompts:
               content:
                 type: "string"
                 description: |
-                  Análise estatística envolvente de EXATAMENTE 3 frases em português brasileiro. OBRIGATÓRIO incluir:
-                  - Números específicos que contextualizam a partida (taxas por minuto, percentuais relevantes) - MAS QUE EXISTEM NOS DADOS
-                  - Comparações estatísticas que mostram diferenças de performance - BASEADAS EM DADOS REAIS
-                  - Correlações entre eventos que contam a história da partida - CONECTANDO DADOS DISPONÍVEIS
-                  - Variações percentuais que revelam mudanças significativas - CALCULADAS DOS DADOS FORNECIDOS
-                  TOM EQUILIBRADO: usar linguagem envolvente mas precisa - destacar, mostrar superioridade, revelar diferenças, evidenciar qualidade.
-                  VALIDAÇÃO OBRIGATÓRIA: CADA número mencionado DEVE existir nos documentos data-team-stats, data-player-stats, data-events ou data-timeline - mas NÃO citar as fontes no texto final para manter fluidez.
-                  EVITAR REPETIÇÕES: variar vocabulário, não repetir jargões como "EXPLODIU", "MASSACROU", "DESTRUIU" - usar sinônimos e termos mais equilibrados.
+                  Análise estatística de EXATAMENTE 3 frases em português brasileiro. INCLUIR:
+                  - Números específicos dos dados fornecidos
+                  - Comparações estatísticas baseadas em dados reais
+                  - Correlações entre eventos conectando dados disponíveis
+                  - Variações percentuais dos dados fornecidos
+                  TOM EQUILIBRADO: linguagem envolvente mas precisa.
+                  VALIDAÇÃO: CADA número DEVE existir nos documentos.
               title:
                 type: "string"
-                description: "Criar um título descritivo em português brasileiro baseado APENAS nos eventos reais e NOVOS encontrados nos documentos. Usar informações específicas dos lances, jogadores envolvidos e momentos da partida mencionados no material fonte que não foram cobertos nas últimas 3 mensagens. Exemplo: 'Gol de João Silva abre o placar para o Flamengo'"
+                description: "Título descritivo baseado APENAS nos eventos reais e NOVOS encontrados nos documentos. Exemplo: 'Gol de João Silva abre o placar para o Flamengo'"
               subject:
                 type: "string"
-                description: "Identificar o evento específico, jogador envolvido ou momento da partida em português brasileiro, baseado APENAS no que está realmente mencionado nos documentos fornecidos e que representa uma novidade em relação aos history-snippets. SEMPRE incluir os nomes dos times do confronto no subject. VERIFICAR que este subject não é duplicata dos history-snippets (mesmo evento + mesmo jogador + mesmo momento). Usar descrições exatas dos eventos como aparecem no texto fonte. Exemplo: 'Flamengo x Vasco - Gol de João Silva' ou 'Palmeiras x Corinthians - Cartão amarelo para Carlos Santos'"
+                description: "Evento específico, jogador envolvido ou momento da partida baseado no que está nos documentos e é novidade. SEMPRE incluir os nomes dos times. VERIFICAR que não é duplicata dos history-snippets. Exemplo: 'Flamengo x Vasco - Gol de João Silva'"
               momento:
                 type: "string"
                 description: |
-                  Momento específico da partida em que o evento ocorreu, baseado no momento mencionado no documento.
-                  SEMPRE reportar no formato MM:SS (minutos:segundos).
-                  Exemplos: "74:26" para um evento aos 74 minutos e 26 segundos, "05:00" para 5 minutos exatos.
-                  Se for pré jogo responder "00:00"
-                  Se for pós jogo responder "90:00"
-                  NUNCA usar apenas minutos (ex: "74") - sempre incluir os segundos.
+                  Momento específico no formato MM:SS (minutos:segundos).
+                  Exemplos: "74:26", "05:00"
+                  Se pré jogo: "00:00"
+                  Se pós jogo: "90:00"
               periodo:
                 type: "string"
                 description: |
-                  Código da fase da partida em que o evento ocorreu, baseado no momento específico mencionado no documento:
-                  PRE_JOGO: Eventos antes do início da partida (aquecimento, hinos, escalações)
-                  PRIMEIRO_TEMPO: Eventos durante os primeiros 45 minutos + acréscimos
-                  INTERVALO: Eventos durante o intervalo entre os tempos
-                  SEGUNDO_TEMPO: Eventos durante os segundos 45 minutos + acréscimos
-                  AGUARDANDO_PRORROGACAO: Período de espera antes da prorrogação
-                  PRIMEIRO_TEMPO_PRORROGACAO: Eventos durante o primeiro tempo da prorrogação
-                  INTERVALO_PRORROGACAO: Intervalo entre os tempos da prorrogação
-                  SEGUNDO_TEMPO_PRORROGACAO: Eventos durante o segundo tempo da prorrogação
-                  AGUARDANDO_PENALIDADES: Período de espera antes dos pênaltis
-                  PENALIDADES: Eventos durante a disputa de pênaltis
-                  FIM_DE_JOGO: Momento final da partida
-                  POS_JOGO_AO_VIVO: Análises estatísticas profundas durante o jogo ao vivo (quando Status: live)
-                  POS_JOGO: Eventos pós-partida (entrevistas, análises - quando Status: closed)
-                  
-                  IMPORTANTE: Use POS_JOGO_AO_VIVO apenas para análises estatísticas detalhadas durante jogos ao vivo.
-                  Use POS_JOGO apenas quando o jogo realmente terminou (Status: closed).
+                  Código da fase da partida:
+                  PRE_JOGO: Antes do início
+                  PRIMEIRO_TEMPO: Primeiros 45 minutos + acréscimos
+                  INTERVALO: Entre os tempos
+                  SEGUNDO_TEMPO: Segundos 45 minutos + acréscimos
+                  AGUARDANDO_PRORROGACAO: Antes da prorrogação
+                  PRIMEIRO_TEMPO_PRORROGACAO: Primeiro tempo da prorrogação
+                  INTERVALO_PRORROGACAO: Intervalo da prorrogação
+                  SEGUNDO_TEMPO_PRORROGACAO: Segundo tempo da prorrogação
+                  AGUARDANDO_PENALIDADES: Antes dos pênaltis
+                  PENALIDADES: Disputa de pênaltis
+                  FIM_DE_JOGO: Momento final
+                  POS_JOGO_AO_VIVO: Análises estatísticas durante jogo ao vivo
+                  POS_JOGO: Eventos pós-partida (quando Status: closed)
                 enum:
                   - PRE_JOGO
                   - PRIMEIRO_TEMPO
@@ -481,18 +196,18 @@ prompts:
               play_type:
                 type: "string"
                 description: |
-                  Tipo de jogada ou evento específico que está sendo analisado no snippet:
-                  - NORMAL: Evento comum da partida (posse de bola, estatísticas gerais, análises rotineiras)
-                  - IMPORTANTE: Evento significativo que impacta o jogo (chances claras, defesas importantes, momentos decisivos)
-                  - RESUMO_AUTOMATICO: Resumo automático de estatísticas ou períodos da partida
-                  - CARTAO_AMARELO: Cartão amarelo mostrado a um jogador
-                  - CARTAO_VERMELHO: Cartão vermelho ou segundo amarelo (expulsão)
+                  Tipo de jogada ou evento:
+                  - NORMAL: Evento comum da partida
+                  - IMPORTANTE: Evento significativo que impacta o jogo
+                  - RESUMO_AUTOMATICO: Resumo automático de estatísticas
+                  - CARTAO_AMARELO: Cartão amarelo
+                  - CARTAO_VERMELHO: Cartão vermelho ou expulsão
                   - SUBSTITUICAO: Entrada ou saída de jogadores
-                  - GOL: Gol marcado por qualquer equipe
-                  - GOL_CONTRA: Gol contra (próprio)
+                  - GOL: Gol marcado
+                  - GOL_CONTRA: Gol contra
                   - PENALTI: Pênalti marcado, cobrado ou defendido
-                  - POS_JOGO_OJOGO: Análise pós-jogo sobre o jogo em si
-                  - POS_JOGO_DESTAQUE: Análise pós-jogo destacando performances individuais ou estatísticas especiais
+                  - POS_JOGO_OJOGO: Análise pós-jogo sobre o jogo
+                  - POS_JOGO_DESTAQUE: Análise pós-jogo de performances individuais
                 enum:
                   - NORMAL
                   - IMPORTANTE
