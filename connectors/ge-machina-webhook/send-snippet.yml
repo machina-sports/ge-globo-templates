@@ -12,7 +12,7 @@ workflow:
     event_code: "$.get('event_code')"
     snippet_id: "$.get('snippet_id')"
   outputs:
-    workflow-status: "'executed'"
+    workflow-status: "$.get('snippet_found') is not True and 'skipped' or 'executed'"
     snippet-sent: "$.get('webhook_success', False)"
     snippet_id: "$.get('snippet_id')"
   tasks:
@@ -44,7 +44,7 @@ workflow:
     - type: document
       name: load-latest-snippet-by-event-code
       description: "Fallback: Search for the latest content-snippet by event_code."
-      condition: "$.get('snippet_found') is not True"
+      condition: "$.get('snippet_found') is not True and $.get('event_code') is not None"
       config:
         action: "search"
         search-limit: 1
