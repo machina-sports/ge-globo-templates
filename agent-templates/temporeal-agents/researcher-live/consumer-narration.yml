@@ -31,7 +31,6 @@ agent:
 
     - name: send-snippet
       description: "Send Snippet"
-      condition: "$.get('event-execution') is True"
       inputs:
         event_code: "$.get('event_code')"
       outputs:
