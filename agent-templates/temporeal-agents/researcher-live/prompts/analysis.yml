@@ -15,6 +15,18 @@ prompts:
       4. FOCAR EM: estatísticas relevantes, números que contextualizam a partida
       5. NUNCA criar snippets duplicados - cada snippet deve ser ÚNICO
 
+      CONVERSÃO DE TEMPO:
+      Para eventos do SEGUNDO_TEMPO, converter o tempo absoluto do jogo para tempo relativo do segundo tempo:
+      - Tempo absoluto 46-90 min → Tempo relativo 1-45 min do segundo tempo
+      - Fórmula: Tempo_relativo = Tempo_absoluto - 45
+      - Exemplos de conversão:
+        * 50 min de jogo = 5 min do segundo tempo
+        * 65 min de jogo = 20 min do segundo tempo  
+        * 70 min de jogo = 25 min do segundo tempo
+        * 89 min de jogo = 44 min do segundo tempo
+      - USAR SEMPRE o tempo relativo no campo "momento" quando periodo = SEGUNDO_TEMPO
+      - Para acréscimos: usar tempo contínuo (90+3 min = 48:00 do segundo tempo)
+      
       REGRA ANTI-DUPLICATA (CRÍTICA):
       - VERIFICAR se já existe nos history-snippets:
         * Mesmo momento (MM:SS) + mesmo jogador = DUPLICATA
@@ -159,9 +171,20 @@ prompts:
                 type: "string"
                 description: |
                   Momento específico no formato MM:SS (minutos:segundos).
-                  Exemplos: "74:26", "05:00"
-                  Se pré jogo: "00:00"
-                  Se pós jogo: "90:00"
+                  
+                  CONVERSÃO OBRIGATÓRIA PARA SEGUNDO TEMPO:
+                  - Se periodo = SEGUNDO_TEMPO: usar tempo RELATIVO (subtrair 45 min)
+                  - Exemplos: 
+                    * 50 min absolutos = "05:00" (5 min do segundo tempo)
+                    * 70 min absolutos = "25:00" (25 min do segundo tempo)
+                    * 89 min absolutos = "44:00" (44 min do segundo tempo)
+                    * 93 min absolutos = "48:00" (48 min do segundo tempo - acréscimos)
+                  
+                  Para outros períodos:
+                  - PRIMEIRO_TEMPO: usar tempo absoluto (0-45 min)
+                  - PRE_JOGO: "00:00"
+                  - POS_JOGO: "90:00"
+                  - Acréscimos: usar tempo contínuo (ex: "48:00" para 93 min absolutos)
               periodo:
                 type: "string"
                 description: |
