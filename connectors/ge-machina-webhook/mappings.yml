@@ -8,6 +8,7 @@ mappings:
     outputs:
       webhook_payload: |
         {
+          'status': true,
           'data': {
             '_id': $.get('snippet_data', {}).get('_id'),
             'created': "$.get('snippet_data', {}).get('created')",
@@ -36,6 +37,7 @@ mappings:
     outputs:
       webhook_payload: |
         {
+          'status': true,
           'data': {
             '_id': $.get('poll_data', {}).get('_id'),
             'created': "$.get('poll_data', {}).get('created')",
