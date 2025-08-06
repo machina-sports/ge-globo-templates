@@ -101,6 +101,7 @@ workflow:
           {
             **$.get('poll_value', {}),
             "sent": True,
+            "sent_payload": $.get('webhook_payload', {}),
             "webhook_response": $.get('webhook_response', {})
           }
       metadata:

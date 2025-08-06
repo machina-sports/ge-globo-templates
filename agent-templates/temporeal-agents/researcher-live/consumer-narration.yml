@@ -36,6 +36,13 @@ agent:
       outputs:
         snippet-sent: "$.get('workflow-status', False)"
 
+    - name: send-poll
+      description: "Send Poll"
+      inputs:
+        event_code: "$.get('event_code')"
+      outputs:
+        poll-sent: "$.get('workflow-status', False)"
+
     - name: coverage-live-narration-use-event
       description: "Use Event - Checkout"
       inputs:
