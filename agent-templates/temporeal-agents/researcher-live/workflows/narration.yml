@@ -6,6 +6,8 @@ workflow:
   context-variables:
     debugger:
       enabled: true
+    google-genai:
+      api_key: "$TEMP_CONTEXT_VARIABLE_GOOGLE_GENERATIVE_AI_API_KEY"
     machina-ai:
       api_key: "$TEMP_CONTEXT_VARIABLE_SDK_OPENAI_API_KEY"
     machina-ai-fast:
@@ -125,9 +127,9 @@ workflow:
       name: prompt-live-event-analysis
       condition: "$.get('event_exists') is True"
       connector:
-        name: "machina-ai"
+        name: "google-genai"
         command: "invoke_prompt"
-        model: "gpt-4.1"
+        model: "gemini-2.5-pro"
       inputs:
         history-snippets: "$.get('retrieved-snippets-parsed')"
         context-match-summary: "$.get('match_service_summary')"
@@ -175,4 +177,63 @@ workflow:
         parsed-items: |
           [
             *$.get('snippets-bulk', [])
+          ]
+
+    # POLLS
+
+    # prompt-live-event-analysis
+    - type: prompt
+      name: prompt-coverage-polls-live
+      condition: "$.get('event_exists') is True"
+      connector:
+        name: "google-genai"
+        command: "invoke_prompt"
+        model: "gemini-2.5-pro"
+      inputs:
+        history-snippets: "$.get('retrieved-snippets-parsed')"
+        context-match-summary: "$.get('match_service_summary')"
+        context-lineups: "$.get('match_prelive_lineups') if $.get('have_lineups') is True else None"
+        context-status: "$.get('match_status_summary')"
+        data-timeline: "$.get('match_timeline')"
+        data-events: "$.get('event-list-mapped')"
+        data-team-stats: "$.get('game-stats-mapped')"
+        data-player-stats: "$.get('players-stats-mapped')"
+      outputs:
+        polls-output: "$"
+        polls-bulk: |
+          [
+            {
+              'title': c.get('title', ''),
+              'answers': c.get('answers', []),
+              'difficulty': c.get('difficulty', ''),
+              'text_to_search': c.get('text_to_search', ''),
+              'momento': c.get('momento', ''),
+              'periodo': c.get('periodo', ''),
+              'play_type': c.get('play_type', ''),
+              'metadata': {
+                'event_code': '$.(event_code)'
+              }
+            }
+            for c in $.get('questions', [])
+          ]
+
+    # save-live-game-polls
+    - type: document
+      name: save-live-game-polls
+      condition: "$.get('event_exists') is True"
+      config:
+        action: "bulk-save"
+        embed-vector: true
+        force-update: true
+      connector:
+        name: machina-ai
+        command: "invoke_embedding"
+        model: "text-embedding-3-small"
+      document_name: "'content-poll'"
+      documents:
+        items: "$.get('parsed-items')"
+      inputs:
+        parsed-items: |
+          [
+            *$.get('polls-bulk', [])
           ]

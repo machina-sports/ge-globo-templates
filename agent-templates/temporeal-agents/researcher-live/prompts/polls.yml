@@ -1,0 +1,158 @@
+prompts:
+
+  # prompt-coverage-polls-live
+  - type: prompt
+    name: prompt-coverage-polls-live
+    title: "Cobertura - Enquetes de TV"
+    description: "Gera enquetes de opinião envolventes para TV antes, durante e após partidas com perguntas de previsão, análise ao vivo e avaliação pós-jogo."
+    schema:
+      title: "PollLiveContentPortuguese"
+      description: |
+        REGRAS DA ENQUETE DE TV:
+
+        OBJETIVO:
+        - PRÉ-JOGO: Criar expectativa antes da partida
+        - AO VIVO: Previsões e opiniões dos fãs durante o jogo
+        - PÓS-JOGO: Coletar opiniões sobre desempenho e momentos marcantes
+        - Engajamento contínuo dos espectadores
+        - Gerar discussão e interação
+
+        DIRETRIZES SIMPLES:
+        - Perguntas focadas em previsões (pré/durante) ou opiniões (pós)
+        - Linguagem simples para espectadores casuais
+        - Conteúdo dinâmico baseado no momento
+        - Conteúdo amigável aos fãs
+
+        FOCO DO CONTEÚDO:
+        - PRÉ/DURANTE: Previsões ("Quem vai ganhar?", "Quem faz o primeiro gol?")
+        - DURANTE: Análise ao vivo ("Melhor jogador até agora?", "Mais escanteios?")
+        - PÓS-JOGO: Avaliações ("Melhor em campo?", "Gol mais bonito?", "Nota do time?")
+        - SEMPRE: Comparações e opiniões dos fãs
+
+        ESTRUTURA:
+        - Perguntas CURTAS (Máx 50 caracteres, Ex: "Quem ganha?", "Primeiro gol?")
+        - 2-4 opções breves (Máx 25 caracteres cada)
+        - Foco em previsões e comparações
+      type: "object"
+      required: ["questions"]
+      properties:
+        questions:
+          type: "array"
+          minItems: 10
+          maxItems: 10
+          description: "Array de perguntas ULTRA-CURTAS de enquete (máx 50 caracteres) para pré-jogo, ao vivo ou pós-jogo com opções breves (máx 25 caracteres)."
+          items:
+            type: "object"
+            required: [
+              "title",
+              "answers",
+              "difficulty",
+              "text_to_search"
+            ]
+            properties:
+              title:
+                type: "string"
+                description: "Pergunta ULTRA-CURTA (máx 50 caracteres) - previsão, análise ao vivo ou avaliação pós-jogo para exibição na TV/app."
+              difficulty:
+                type: "string"
+                description: "Nível de dificuldade: apenas perguntas FÁCEIS para amplo apelo"
+                enum: ["EASY", "MEDIUM", "HARD"]
+              text_to_search:
+                type: "string"
+                description: |
+                  Uma lista separada por vírgulas de termos relevantes para busca de imagens. SEMPRE prefixe com "Futebol" para evitar resultados não relacionados. DEVE incluir:
+                  - "Futebol" seguido do nome do time (ex: "Futebol AC Milan" não apenas "Milan")
+                  - "Futebol" seguido do nome completo de qualquer pessoa mencionada
+                  - Qualquer local ou evento específico mencionado com contexto "Futebol"
+                  - "Futebol previsão" ou "Futebol prévia da partida" para conteúdo ao vivo
+              answers:
+                type: "array"
+                description: "2-4 opções ULTRA-CURTAS (máx 25 caracteres cada) - previsões, análises ou avaliações para exibição na TV/app."
+                minItems: 2
+                maxItems: 4
+                items:
+                  type: "object"
+                  description: "Opção breve (máx 25 caracteres) - previsão, análise ou avaliação."
+                  required: [
+                    "title",
+                  ]
+                  properties:
+                    title:
+                      type: "string"
+                      description: "Opção ULTRA-CURTA (máx 25 caracteres) - previsão, análise ou avaliação."
+              momento:
+                type: "string"
+                description: |
+                  Momento específico no formato MM:SS (minutos:segundos).
+                  
+                  CONVERSÃO OBRIGATÓRIA PARA SEGUNDO TEMPO:
+                  - Se periodo = SEGUNDO_TEMPO: usar tempo RELATIVO (subtrair 45 min)
+                  - Exemplos: 
+                    * 50 min absolutos = "05:00" (5 min do segundo tempo)
+                    * 70 min absolutos = "25:00" (25 min do segundo tempo)
+                    * 89 min absolutos = "44:00" (44 min do segundo tempo)
+                    * 93 min absolutos = "48:00" (48 min do segundo tempo - acréscimos)
+                  
+                  Para outros períodos:
+                  - PRIMEIRO_TEMPO: usar tempo absoluto (0-45 min)
+                  - PRE_JOGO: "00:00"
+                  - POS_JOGO: "90:00"
+                  - Acréscimos: usar tempo contínuo (ex: "48:00" para 93 min absolutos)
+              periodo:
+                type: "string"
+                description: |
+                  Código da fase da partida:
+                  PRE_JOGO: Antes do início
+                  PRIMEIRO_TEMPO: Primeiros 45 minutos + acréscimos
+                  INTERVALO: Entre os tempos
+                  SEGUNDO_TEMPO: Segundos 45 minutos + acréscimos
+                  AGUARDANDO_PRORROGACAO: Antes da prorrogação
+                  PRIMEIRO_TEMPO_PRORROGACAO: Primeiro tempo da prorrogação
+                  INTERVALO_PRORROGACAO: Intervalo da prorrogação
+                  SEGUNDO_TEMPO_PRORROGACAO: Segundo tempo da prorrogação
+                  AGUARDANDO_PENALIDADES: Antes dos pênaltis
+                  PENALIDADES: Disputa de pênaltis
+                  FIM_DE_JOGO: Momento final
+                  POS_JOGO_AO_VIVO: Análises estatísticas durante jogo ao vivo
+                  POS_JOGO: Eventos pós-partida (quando Status: closed)
+                enum:
+                  - PRE_JOGO
+                  - PRIMEIRO_TEMPO
+                  - INTERVALO
+                  - SEGUNDO_TEMPO
+                  - AGUARDANDO_PRORROGACAO
+                  - PRIMEIRO_TEMPO_PRORROGACAO
+                  - INTERVALO_PRORROGACAO
+                  - SEGUNDO_TEMPO_PRORROGACAO
+                  - AGUARDANDO_PENALIDADES
+                  - PENALIDADES
+                  - FIM_DE_JOGO
+                  - POS_JOGO_AO_VIVO
+                  - POS_JOGO
+              play_type:
+                type: "string"
+                description: |
+                  Tipo de jogada ou evento:
+                  - NORMAL: Evento comum da partida
+                  - IMPORTANTE: Evento significativo que impacta o jogo
+                  - RESUMO_AUTOMATICO: Resumo automático de estatísticas
+                  - CARTAO_AMARELO: Cartão amarelo
+                  - CARTAO_VERMELHO: Cartão vermelho ou expulsão
+                  - SUBSTITUICAO: Entrada ou saída de jogadores
+                  - GOL: Gol marcado
+                  - GOL_CONTRA: Gol contra
+                  - PENALTI: Pênalti marcado, cobrado ou defendido
+                  - POS_JOGO_OJOGO: Análise pós-jogo sobre o jogo
+                  - POS_JOGO_DESTAQUE: Análise pós-jogo de performances individuais
+                enum:
+                  - NORMAL
+                  - IMPORTANTE
+                  - RESUMO_AUTOMATICO
+                  - CARTAO_AMARELO
+                  - CARTAO_VERMELHO
+                  - SUBSTITUICAO
+                  - GOL
+                  - GOL_CONTRA
+                  - PENALTI
+                  - POS_JOGO_OJOGO
+                  - POS_JOGO_DESTAQUE

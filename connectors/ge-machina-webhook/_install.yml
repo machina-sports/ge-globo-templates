@@ -28,5 +28,8 @@ datasets:
   - type: "workflow"
     path: "send-snippet.yml"
 
+  - type: "workflow"
+    path: "send-poll.yml"
+
   - type: "mappings"
     path: "mappings.yml"

@@ -94,6 +94,9 @@ datasets:
   - type: "prompts"
     path: "researcher-live/prompts/lineups.yml"
 
+  - type: "prompts"
+    path: "researcher-live/prompts/polls.yml"
+
   - type: "agent"
     path: "researcher-live/consumer-live.yml"
 

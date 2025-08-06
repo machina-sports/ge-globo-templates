@@ -27,3 +27,32 @@ mappings:
             }
           }
         }
+
+  # Transform content-snippet data into GE Machina webhook payload format
+  - type: mapping
+    name: "prepare-webhook-payload-poll"
+    title: "GE Machina - Prepare Webhook Payload Poll"
+    description: "Transform content-poll document into GE Machina webhook payload format"
+    outputs:
+      webhook_payload: |
+        {
+          'data': {
+            '_id': $.get('poll_data', {}).get('_id'),
+            'created': "$.get('poll_data', {}).get('created')",
+            'updated': "$.get('poll_data', {}).get('updated')",
+            'name': 'content-poll',
+            'metadata': {
+              'event_code': $.get('poll_data', {}).get('metadata', {}).get('event_code'),
+              'integration_code': $.get('poll_data', {}).get('metadata', {}).get('integration_code', 'GE_MACHINA_WEBHOOK'),
+            },
+            'value': {
+              'title': $.get('poll_data', {}).get('value', {}).get('title', ''),
+              'text': 'ENQUETE_AUTOMATICA',
+              'answers': $.get('poll_data', {}).get('value', {}).get('answers', []),
+              'difficulty': $.get('poll_data', {}).get('value', {}).get('difficulty', ''),
+              'moment': $.get('poll_data', {}).get('value', {}).get('momento', ''),
+              'period': $.get('poll_data', {}).get('value', {}).get('periodo', ''),
+              'play_type': 'ENQUETE_AUTOMATICA'
+            }
+          }
+        }
