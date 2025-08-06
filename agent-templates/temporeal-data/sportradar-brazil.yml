@@ -1,74 +1,74 @@
 agent:
-  name: populate-data-conmebol
-  title: "Populate - CONMEBOL"
+  name: populate-data-brasileirao
+  title: "Populate - Brasileirao"
   description: "Populate Content from Sync Workflows"
   workflows:
 
-    # CONMEBOL LIBERTADORES
+    ## BRASILEIRAO SERIE A
 
-    # sync CONMEBOL LIBERTADORES - seasons
+    # sync Brasileirao - seasons
     - name: "sportradar-soccer-sync-seasons"
       description: "sync-seasons"
       inputs:
-        competition_id: "'sr:competition:384'"
+        competition_id: "'sr:competition:325'"
       outputs:
         sync-seasons-status: "$.get('workflow-status', False)"
 
-    # update CONMEBOL LIBERTADORES - competition
+    # update Brasileirao - competition
     - name: "sportradar-soccer-update-competition"
       description: "update-competition"
       inputs:
-        season_id: "'sr:season:127215'"
+        season_id: "'sr:season:128461'"
       outputs:
         update-competition-status: "$.get('workflow-status', False)"
 
-    # sync CONMEBOL LIBERTADORES - schedules
+    # sync Brasileirao - schedules
     - name: "sportradar-soccer-sync-schedules"
       description: "sync-schedules"
       inputs:
-        season_id: "'sr:season:127215'"
+        season_id: "'sr:season:128461'"
       outputs:
         sync-schedules-status: "$.get('workflow-status', False)"
 
-    # sync CONMEBOL LIBERTADORES - competitors
+    # sync Brasileirao - competitors
     - name: "sportradar-soccer-sync-competitors"
       description: "sync-competitors"
       inputs:
-        season_id: "'sr:season:127215'"
+        season_id: "'sr:season:128461'"
       outputs:
         sync-competitors-status: "$.get('workflow-status', False)"
-    
-    # CONMEBOL SUDAMERICANA
 
-    # sync CONMEBOL SUDAMERICANA - seasons
+    ## COPA DO BRASIL
+
+    # sync Copa do Brasil - seasons
     - name: "sportradar-soccer-sync-seasons"
       description: "sync-seasons"
       inputs:
-        competition_id: "'sr:competition:480'"
+        competition_id: "'sr:competition:373'"
       outputs:
         sync-seasons-status: "$.get('workflow-status', False)"
 
-    # update CONMEBOL SUDAMERICANA - competition
+    # update Copa do Brasil - competition
     - name: "sportradar-soccer-update-competition"
       description: "update-competition"
       inputs:
-        season_id: "'sr:season:127223'"
+        season_id: "'sr:season:128463'"
       outputs:
         update-competition-status: "$.get('workflow-status', False)"
 
-    # sync CONMEBOL SUDAMERICANA - schedules
+    # sync Copa do Brasil - schedules
     - name: "sportradar-soccer-sync-schedules"
       description: "sync-schedules"
       inputs:
-        season_id: "'sr:season:127223'"
+        season_id: "'sr:season:128463'"
       outputs:
         sync-schedules-status: "$.get('workflow-status', False)"
 
-    # sync CONMEBOL SUDAMERICANA - competitors
+    # sync Copa do Brasil - competitors
     - name: "sportradar-soccer-sync-competitors"
       description: "sync-competitors"
       inputs:
-        season_id: "'sr:season:127223'"
+        season_id: "'sr:season:128463'"
       outputs:
         sync-competitors-status: "$.get('workflow-status', False)"
     

@@ -27,7 +27,10 @@ datasets:
     path: "folders/folders-installer.yml"
 
   - type: "agent"
-    path: "sportradar-bra-seriea.yml"
+    path: "sportradar-brazil.yml"
+
+  - type: "agent"
+    path: "sportradar-conmebol.yml"
 
   - type: "agent"
     path: "sportradar-conmebol.yml"
