@@ -11,8 +11,8 @@ mappings:
           'status': True,
           'data': {
             '_id': $.get('snippet_data', {}).get('_id'),
-            'created': "$.get('snippet_data', {}).get('created')",
-            'updated': "$.get('snippet_data', {}).get('updated')",
+            'created': $.get('snippet_data', {}).get('created'),
+            'updated': $.get('snippet_data', {}).get('updated'),
             'name': 'content-snippet',
             'metadata': {
               'event_code': $.get('snippet_data', {}).get('metadata', {}).get('event_code'),
@@ -40,8 +40,8 @@ mappings:
           'status': True,
           'data': {
             '_id': $.get('poll_data', {}).get('_id'),
-            'created': "$.get('poll_data', {}).get('created')",
-            'updated': "$.get('poll_data', {}).get('updated')",
+            'created': $.get('poll_data', {}).get('created'),
+            'updated': $.get('poll_data', {}).get('updated'),
             'name': 'content-poll',
             'metadata': {
               'event_code': $.get('poll_data', {}).get('metadata', {}).get('event_code'),
